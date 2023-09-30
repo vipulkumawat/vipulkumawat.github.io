@@ -1,5 +1,5 @@
 ---
-name: John Doe
+name: Vipul Kumawat
 username: johndoe
 bio: "Hi I a John, a Web Developer and Designer."
 site: http://johndoe.com
