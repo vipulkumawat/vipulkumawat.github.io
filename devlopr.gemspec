@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |spec|
-  spec.name          = "devlopr"
+  spec.name          = "Vipul"
   spec.version       = "0.4.9"
-  spec.authors       = ["Sujay Kundu"]
-  spec.email         = ["sujaykundu777@gmail.com"]
+  spec.authors       = ["Vipul Kumawat"]
+  spec.email         = ["vipul.kumawat7@gmail.com"]
 
   spec.summary       = %q{ A Jekyll Theme built for developers }
-  spec.homepage      = "https://github.com/sujaykundu777/devlopr-jekyll"
+  spec.homepage      = "https://github.com/vipulkumawat"
   spec.license       = "MIT"
 
   spec.metadata["plugin_type"] = "theme"
