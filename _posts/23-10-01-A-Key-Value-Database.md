@@ -5,7 +5,7 @@ summary: "A Key-Value Database, often referred to as a Key-Value Store or KVS, b
 author: vipul
 date: '23-10-01 14:35:23 +0530'
 category: database
-thumbnail: /assets/img/posts/code.jpg
+thumbnail: /assets/img/posts/Keyvalue.png
 keywords: database, Key-Value Database, redis
 permalink: /blog/A-Key-Value-Database/
 usemathjax: true
