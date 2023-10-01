@@ -1,7 +1,7 @@
-title: devlopr
-subtitle: A Portfolio Jekyll Theme Built for Developers
+title: Vipul
+subtitle: A Backend Developer
 description: >- # this means to ignore newlines until "baseurl:"
-  devlopr-jekyll is a beautiful Jekyll Theme Built For Developers, which is optimized for speed and readability.
+  I thrive on the intricacies of Java backend development and relish crafting innovative solutions for real-world challenges.|
 
 url: "" # the base hostname & protocol for your site, e.g. https://example.github.io
 baseurl: "" # the subpath of your site, e.g. /blog
@@ -16,8 +16,8 @@ urls:
       url: /blog
     - text: Gallery
       url: /gallery
-    - text: Shop
-      url : /shop
+    #- text: Shop
+    #  url : /shop
     - text: Contact
       url : /contact
 
@@ -63,12 +63,12 @@ author_project_details:
                 project_title: Gamers Hub
                 project_description: A Platform built for Gamers and Game Devs
                 project_url: https://gamershub.in
-                visibility: true
+                visibility: false
               - project_thumbnail: hack4r.PNG
                 project_title: Hack4r
                 project_description: A Platform built for Hackers and Penetration Testers
                 project_url: https://hack4r.com
-                visibility: true
+                visibility: false
 
 # social links
 twitter_username: vipulkumawat7
@@ -98,7 +98,7 @@ linkedin_username: vipul-kumawat
 #formspree_email: johndoe@gmail.com
 
 # releases - widget can be (sidebar, modal or embed)
-olvy_organization: devlopr
+olvy_organization: Vipul
 olvy_widget_type: sidebar
 
 # syntax highlighter
@@ -109,7 +109,7 @@ permalink: pretty
 # Choose what to show ( can be true or false)
 show_author_work_experiences: true
 show_author_education_details: true
-show_author_project_details: true
+show_author_project_details: false
 
 # pagination of posts
 paginate: 4
