@@ -9,7 +9,7 @@ summary: These databases use a simple key-value pairing method to store and
   quickly fetch the data with minimum latency.
 keywords: database, Key-Value Database, redis
 thumbnail: /assets/img/posts/Keyvaluepair.png
-permalink: /blog/A Key-Value Database/
+permalink: /blog/A-Key-Value-Database/
 usemathjax: true
 ---
 A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key. This straightforward data structure imparts significant efficiency to Key-Value Databases in specific scenarios, particularly when rapid data retrieval and scalability are vital.
