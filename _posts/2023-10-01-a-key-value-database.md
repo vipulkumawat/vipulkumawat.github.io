@@ -7,7 +7,7 @@ date: '2023-10-01 14:35:23 +0530'
 category: database
 thumbnail: /assets/img/posts/Keyvalue.jpg
 keywords: database, Key-Value Database, redis
-permalink: /blog/welcome-to-devlopr-jekyll/
+permalink: /blog/A Key-Value Database/
 usemathjax: true
 ---
 
