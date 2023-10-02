@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "A Key Value Database"
-summary: "A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key."
+title: "A Key-Value Database"
+summary: "A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a \"key,\" while the actual data content is stored as the \"value\" corresponding to that specific key."
 author: vipul
 date: '2023-10-01 14:35:23 +0530'
 category: database
@@ -10,6 +10,7 @@ keywords: database, Key-Value Database, redis
 permalink: /blog/welcome-to-devlopr-jekyll/
 usemathjax: true
 ---
+
 ## A Key-Value Database
 
 A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key. This straightforward data structure imparts significant efficiency to Key-Value Databases in specific scenarios, particularly when rapid data retrieval and scalability are vital.
