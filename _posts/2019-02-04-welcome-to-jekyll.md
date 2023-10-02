@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Welcome to devlopr-jekyll !"
-summary: "Getting Started using devlopr-jekyll"
+title:  "A Key-Value Database"
+summary: "A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key."
 author: vipul
 date: '2019-05-22 14:35:23 +0530'
-category: jekyll
-thumbnail: /assets/img/posts/code.jpg
-keywords: devlopr jekyll, how to use devlopr, devlopr, how to use devlopr-jekyll, devlopr-jekyll tutorial,best jekyll themes
+category: database
+thumbnail: /assets/img/posts/Keyvalue.jpg
+keywords: database, Key-Value Database, redis
 permalink: /blog/welcome-to-devlopr-jekyll/
 usemathjax: true
 ---
