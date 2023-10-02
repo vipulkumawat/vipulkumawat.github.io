@@ -2,7 +2,7 @@
 layout: post
 author: vipul kumawat
 title: A Key-Value Database
-date: 2023-10-02T09:05:23.000Z
+date: 2023-10-02
 thumbnail-img: /assets/img/posts/Keyvaluepair.png
 category: database
 summary: These databases use a simple key-value pairing method to store and
