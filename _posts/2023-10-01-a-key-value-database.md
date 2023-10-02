@@ -5,7 +5,7 @@ summary: "These databases use a simple key-value pairing method to store and qui
 author: vipul
 date: '2023-10-01 14:35:23 +0530'
 category: database
-thumbnail: /assets/img/posts/Keyvalue.jpg
+thumbnail: /assets/img/posts/Keyvaluepair.jpg
 keywords: database, Key-Value Database, redis
 permalink: /blog/A Key-Value Database/
 usemathjax: true
