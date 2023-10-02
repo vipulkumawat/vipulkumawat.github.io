@@ -3,7 +3,7 @@ name: Vipul Kumawat
 username: vipul
 bio: "Hi I a Vipul, a Java Backend Developer."
 site: http://vipulkumawat.in
-avatar: johndoe.png
+avatar: vipul.png
 email: vipul.kumawat7@gmail.com
 social:
     - title: "github"
