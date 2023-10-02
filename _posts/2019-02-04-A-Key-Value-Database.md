@@ -1,16 +1,16 @@
 ---
 layout: post
-title:  "A Key-Value Database"
+title:  "A Key Value Database"
 summary: "A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key."
 author: vipul
-date: '23-10-01 14:35:23 +0530'
+date: '2019-05-22 14:35:23 +0530'
 category: database
-thumbnail: /assets/img/posts/Keyvalue.png
+thumbnail: /assets/img/posts/Keyvalue.jpg
 keywords: database, Key-Value Database, redis
-permalink: /blog/A-Key-Value-Database/
+permalink: /blog/welcome-to-devlopr-jekyll/
 usemathjax: true
 ---
-
+## A Key-Value Database
 
 A Key-Value Database, often referred to as a Key-Value Store or KVS, belongs to the NoSQL (Not Only SQL) database category. It operates by storing data in the form of key-value pairs. In this database model, each data entry is linked to a unique identifier known as a "key," while the actual data content is stored as the "value" corresponding to that specific key. This straightforward data structure imparts significant efficiency to Key-Value Databases in specific scenarios, particularly when rapid data retrieval and scalability are vital.
 
@@ -23,24 +23,26 @@ Here are some prominent characteristics and features of Key-Value Databases:
 5. **In-Memory or Disk-Based:** Depending on the specific implementation, Key-Value Databases can be tailored to function predominantly in memory, referred to as in-memory databases, delivering ultra-swift data access. Alternatively, they can operate on disk for persistent storage, ensuring data durability.
 6. **Use Cases:** Key-Value Databases find a fitting application in numerous scenarios, including caching, session management, real-time analytics, metadata storage, and distributed systems where the imperative is to partition data and disseminate it across multiple nodes.
 7. **Eventual Consistency:** Certain Key-Value Databases may prioritize attributes like availability and partition tolerance over immediate consistency. As a result, they may offer guarantees of eventual consistency, a characteristic well-suited for situations where real-time consistency holds less importance.
-8. Examples
-  1. **Redis**:
-    - Redis stands out as a prominent in-memory key-value storage system, known for its rapid data access and high performance. It finds extensive use in caching, real-time analytics, and message brokering.
-  2. **Apache Cassandra**:
-    - Primarily recognized as a wide-column database, Apache Cassandra also offers key-value storage capabilities. It boasts scalability and is ideal for managing large datasets with high availability requirements.
-  3. **Amazon DynamoDB**:
-    - Amazon DynamoDB, a fully managed NoSQL database service provided by AWS, supports both key-value and document-based data storage. It delivers automatic scaling and low-latency performance.
-  4. **Aerospike**:
-    - Aerospike is an open-source, in-memory NoSQL database that offers robust consistency and exceptional performance. It frequently serves real-time, mission-critical applications.
-  5. **Couchbase Server**:
-    - Couchbase, a NoSQL database with key-value and document storage features, provides a distributed architecture. It is instrumental for high-performance caching and data storage needs.
-  6. **Riak**:
-    - Riak, a distributed NoSQL database with key-value storage, emphasizes fault tolerance and uninterrupted availability. It suits distributed systems effectively.
-  7. **RocksDB**:
-    - RocksDB, created by Facebook, is an open-source, embeddable key-value store. It prioritizes high write throughput and serves various applications, including data caching.
-  8. **Etcd**:
-    - Etcd serves as a distributed key-value store and is commonly used for configuration management and service discovery in distributed systems. It is an integral component of Kubernetes.
-  9. **Oracle NoSQL Database**:
-    - Oracle offers a robust key-value database known for its high availability, catering to diverse data storage requirements.
-  10. **BoltDB**:
-    - BoltDB, a key-value database written in Go, is an embedded data store known for its simplicity. It is favored for lightweight, single-node data storage use cases.
+
+#### Examples
+1. **Redis**:
+- Redis stands out as a prominent in-memory key-value storage system, known for its rapid data access and high performance. It finds extensive use in caching, real-time analytics, and message brokering.
+2. **Apache Cassandra**:
+- Primarily recognized as a wide-column database, Apache Cassandra also offers key-value storage capabilities. It boasts scalability and is ideal for managing large datasets with high availability requirements.
+3. **Amazon DynamoDB**:
+- Amazon DynamoDB, a fully managed NoSQL database service provided by AWS, supports both key-value and document-based data storage. It delivers automatic scaling and low-latency performance.
+4. **Aerospike**:
+- Aerospike is an open-source, in-memory NoSQL database that offers robust consistency and exceptional performance. It frequently serves real-time, mission-critical applications.
+5. **Couchbase Server**:
+- Couchbase, a NoSQL database with key-value and document storage features, provides a distributed architecture. It is instrumental for high-performance caching and data storage needs.
+6. **Riak**:
+- Riak, a distributed NoSQL database with key-value storage, emphasizes fault tolerance and uninterrupted availability. It suits distributed systems effectively.
+7. **RocksDB**:
+- RocksDB, created by Facebook, is an open-source, embeddable key-value store. It prioritizes high write throughput and serves various applications, including data caching.
+8. **Etcd**:
+- Etcd serves as a distributed key-value store and is commonly used for configuration management and service discovery in distributed systems. It is an integral component of Kubernetes.
+9. **Oracle NoSQL Database**:
+- Oracle offers a robust key-value database known for its high availability, catering to diverse data storage requirements.
+10. **BoltDB**:
+- BoltDB, a key-value database written in Go, is an embedded data store known for its simplicity. It is favored for lightweight, single-node data storage use cases.
+
