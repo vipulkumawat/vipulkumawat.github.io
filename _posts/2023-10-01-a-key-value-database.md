@@ -1,12 +1,14 @@
 ---
 layout: post
-title: "A Key-Value Database"
-summary: "These databases use a simple key-value pairing method to store and quickly fetch the data with minimum latency."
-author: vipul
-date: '2023-10-01 14:35:23 +0530'
+author: vipul kumawat
+title: A Key-Value Database
+date: 2023-10-02T09:05:23.000Z
+thumbnail-img: /assets/img/posts/Keyvaluepair.png
 category: database
-thumbnail: /assets/img/posts/Keyvaluepair.png
+summary: These databases use a simple key-value pairing method to store and
+  quickly fetch the data with minimum latency.
 keywords: database, Key-Value Database, redis
+thumbnail: /assets/img/posts/Keyvaluepair.png
 permalink: /blog/A Key-Value Database/
 usemathjax: true
 ---
