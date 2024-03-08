@@ -2,14 +2,14 @@ vCard - Personal Portfolio
 
 # sidebar
 
-alt = Richard hanrick
-Richard hanrick
+alt = Vipul Kumawat
+Vipul Kumawat
 Web developer
 
 Show Contacts
 
 Email
-richard@example.com
+vipul.kumawat7@gmail.com
 
 Phone
 +1 (213) 352-2795
