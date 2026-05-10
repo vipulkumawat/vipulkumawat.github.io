@@ -6,180 +6,238 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vipul - Personal Portfolio</title>
-
-  <!--
-    - favicon
-  -->
   <link rel="shortcut icon" href="./assets/images/logo.ico" type="image/x-icon">
-
-  <!--
-    - custom css link
-  -->
   <link rel="stylesheet" href="./assets/css/style.css">
-
-  <!--
-    - google font link
-  -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Courses tab styles ── */
+    .course-hero {
+      background: linear-gradient(135deg, hsl(240,2%,13%) 0%, hsl(240,4%,18%) 100%);
+      border: 1px solid hsl(0,0%,22%);
+      border-radius: 14px;
+      padding: 28px 24px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .course-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 90% 10%, rgba(255,213,0,.06), transparent);
+      pointer-events: none;
+    }
+    .course-hero h2 {
+      font-size: 18px; font-weight: 600;
+      color: hsl(0,0%,84%); margin-bottom: 8px;
+    }
+    .course-hero p {
+      color: hsl(0,0%,55%); font-size: 13px;
+      line-height: 1.7; margin-bottom: 18px;
+    }
+    .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .hero-stat .num {
+      display: block; font-size: 22px; font-weight: 700;
+      color: hsl(45,100%,60%); line-height: 1.1;
+    }
+    .hero-stat .lbl {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: .08em; color: hsl(0,0%,50%);
+    }
+    .course-card {
+      background: hsl(240,2%,13%);
+      border: 1px solid hsl(0,0%,20%);
+      border-radius: 14px; padding: 22px;
+      margin-bottom: 18px;
+      transition: border-color .25s, transform .2s;
+    }
+    .course-card:hover {
+      border-color: hsl(45,100%,60%);
+      transform: translateY(-2px);
+    }
+    .course-card.dimmed { opacity: .55; pointer-events: none; }
+    .card-head {
+      display: flex; align-items: flex-start;
+      gap: 14px; margin-bottom: 12px;
+    }
+    .card-ico {
+      width: 44px; height: 44px; min-width: 44px;
+      background: rgba(255,213,0,.1); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .card-head h3 {
+      font-size: 15px; font-weight: 600;
+      color: hsl(0,0%,84%); margin-bottom: 4px; line-height: 1.3;
+    }
+    .card-head .sub { font-size: 12px; color: hsl(0,0%,50%); }
+    .cbadge {
+      display: inline-block; padding: 2px 9px;
+      border-radius: 20px; font-size: 10px; font-weight: 600;
+      white-space: nowrap; margin-left: auto;
+    }
+    .cbadge-new  { background: rgba(76,175,132,.15); color: #4caf84; }
+    .cbadge-soon { background: rgba(79,163,209,.15);  color: #4fa3d1; }
+    .card-desc {
+      font-size: 13px; color: hsl(0,0%,52%);
+      line-height: 1.75; margin-bottom: 14px;
+    }
+    .mod-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; list-style: none;
+      padding: 0; margin: 0 0 14px;
+    }
+    .mod-grid li {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: hsl(0,0%,52%);
+    }
+    .mod-grid li::before {
+      content: ''; width: 5px; height: 5px; min-width: 5px;
+      border-radius: 50%; background: hsl(45,100%,60%); opacity: .7;
+    }
+    .ctags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .ctag {
+      background: hsl(240,2%,18%); border: 1px solid hsl(0,0%,22%);
+      color: hsl(0,0%,52%); font-size: 11px;
+      padding: 2px 9px; border-radius: 5px;
+    }
+    .card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+      padding-top: 14px; border-top: 1px solid hsl(0,0%,20%);
+    }
+    .cpills { display: flex; gap: 14px; flex-wrap: wrap; }
+    .cpill { font-size: 11px; color: hsl(0,0%,50%); }
+    .btn-course {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: hsl(45,100%,60%); color: #111;
+      font-size: 12px; font-weight: 700;
+      padding: 8px 16px; border-radius: 7px;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-course:hover { opacity: .85; }
+    .csection-title {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: hsl(45,100%,60%);
+      margin: 28px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid hsl(0,0%,20%);
+    }
+    .course-quote {
+      border-left: 3px solid hsl(45,100%,60%);
+      padding: 14px 18px;
+      background: hsl(240,2%,13%);
+      border-radius: 0 10px 10px 0;
+      margin-top: 28px;
+    }
+    .course-quote blockquote {
+      font-size: 13px; font-style: italic;
+      color: hsl(0,0%,52%); line-height: 1.75; margin: 0 0 8px;
+    }
+    .course-quote cite { font-size: 11px; color: hsl(0,0%,42%); }
+    @media (max-width: 520px) { .mod-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 
 <body>
 
-  <!--
-    - #MAIN
-  -->
-
   <main>
 
-    <!--
-      - #SIDEBAR
-    -->
-
+    <!-- SIDEBAR -->
     <aside class="sidebar" data-sidebar>
 
       <div class="sidebar-info">
-
         <figure class="avatar-box">
           <img src="./assets/images/my-avatar.png" alt="Vipul Kumawat" width="80">
         </figure>
-
         <div class="info-content">
           <h1 class="name" title="Vipul Kumawat">Vipul Kumawat</h1>
-
           <p class="title">The Java Engineer</p>
         </div>
-
         <button class="info_more-btn" data-sidebar-btn>
           <span>Show Contacts</span>
-
           <ion-icon name="chevron-down"></ion-icon>
         </button>
-
       </div>
 
       <div class="sidebar-info_more">
-
         <div class="separator"></div>
-
         <ul class="contacts-list">
 
           <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="mail-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="mail-outline"></ion-icon></div>
             <div class="contact-info">
               <p class="contact-title">Email</p>
-
-              <a href="vipul.kumawat7@gmail.com" class="contact-link">vipul.kumawat7@gmail.com</a>
+              <a href="mailto:vipul.kumawat7@gmail.com" class="contact-link">vipul.kumawat7@gmail.com</a>
             </div>
-
           </li>
 
           <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="phone-portrait-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="phone-portrait-outline"></ion-icon></div>
             <div class="contact-info">
               <p class="contact-title">Phone</p>
-
               <a href="tel:+918233156197" class="contact-link">+918233156197</a>
             </div>
-
           </li>
 
           <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="calendar-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="calendar-outline"></ion-icon></div>
             <div class="contact-info">
               <p class="contact-title">Birthday</p>
               <time datetime="1993-07-17">July 17, 1993</time>
             </div>
-
           </li>
 
           <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="location-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="location-outline"></ion-icon></div>
             <div class="contact-info">
               <p class="contact-title">Location</p>
-
               <address>Udaipur, Rajasthan, India</address>
             </div>
-
           </li>
 
         </ul>
-
         <div class="separator"></div>
-
-        <ul class="social-list">
-
-        </ul>
-
+        <ul class="social-list"></ul>
       </div>
 
     </aside>
 
 
-
-
-
-    <!--
-      - #main-content
-    -->
-
+    <!-- MAIN CONTENT -->
     <div class="main-content">
 
-      <!--
-        - #NAVBAR
-      -->
-
+      <!-- NAVBAR -->
       <nav class="navbar">
-
         <ul class="navbar-list">
 
           <li class="navbar-item">
-            <button class="navbar-link  active" data-nav-link>About</button>
+            <button class="navbar-link active" data-nav-link>About</button>
           </li>
-
           <li class="navbar-item">
             <button class="navbar-link" data-nav-link>Resume</button>
           </li>
-
-
+          <li class="navbar-item">
+            <button class="navbar-link" data-nav-link>Courses</button>
+          </li>
           <li class="navbar-item">
             <button class="navbar-link" data-nav-link>Blog</button>
           </li>
-
           <li class="navbar-item">
             <button class="navbar-link" data-nav-link>Contact</button>
           </li>
 
         </ul>
-
       </nav>
 
 
-
-
-
-      <!--
-        - #ABOUT
-      -->
-
-      <article class="about  active" data-page="about">
+      <!-- ═══════════════════════════════════════
+           ABOUT
+      ════════════════════════════════════════ -->
+      <article class="about active" data-page="about">
 
         <header>
           <h2 class="h2 article-title">About me</h2>
@@ -187,293 +245,440 @@
 
         <section class="about-text">
           <p>
-            👋 Hello there! I'm Vipul Kumawat, a passionate software developer hailing from the picturesque city of Udaipur, India.<br>
-            🌟 I thrive on the intricacies of Java backend development and relish crafting innovative solutions for real-world challenges.<br>
-            🚀 Presently, my focus is on architecting a revolutionary banking platform, poised to transform the way we experience banking services.<br>
-            🌐 You'll discover my coding endeavors and contributions to GitHub.
+            👋 Hello! I'm Vipul Kumawat — a Senior Software Engineer with 7+ years of
+            experience building high-performance Java backend systems for global enterprise
+            clients in banking and fintech.
           </p>
-
           <p>
-            🔗 Let's connect! I'm just a message away on LinkedIn, where we can delve into exciting projects, explore the latest tech trends, or simply have an insightful conversation.<br>
-            📬 Feel free to drop me a message if you're interested in collaborating on thrilling projects or if you have any questions. I'm always on the lookout for fresh opportunities and intriguing challenges!<br>
-            Happy coding! 🚀
+            🏦 I currently work at EPAM Systems, where I architect microservices-based
+            platforms handling real-time financial data for Tier-1 banking clients across
+            Europe. My work involves Java 11, Spring Boot, Apache Kafka, Redis, Spring Cloud
+            Gateway, and Kubernetes — at production scale.<br><br>
+            🚀 I'm passionate about clean architecture, system design, and helping other
+            developers level up through real-world, project-based learning. That's why I
+            created courses based on actual enterprise projects — not toy examples.<br><br>
+            📬 Open to collaboration, mentorship conversations, or just geeking out about
+            Java and distributed systems. Happy coding! 🚀
           </p>
         </section>
 
-
-        <!--
-          - service
-        -->
-
+        <!-- service -->
         <section class="service">
-
           <h3 class="h3 service-title">What i'm doing</h3>
-
           <ul class="service-list">
 
             <li class="service-item">
-
               <div class="service-icon-box">
-                <img src="./assets/images/icon-design.svg
-                " alt="design icon" width="40">
+                <img src="./assets/images/icon-dev.svg" alt="backend icon" width="40">
               </div>
-
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">Java Backend Development</h4>
-
+                <h4 class="h4 service-item-title">Enterprise Java Backend</h4>
                 <p class="service-item-text">
-                  architecting highly scalable applications, driven by curiosity and a commitment to building innovative and efficient solutions.
+                  Building high-performance microservices for banking and fintech clients
+                  using Java 11, Spring Boot, Kafka, and Redis at production scale.
                 </p>
               </div>
-
             </li>
 
             <li class="service-item">
-
               <div class="service-icon-box">
-                <img src="./assets/images/icon-dev.svg" alt=" development icon" width="40">
+                <img src="./assets/images/icon-design.svg" alt="courses icon" width="40">
               </div>
-
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">Clean Code Practice</h4>
-
+                <h4 class="h4 service-item-title">Real-World Courses</h4>
                 <p class="service-item-text">
-                  My approach ensures a streamlined and robust software development process.
+                  Teaching enterprise Java development through actual production projects —
+                  real Kafka pipelines, real OAuth flows, real interview Q&amp;A.
                 </p>
               </div>
-
             </li>
 
           </ul>
-
         </section>
 
-
-
-        <!--
-          - clients
-        -->
-
+        <!-- clients -->
         <section class="clients">
-
           <h3 class="h3 clients-title">Workplace</h3>
-
           <ul class="clients-list has-scrollbar">
-
             <li class="clients-item">
               <a href="#">
                 <img src="./assets/images/logo-1-color.png" height="75px" width="50px" alt="client logo">
               </a>
             </li>
-
             <li class="clients-item">
               <a href="#">
                 <img src="./assets/images/logo-2-color.png" height="75px" width="50px" alt="client logo">
               </a>
             </li>
-
           </ul>
-
         </section>
 
       </article>
 
 
-      <!--
-        - #RESUME
-      -->
-
+      <!-- ═══════════════════════════════════════
+           RESUME
+      ════════════════════════════════════════ -->
       <article class="resume" data-page="resume">
 
         <header>
           <h2 class="h2 article-title">Resume</h2>
         </header>
 
-
+        <!-- Experience -->
         <section class="timeline">
-
           <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="book-outline"></ion-icon></div>
             <h3 class="h3">Experience</h3>
           </div>
 
           <ol class="timeline-list">
 
             <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Software Engineer II</h4>
-
-              <span>2021 — Present</span>
-
+              <h4 class="h4 timeline-item-title">Senior Software Engineer — EPAM Systems</h4>
+              <span>Sep 2021 — Present</span>
               <p class="timeline-text">
-                Nemo enim ipsam voluptatem blanditiis praesentium voluptum delenit atque corrupti, quos dolores et qvuas
-                molestias
-                exceptur.
+                Working as a Java Backend Engineer on enterprise-grade financial systems for
+                global banking clients. Architected microservices for a Credit Score Analysis
+                Tool serving a leading Swedish bank. Built real-time credit scoring pipelines
+                using Apache Kafka. Implemented OAuth 2.0 + Spring Cloud Gateway security.
+                Integrated Redis caching and ensured GDPR compliance via AES-256 encryption.
+                Led Java 8 → Java 11 migration. Set up CI/CD with Jenkins, Docker, and Kubernetes
+                for zero-downtime deployments. Maintained 80%+ SonarQube code coverage.
               </p>
-
             </li>
 
             <li class="timeline-item">
-
               <h4 class="h4 timeline-item-title">Senior Software Engineer</h4>
-
               <span>2020 — 2021</span>
-
               <p class="timeline-text">
-                Nemo enims ipsam voluptatem, blanditiis praesentium voluptum delenit atque corrupti, quos dolores et
-                quas molestias
-                exceptur.
+                [Update with your real company name and experience details here.]
               </p>
-
             </li>
 
             <li class="timeline-item">
-
               <h4 class="h4 timeline-item-title">Software Engineer</h4>
-
               <span>2017 — 2019</span>
-
               <p class="timeline-text">
-                Nemo enims ipsam voluptatem, blanditiis praesentium voluptum delenit atque corrupti, quos dolores et
-                quas molestias
-                exceptur.
+                [Update with your real company name and experience details here.]
               </p>
-
             </li>
 
             <li class="timeline-item">
-
               <h4 class="h4 timeline-item-title">Trainee Software Engineer</h4>
-
               <span>2017 — 2017</span>
-
               <p class="timeline-text">
-                Nemo enims ipsam voluptatem, blanditiis praesentium voluptum delenit atque corrupti, quos dolores et
-                quas molestias
-                exceptur.
+                Started software engineering career learning Java development fundamentals,
+                agile practices, and enterprise application development workflows.
               </p>
-
             </li>
 
           </ol>
-
         </section>
 
+        <!-- Education -->
         <section class="timeline">
-
           <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
+            <div class="icon-box"><ion-icon name="book-outline"></ion-icon></div>
             <h3 class="h3">Education</h3>
           </div>
 
           <ol class="timeline-list">
 
             <li class="timeline-item">
-
               <h4 class="h4 timeline-item-title">National Institute of Technology, Kurukshetra</h4>
-
               <span>2014 — 2017</span>
-
               <p class="timeline-text">
-                Achieved 8.5 CGPA in core coursework including programming languages, database management, and algorithms.
-                Completed impactful projects showcasing proficiency in Java, C++, Python.
-                Gained practical experience by have internship at cloud computing experts inc.
+                Achieved 8.5 CGPA in core coursework including programming languages,
+                database management, and algorithms. Completed impactful projects showcasing
+                proficiency in Java, C++, Python. Gained practical experience through
+                internship at a cloud computing firm.
               </p>
-
             </li>
 
             <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Bhupal Nobles Collage, Udaipur</h4>
-
+              <h4 class="h4 timeline-item-title">Bhupal Nobles College, Udaipur</h4>
               <span>2010 — 2013</span>
-
               <p class="timeline-text">
-                Achieved 77% in core coursework including programming languages, database management, and algorithms.
-                Developed strong problem-solving skills and a solid foundation in software development practices.
+                Achieved 77% in core coursework including programming languages, database
+                management, and algorithms. Developed strong problem-solving skills and a
+                solid foundation in software development practices.
               </p>
-
             </li>
 
           </ol>
-
         </section>
 
+        <!-- Skills -->
         <section class="skill">
-
           <h3 class="h3 skills-title">My skills</h3>
-
           <ul class="skills-list content-card">
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">Java, SpringBoot</h5>
+                <h5 class="h5">Java 11 + Spring Boot</h5>
                 <data value="90">90%</data>
               </div>
-
               <div class="skill-progress-bg">
                 <div class="skill-progress-fill" style="width: 90%;"></div>
               </div>
-
             </li>
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">Databases- MS-SQL,DB2</h5>
+                <h5 class="h5">Apache Kafka + Redis</h5>
+                <data value="80">80%</data>
+              </div>
+              <div class="skill-progress-bg">
+                <div class="skill-progress-fill" style="width: 80%;"></div>
+              </div>
+            </li>
+
+            <li class="skills-item">
+              <div class="title-wrapper">
+                <h5 class="h5">MySQL + Spring Data JPA</h5>
+                <data value="78">78%</data>
+              </div>
+              <div class="skill-progress-bg">
+                <div class="skill-progress-fill" style="width: 78%;"></div>
+              </div>
+            </li>
+
+            <li class="skills-item">
+              <div class="title-wrapper">
+                <h5 class="h5">Docker + Kubernetes</h5>
+                <data value="65">65%</data>
+              </div>
+              <div class="skill-progress-bg">
+                <div class="skill-progress-fill" style="width: 65%;"></div>
+              </div>
+            </li>
+
+            <li class="skills-item">
+              <div class="title-wrapper">
+                <h5 class="h5">CI/CD — Jenkins + SonarQube</h5>
                 <data value="70">70%</data>
               </div>
-
               <div class="skill-progress-bg">
                 <div class="skill-progress-fill" style="width: 70%;"></div>
               </div>
-
             </li>
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">CI CD</h5>
-                <data value="40">40%</data>
+                <h5 class="h5">System Design + Microservices</h5>
+                <data value="75">75%</data>
               </div>
-
               <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 40%;"></div>
+                <div class="skill-progress-fill" style="width: 75%;"></div>
               </div>
-
-            </li>
-
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Supported Tech</h5>
-                <data value="50">50%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 50%;"></div>
-              </div>
-
             </li>
 
           </ul>
+        </section>
+
+      </article>
+
+
+      <!-- ═══════════════════════════════════════
+           COURSES
+      ════════════════════════════════════════ -->
+      <article class="courses" data-page="courses">
+
+        <header>
+          <h2 class="h2 article-title">Courses</h2>
+        </header>
+
+        <section class="about-text">
+
+          <!-- Hero -->
+          <div class="course-hero">
+            <h2>Learn from Real Enterprise Projects</h2>
+            <p>
+              Hands-on courses built from 7+ years of Java backend experience across
+              global banking and fintech systems. Every lesson is grounded in real
+              production code — not toy examples.
+            </p>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <span class="num">2</span>
+                <span class="lbl">Courses</span>
+              </div>
+              <div class="hero-stat">
+                <span class="num">7+</span>
+                <span class="lbl">Years XP</span>
+              </div>
+              <div class="hero-stat">
+                <span class="num">Java 11</span>
+                <span class="lbl">Core Stack</span>
+              </div>
+              <div class="hero-stat">
+                <span class="num">Real</span>
+                <span class="lbl">Project Code</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Available -->
+          <p class="csection-title">Available Now</p>
+
+          <!-- Course 1 -->
+          <div class="course-card">
+            <div class="card-head">
+              <div class="card-ico">🏦</div>
+              <div>
+                <h3>Credit Score Analysis Tool — Enterprise Java Deep Dive</h3>
+                <span class="sub">Real project from a leading Swedish bank (Swedbank)</span>
+              </div>
+              <span class="cbadge cbadge-new">New</span>
+            </div>
+            <p class="card-desc">
+              A complete walkthrough of a production-grade Credit Score Analysis
+              microservices platform. Understand how enterprise Java systems are architected,
+              secured, and deployed — from Kafka-driven real-time pipelines to OAuth 2.0
+              token flows through Spring Cloud Gateway. The kind of project that gets you
+              through senior-level Java interviews.
+            </p>
+            <ul class="mod-grid">
+              <li>Module 1 — Architecture overview</li>
+              <li>Module 2 — Microservices deep dive</li>
+              <li>Module 3 — Kafka real-time pipeline</li>
+              <li>Module 4 — OAuth 2.0 + Gateway security</li>
+              <li>Module 5 — Redis caching strategies</li>
+              <li>Module 6 — GDPR &amp; AES-256 masking</li>
+              <li>Module 7 — CI/CD with K8s</li>
+              <li>Module 8 — 40+ interview Q&amp;A</li>
+            </ul>
+            <div class="ctags">
+              <span class="ctag">Java 11</span>
+              <span class="ctag">Spring Boot 2.5</span>
+              <span class="ctag">Apache Kafka</span>
+              <span class="ctag">Redis</span>
+              <span class="ctag">Spring Cloud Gateway</span>
+              <span class="ctag">OAuth 2.0</span>
+              <span class="ctag">MySQL</span>
+              <span class="ctag">Docker</span>
+              <span class="ctag">Kubernetes</span>
+              <span class="ctag">JUnit + Mockito</span>
+              <span class="ctag">SonarQube</span>
+            </div>
+            <div class="card-foot">
+              <div class="cpills">
+                <span class="cpill">📦 8 Modules</span>
+                <span class="cpill">📊 Intermediate–Senior</span>
+                <span class="cpill">🎬 PDF + Video + Quiz</span>
+              </div>
+              <a href="https://www.notion.so/vipulkumawat/0ed9871ddd814388a3d0d3c6d35df6ba"
+                 target="_blank" class="btn-course">▶ Start Learning</a>
+            </div>
+          </div>
+
+          <!-- Course 2 -->
+          <div class="course-card">
+            <div class="card-head">
+              <div class="card-ico">🏗️</div>
+              <div>
+                <h3>Enterprise Project 2 — Backend Architecture Masterclass</h3>
+                <span class="sub">Second real-world enterprise client system</span>
+              </div>
+              <span class="cbadge cbadge-new">New</span>
+            </div>
+            <p class="card-desc">
+              The second enterprise project walkthrough covering a different domain and
+              architecture pattern. Explore how large-scale backend systems are designed
+              differently based on business requirements — including full source code
+              walkthrough, all possible interview questions, and hands-on quizzes.
+            </p>
+            <ul class="mod-grid">
+              <li>Module 1 — Project context &amp; domain</li>
+              <li>Module 2 — Architecture decisions</li>
+              <li>Module 3 — Code walkthrough (GitHub)</li>
+              <li>Module 4 — 30+ interview Q&amp;A</li>
+            </ul>
+            <div class="ctags">
+              <span class="ctag">Java</span>
+              <span class="ctag">Spring Boot</span>
+              <span class="ctag">Microservices</span>
+              <span class="ctag">REST APIs</span>
+              <span class="ctag">Enterprise Patterns</span>
+            </div>
+            <div class="card-foot">
+              <div class="cpills">
+                <span class="cpill">📦 4 Modules</span>
+                <span class="cpill">📊 Intermediate–Senior</span>
+                <span class="cpill">🎬 PDF + Video + Quiz</span>
+              </div>
+              <a href="https://www.notion.so/vipulkumawat/0ed9871ddd814388a3d0d3c6d35df6ba"
+                 target="_blank" class="btn-course">▶ Start Learning</a>
+            </div>
+          </div>
+
+          <!-- Coming Soon -->
+          <p class="csection-title">Coming Soon</p>
+
+          <div class="course-card dimmed">
+            <div class="card-head">
+              <div class="card-ico">☕</div>
+              <div>
+                <h3>Java 17 + Spring Boot 3 — Modern Enterprise Upgrade Guide</h3>
+                <span class="sub">Migrating production systems to the modern Java stack</span>
+              </div>
+              <span class="cbadge cbadge-soon">Soon</span>
+            </div>
+            <p class="card-desc">
+              A practical guide to upgrading from Java 11 + Spring Boot 2.x to Java 17 +
+              Spring Boot 3.x — covering records, sealed classes, virtual threads, and the
+              new Jakarta EE namespace migration.
+            </p>
+            <div class="ctags">
+              <span class="ctag">Java 17</span>
+              <span class="ctag">Spring Boot 3</span>
+              <span class="ctag">Virtual Threads</span>
+              <span class="ctag">Jakarta EE</span>
+            </div>
+          </div>
+
+          <div class="course-card dimmed">
+            <div class="card-head">
+              <div class="card-ico">🎯</div>
+              <div>
+                <h3>Google L5 Java Interview Prep — DSA + System Design</h3>
+                <span class="sub">A structured 24-month roadmap to Google L5</span>
+              </div>
+              <span class="cbadge cbadge-soon">Soon</span>
+            </div>
+            <p class="card-desc">
+              Comprehensive interview preparation covering DSA, System Design, Behavioral
+              rounds, and Java deep dives — built around a realistic plan for targeting
+              Google L5.
+            </p>
+            <div class="ctags">
+              <span class="ctag">DSA in Java</span>
+              <span class="ctag">System Design</span>
+              <span class="ctag">Behavioral STAR</span>
+              <span class="ctag">Google L5</span>
+            </div>
+          </div>
+
+          <!-- Quote -->
+          <div class="course-quote">
+            <blockquote>
+              "These aren't made-up projects — they are real systems I built for real banks.
+              The interview questions are the exact ones I was asked and prepared for my team.
+              If you are preparing for a senior Java interview, this is the closest you can
+              get to the real thing."
+            </blockquote>
+            <cite>— Vipul Kumawat, Senior Software Engineer @ EPAM Systems</cite>
+          </div>
 
         </section>
 
       </article>
 
 
-      <!--
-        - #BLOG
-      -->
-
+      <!-- ═══════════════════════════════════════
+           BLOG
+      ════════════════════════════════════════ -->
       <article class="blog" data-page="blog">
 
         <header>
@@ -481,76 +686,49 @@
         </header>
 
         <section class="blog-posts">
-
           <ul class="service-list">
             <a href="https://thejavaengineer.in" target="_blank">
             <li class="service-item">
-
               <div class="service-icon-box">
-                <img src="https://yt3.googleusercontent.com/YtCgADliJtcVK2PeoVGvVJ8dB1fzkpDlCVfzo_cpkH-3MSUfZdmTZtjodr_a_CjsJ4kmBIQN=s176-c-k-c0x00ffffff-no-rj" alt="design icon" width="40">
+                <img src="https://yt3.googleusercontent.com/YtCgADliJtcVK2PeoVGvVJ8dB1fzkpDlCVfzo_cpkH-3MSUfZdmTZtjodr_a_CjsJ4kmBIQN=s176-c-k-c0x00ffffff-no-rj" alt="blog icon" width="40">
               </div>
               <div class="service-content-box">
                 <h4 class="h4 service-item-title">The Java Engineer Blog</h4>
-
                 <p class="service-item-text">
-                  architecting highly scalable applications, driven by curiosity and a commitment to building innovative and efficient solutions.
+                  Deep dives into Java backend development, microservices architecture,
+                  and real-world enterprise system design.
                 </p>
               </div>
-
             </li>
             </a>
-            <!--
-                        <a href="https://www.youtube.com/channel/UCMuVCdrTPo8Sd2IpYVtygxg" target="_blank">
-                        <li class="service-item">
-                          <div class="service-icon-box">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/YouTube_social_white_circle_%282017%29.svg/300px-YouTube_social_white_circle_%282017%29.svg.png?20220808215513" alt="design icon" width="40">
-                          </div>
-                          <div class="service-content-box">
-                            <h4 class="h4 service-item-title">The Java Engineer YouTube</h4>
-                            <p class="service-item-text">
-                              architecting highly scalable applications, driven by curiosity and a commitment to building innovative and efficient solutions.
-                            </p>
-                          </div>
-                        </li>
-                        </a>
-                        -->
-
-
           </ul>
-
         </section>
 
       </article>
 
-      <!--
-        - #CONTACT
-      -->
 
+      <!-- ═══════════════════════════════════════
+           CONTACT
+      ════════════════════════════════════════ -->
       <article class="contact" data-page="contact">
 
         <header>
           <h2 class="h2 article-title">Contact</h2>
         </header>
 
-
         <section class="contact-form">
-
           <h3 class="h3 form-title">Contact Form</h3>
-          <form action="https://formspree.io/f/xleqlbwz" method="POST" class="form" data-form >
+          <form action="https://formspree.io/f/xleqlbwz" method="POST" class="form" data-form>
             <div class="input-wrapper">
               <input type="text" name="fullname" class="form-input" placeholder="Full name" required data-form-input>
-
               <input type="email" name="email" class="form-input" placeholder="Email address" required data-form-input>
             </div>
-
             <textarea name="message" class="form-input" placeholder="Your Message" required data-form-input></textarea>
-
-            <button class="form-btn" type="submit"  data-form-btn>
+            <button class="form-btn" type="submit" data-form-btn>
               <ion-icon name="paper-plane"></ion-icon>
               <span>Send Message</span>
             </button>
           </form>
-
         </section>
 
       </article>
@@ -559,22 +737,9 @@
 
   </main>
 
-
-
-
-
-
-  <!--
-    - custom js link
-  -->
   <script src="./assets/js/script.js"></script>
-
-  <!--
-    - ionicon link
-  -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
 </body>
-
 </html>
