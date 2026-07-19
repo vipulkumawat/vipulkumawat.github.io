@@ -1,0 +1,1673 @@
+<style>
+  :root{
+    --ground:#FBF7F0; --panel:#FFFFFF; --panel-2:#F4EEE3;
+    --ink:#20242C; --ink-soft:#4B515C; --ink-faint:#7A8089;
+    --line:#E7DFD1; --line-soft:#EFE9DD;
+    --amber:#D8842A; --amber-soft:#F6E3C8; --amber-ink:#8A5210;
+    --teal:#1D8F82; --teal-soft:#D2EFEA;
+    --good:#2E9E5B; --warn:#C98A16; --bad:#D0453F;
+    --code-bg:#F5EFE4; --code-ink:#3A4048;
+    --shadow:0 1px 2px rgba(40,30,10,.05),0 8px 24px rgba(40,30,10,.06);
+    --shadow-lg:0 20px 60px rgba(40,30,10,.14);
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    --mono:"JetBrains Mono","SF Mono","Fira Code","Cascadia Code",ui-monospace,Menlo,Consolas,monospace;
+    --r:14px; --r-sm:9px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0F1219; --panel:#161B23; --panel-2:#1C222C;
+      --ink:#E8EAED; --ink-soft:#AEB4BD; --ink-faint:#767D88;
+      --line:#262D38; --line-soft:#1E242E;
+      --amber:#F2A13B; --amber-soft:#3A2C16; --amber-ink:#F5B968;
+      --teal:#5BC8B8; --teal-soft:#122A28;
+      --good:#5FCB7E; --warn:#E9B44C; --bad:#EC6660;
+      --code-bg:#12171F; --code-ink:#C6CDD6;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+      --shadow-lg:0 24px 70px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#FBF7F0; --panel:#FFFFFF; --panel-2:#F4EEE3;
+    --ink:#20242C; --ink-soft:#4B515C; --ink-faint:#7A8089;
+    --line:#E7DFD1; --line-soft:#EFE9DD;
+    --amber:#D8842A; --amber-soft:#F6E3C8; --amber-ink:#8A5210;
+    --teal:#1D8F82; --teal-soft:#D2EFEA;
+    --good:#2E9E5B; --warn:#C98A16; --bad:#D0453F;
+    --code-bg:#F5EFE4; --code-ink:#3A4048;
+    --shadow:0 1px 2px rgba(40,30,10,.05),0 8px 24px rgba(40,30,10,.06);
+    --shadow-lg:0 20px 60px rgba(40,30,10,.14);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F1219; --panel:#161B23; --panel-2:#1C222C;
+    --ink:#E8EAED; --ink-soft:#AEB4BD; --ink-faint:#767D88;
+    --line:#262D38; --line-soft:#1E242E;
+    --amber:#F2A13B; --amber-soft:#3A2C16; --amber-ink:#F5B968;
+    --teal:#5BC8B8; --teal-soft:#122A28;
+    --good:#5FCB7E; --warn:#E9B44C; --bad:#EC6660;
+    --code-bg:#12171F; --code-ink:#C6CDD6;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  body{margin:0}
+  .app{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--sans); line-height:1.65;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+    font-size:16.5px;
+  }
+
+  /* progress bar */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+    background:linear-gradient(90deg,var(--amber),var(--teal));transition:width .12s linear}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    position:fixed;top:0;left:0;width:288px;height:100vh;z-index:100;
+    background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;overflow:hidden;
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+  }
+  .sb-head{padding:22px 22px 16px;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+  .sb-logo{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit}
+  .sb-mark{width:34px;height:34px;border-radius:9px;flex-shrink:0;
+    background:radial-gradient(120% 120% at 30% 20%,var(--amber),var(--teal));
+    display:grid;place-items:center;font-family:var(--mono);font-weight:700;color:#0F1219;font-size:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,.2)}
+  .sb-title{font-weight:800;font-size:15px;letter-spacing:-.2px;line-height:1.2}
+  .sb-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.5px;text-transform:uppercase;margin-top:2px}
+  .sb-scroll{overflow-y:auto;flex:1;padding:12px 12px 40px}
+  .sb-scroll::-webkit-scrollbar{width:8px}
+  .sb-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .sb-part{margin-top:16px}
+  .sb-part:first-child{margin-top:4px}
+  .sb-part-t{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.7px;
+    text-transform:uppercase;color:var(--amber);padding:6px 12px 4px;display:flex;gap:8px;align-items:baseline}
+  .sb-part-n{color:var(--ink-faint)}
+  .sb-link{display:flex;gap:9px;align-items:baseline;padding:6px 12px;border-radius:8px;
+    text-decoration:none;color:var(--ink-soft);font-size:13.5px;transition:.15s;line-height:1.35;position:relative}
+  .sb-link:hover{background:var(--panel-2);color:var(--ink)}
+  .sb-link.active{background:var(--amber-soft);color:var(--amber-ink);font-weight:600}
+  .sb-link .n{font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-shrink:0;width:20px}
+  .sb-link.active .n{color:var(--amber-ink)}
+  .sb-link .dot{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:6px;height:6px;
+    border-radius:50%;background:var(--good);opacity:0;transition:.2s}
+  .sb-link.done .dot{opacity:1}
+
+  /* backdrop */
+  .backdrop{position:fixed;inset:0;background:rgba(10,8,4,.5);z-index:90;opacity:0;pointer-events:none;
+    transition:opacity .28s;backdrop-filter:blur(2px)}
+  .backdrop.show{opacity:1;pointer-events:auto}
+
+  /* ---------- TOPBAR (mobile) ---------- */
+  .topbar{position:sticky;top:0;z-index:80;display:none;align-items:center;gap:12px;
+    padding:11px 16px;background:color-mix(in srgb,var(--ground) 88%,transparent);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line-soft)}
+  .icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);display:grid;place-items:center;cursor:pointer;flex-shrink:0;transition:.15s}
+  .icon-btn:hover{background:var(--panel-2)}
+  .icon-btn:active{transform:scale(.94)}
+  .topbar-t{font-weight:800;font-size:15px;flex:1;letter-spacing:-.2px}
+  .theme-toggle{position:fixed;top:18px;right:22px;z-index:85}
+
+  /* ---------- MAIN ---------- */
+  .main{margin-left:288px;padding:0 clamp(20px,5vw,70px)}
+  .wrap{max-width:820px;margin:0 auto}
+
+  /* HERO */
+  .hero{padding:clamp(50px,9vh,110px) 0 40px;border-bottom:1px solid var(--line-soft)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--amber);font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:1.5px;background:var(--amber)}
+  .hero h1{font-size:clamp(34px,6vw,60px);font-weight:800;letter-spacing:-1.5px;line-height:1.02;
+    margin:0 0 22px;text-wrap:balance}
+  .hero h1 .hl{background:linear-gradient(120deg,var(--amber),var(--teal));-webkit-background-clip:text;
+    background-clip:text;-webkit-text-fill-color:transparent}
+  .hero-lead{font-size:clamp(17px,2.4vw,21px);color:var(--ink-soft);max-width:60ch;line-height:1.6}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;box-shadow:var(--shadow)}
+  .stat b{font-family:var(--mono);font-size:24px;font-weight:700;display:block;color:var(--amber);letter-spacing:-.5px}
+  .stat span{font-size:12.5px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.3px}
+  .hero-note{margin-top:30px;padding:16px 20px;background:var(--teal-soft);border-radius:var(--r);
+    border:1px solid color-mix(in srgb,var(--teal) 25%,transparent);font-size:14.5px;color:var(--ink);display:flex;gap:12px}
+  .hero-note b{color:var(--teal)}
+
+  /* MODULE SECTIONS */
+  section.mod{padding:56px 0 20px;border-bottom:1px solid var(--line-soft);scroll-margin-top:70px}
+  .mod-tag{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.5px;margin-bottom:12px;
+    display:flex;gap:10px;align-items:center}
+  .mod-tag .pill{background:var(--amber-soft);color:var(--amber-ink);padding:3px 9px;border-radius:20px;font-weight:600;font-size:11px}
+  h2.mod-h{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.8px;margin:0 0 8px;line-height:1.12;text-wrap:balance}
+  .mod-hi{font-size:16px;color:var(--teal);font-family:var(--mono);margin:0 0 22px;font-weight:500}
+  h3{font-size:20px;font-weight:800;letter-spacing:-.3px;margin:34px 0 12px}
+  h4{font-size:15px;font-weight:700;margin:22px 0 8px;color:var(--ink)}
+  p{margin:14px 0;color:var(--ink-soft)}
+  .main strong{color:var(--ink);font-weight:700}
+  em{color:var(--teal);font-style:normal;font-weight:600}
+  ul,ol{color:var(--ink-soft);padding-left:22px;margin:14px 0}
+  li{margin:7px 0}
+  a.ln{color:var(--amber);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--amber) 40%,transparent)}
+
+  /* callouts */
+  .box{border-radius:var(--r);padding:18px 20px;margin:20px 0;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow)}
+  .box .bt{font-family:var(--mono);font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;font-weight:600;
+    display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .box p:first-of-type,.box p:last-child{margin-top:6px;margin-bottom:0}
+  .box.simple{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 30%,transparent)}
+  .box.simple .bt{color:var(--amber-ink)}
+  .box.why{background:var(--teal-soft);border-color:color-mix(in srgb,var(--teal) 25%,transparent)}
+  .box.why .bt{color:var(--teal)}
+  .box.interview .bt{color:var(--ink)}
+  .box.interview{border-left:3px solid var(--amber)}
+  .box.warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+  .box.warn .bt{color:var(--warn)}
+  .box.analogy{background:var(--panel-2)}
+  .box.analogy .bt{color:var(--teal)}
+
+  /* code */
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;
+    overflow-x:auto;margin:18px 0;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--code-ink)}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:2px 6px;border-radius:5px;color:var(--code-ink)}
+  pre code{background:none;padding:0;font-size:13px}
+  .cm{color:var(--ink-faint)} .kw{color:var(--amber)} .st{color:var(--teal)} .fn{color:var(--ink)}
+
+  /* diagram flow */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:24px 0;font-family:var(--mono);font-size:12.5px}
+  .flow .node{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;
+    box-shadow:var(--shadow);text-align:center;min-width:90px;display:flex;align-items:center;justify-content:center}
+  .flow .node.acc{border-color:var(--amber);background:var(--amber-soft);color:var(--amber-ink)}
+  .flow .node.tl{border-color:var(--teal);background:var(--teal-soft);color:var(--teal)}
+  .flow .arr{display:flex;align-items:center;color:var(--ink-faint);padding:0 8px;font-size:16px}
+
+  /* comparison table */
+  .tbl-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:480px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line-soft)}
+  th{background:var(--panel-2);font-family:var(--mono);font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  td{color:var(--ink-soft)}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--ink)}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .sc-g{color:var(--good);font-weight:700} .sc-w{color:var(--warn);font-weight:700} .sc-b{color:var(--bad);font-weight:700}
+
+  /* LAB */
+  .lab{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin:26px 0;overflow:hidden;box-shadow:var(--shadow-lg)}
+  .lab-head{padding:14px 20px;background:linear-gradient(90deg,var(--amber-soft),transparent);
+    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .lab-head .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:700;
+    color:var(--amber-ink);background:var(--panel);padding:3px 8px;border-radius:6px;border:1px solid color-mix(in srgb,var(--amber) 30%,transparent)}
+  .lab-head b{font-size:15px}
+  .lab-body{padding:20px}
+  .lab label{font-family:var(--mono);font-size:12px;color:var(--ink-soft);display:block;margin-bottom:6px}
+  .lab input[type=range]{width:100%;accent-color:var(--amber);margin:4px 0 2px}
+  .lab textarea,.lab input[type=text]{width:100%;font-family:var(--mono);font-size:12.5px;padding:10px 12px;
+    border:1px solid var(--line);border-radius:9px;background:var(--code-bg);color:var(--ink);resize:vertical}
+  .lab-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+  .lab-row>div{flex:1;min-width:140px}
+  .chip{font-family:var(--mono);font-size:12px;padding:7px 13px;border-radius:20px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-soft);cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--amber);color:var(--ink)}
+  .chip.on{background:var(--amber);color:#0F1219;border-color:var(--amber);font-weight:600}
+  .chunk{display:inline;padding:2px 1px;border-radius:4px;font-family:var(--mono);font-size:12.5px;line-height:2}
+  .val{font-family:var(--mono);color:var(--amber);font-weight:700}
+  canvas{max-width:100%;display:block}
+  .btn{font-family:var(--mono);font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:9px;border:none;
+    background:var(--amber);color:#0F1219;cursor:pointer;transition:.15s}
+  .btn:hover{filter:brightness(1.06)} .btn:active{transform:scale(.97)}
+  .btn.ghost{background:var(--panel-2);color:var(--ink);border:1px solid var(--line)}
+
+  /* accordion */
+  .acc{border:1px solid var(--line);border-radius:var(--r);margin:12px 0;overflow:hidden;background:var(--panel)}
+  .acc summary{padding:14px 18px;cursor:pointer;font-weight:600;font-size:14.5px;list-style:none;display:flex;
+    justify-content:space-between;align-items:center;gap:12px}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary::after{content:"+";font-family:var(--mono);font-size:20px;color:var(--amber);transition:.2s;flex-shrink:0}
+  .acc[open] summary::after{transform:rotate(45deg)}
+  .acc summary:hover{background:var(--panel-2)}
+  .acc .acc-body{padding:0 18px 16px;color:var(--ink-soft);font-size:14.5px}
+  .acc .acc-body p:first-child{margin-top:4px}
+
+  /* module footer nav */
+  .mod-nav{display:flex;justify-content:space-between;gap:14px;margin:34px 0 6px;flex-wrap:wrap}
+  .mod-nav a{flex:1;min-width:200px;text-decoration:none;padding:14px 18px;border:1px solid var(--line);
+    border-radius:var(--r);background:var(--panel);transition:.18s;box-shadow:var(--shadow)}
+  .mod-nav a:hover{border-color:var(--amber);transform:translateY(-2px)}
+  .mod-nav .dir{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.5px;text-transform:uppercase}
+  .mod-nav .ttl{font-weight:700;font-size:14.5px;margin-top:3px;color:var(--ink)}
+  .mod-nav a.next{text-align:right}
+  .done-btn{margin:26px 0 4px;display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-family:var(--mono);
+    font-size:12.5px;padding:9px 16px;border-radius:9px;border:1px dashed var(--line);background:transparent;color:var(--ink-soft);transition:.15s}
+  .done-btn:hover{border-color:var(--good);color:var(--good)}
+  .done-btn.done{background:color-mix(in srgb,var(--good) 15%,transparent);border-style:solid;border-color:var(--good);color:var(--good)}
+
+  .footer{padding:50px 0 80px;color:var(--ink-faint);font-size:13.5px;text-align:center}
+  .kbd{font-family:var(--mono);font-size:11px;background:var(--panel-2);border:1px solid var(--line);
+    border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink-soft)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:960px){
+    .sidebar{transform:translateX(-100%);box-shadow:var(--shadow-lg)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0}
+    .topbar{display:flex}
+    .theme-toggle{display:none}
+    .hero{padding-top:36px}
+  }
+</style>
+
+<div class="app">
+<div id="progress"></div>
+<div class="backdrop" id="backdrop"></div>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <a href="#top" class="sb-logo">
+      <div class="sb-mark">आ</div>
+      <div>
+        <div class="sb-title">Agentic AI &mdash; Asaan Bhasha</div>
+        <div class="sb-sub">System Design · Hinglish</div>
+      </div>
+    </a>
+  </div>
+  <nav class="sb-scroll" id="nav"></nav>
+</aside>
+
+<!-- ===== TOPBAR (mobile) ===== -->
+<div class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div class="topbar-t">Agentic AI &mdash; Hinglish</div>
+  <button class="icon-btn" id="themeBtnM" aria-label="Theme">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+</div>
+<button class="icon-btn theme-toggle" id="themeBtn" aria-label="Theme">
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+</button>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+<div class="wrap" id="top">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">30 ghante ka course &mdash; 1 jagah, asaan bhasha mein</div>
+    <h1>Poora <span class="hl">Agentic AI System Design</span>, bina ek bhi concept chhode.</h1>
+    <p class="hero-lead">Ye woh saari cheezein hai jo aapko RAG se lekar apna khud ka <b>Claude Code</b> banane tak seekhni hai &mdash; interview ke liye bhi, office ke kaam ke liye bhi. Sab kuch sequence mein, Hinglish mein, interactive labs ke saath.</p>
+    <div class="hero-stats">
+      <div class="stat"><b>12</b><span>Parts</span></div>
+      <div class="stat"><b>34</b><span>Modules</span></div>
+      <div class="stat"><b>7</b><span>Live Labs</span></div>
+      <div class="stat"><b>0</b><span>Concepts chhoote</span></div>
+    </div>
+    <div class="hero-note">
+      <span>💡</span>
+      <div><b>Kaise padhein:</b> Left sidebar (mobile pe <span class="kbd">☰</span> button) mein sequence diya hai &mdash; upar se neeche. Har module ke end mein &ldquo;Ho gaya&rdquo; mark kar dena, aapki progress save rahegi. Labs ke saath khud khelke dekhna &mdash; wahi se concept pakka hota hai.</div>
+    </div>
+  </header>
+
+  <div id="content"></div>
+
+  <div class="footer">
+    <p>Banaya gaya taaki aap 30 ghante ka course 1 jagah, apni bhasha mein revise kar sako.<br>
+    Concept clear ho toh <b>khud code likho</b> &mdash; wahi last aur sabse zaroori step hai. 🚀</p>
+  </div>
+</div>
+</main>
+</div>
+
+<script>
+/* ============================================================
+   CONTENT DATA — har module ka HTML yahan hai (Hinglish)
+   ============================================================ */
+const PARTS = [
+ {t:"Neev (Foundations)", mods:["m1","m2"]},
+ {t:"RAG — System ka Dil", mods:["m3","m4","m5","m6","m7","m8","m9"]},
+ {t:"Advanced RAG (Research)", mods:["m10","m11","m12","m13"]},
+ {t:"RAG ko Naapo (Evaluation)", mods:["m14","m15","m16"]},
+ {t:"Context Engineering", mods:["m17","m18","m19"]},
+ {t:"Memory", mods:["m20","m21"]},
+ {t:"Vector DB ke Andar", mods:["m22"]},
+ {t:"Capstone: Apna Claude Code", mods:["m23","m24"]},
+ {t:"Harness (Tools · MCP · Skills)", mods:["m25","m26","m27"]},
+ {t:"Safety", mods:["m28","m29"]},
+ {t:"Long-Running Tasks", mods:["m30","m31"]},
+ {t:"Ops & Interview", mods:["m32","m33","m34"]},
+];
+
+const M = {};
+
+/* ---------- PART 1 ---------- */
+M.m1 = {n:1, part:"Neev", title:"Agent aur LLM ki Basics", hi:"agent = LLM + tools (+ context + harness)", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Ek <b>LLM</b> (jaise GPT, Claude, Gemini) sirf text ka jawaab de sakta hai. Usko <b>tools</b> de do &mdash; jaise file padhna, terminal chalana, web search &mdash; toh woh <b>Agent</b> ban jaata hai. Agent = dimaag (LLM) + haath (tools).</p></div>
+
+<p>Do zaroori definitions jo interview mein kaam aati hain:</p>
+<ul>
+<li><b>Agent = LLM + Tools</b> &mdash; sabse common definition.</li>
+<li><b>Agent = LLM + Context + Harness</b> &mdash; nayi, modern definition. <em>Context engineering</em> aur <em>harness engineering</em> is course ke bade topics hain.</li>
+</ul>
+
+<div class="box analogy"><div class="bt">🧠 Analogy</div>
+<p>LLM ek bahut padha-likha insaan hai jiske <b>haath bandhe hue</b> hain &mdash; sab jaanta hai par kuch <b>kar</b> nahi sakta. Tools usko haath dete hain. Aur jab woh khud decide kare ki kaunsa tool kab use karna hai &mdash; woh agent hai.</p></div>
+
+<h3>Zaroori terms clear kar lo</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Term</th><th>Kya hai</th><th>Example</th></tr>
+<tr><td><b>Model Provider</b></td><td>Company jo model banati hai</td><td>OpenAI, Anthropic, Google</td></tr>
+<tr><td><b>LLM</b></td><td>Actual model</td><td>GPT&#8209;4o, Claude, Gemini, Kimi</td></tr>
+<tr><td><b>Application</b></td><td>Product jo LLM use karta hai</td><td>ChatGPT, Claude Code, Cursor</td></tr>
+</table></div>
+<div class="box warn"><div class="bt">⚠️ Galti mat karna</div>
+<p>OpenAI &ne; LLM. OpenAI ek <b>provider</b> hai. ChatGPT ek <b>application</b> hai jo GPT model use karti hai. Interview mein ye clear hona chahiye.</p></div>
+`};
+
+M.m2 = {n:2, part:"Neev", title:"LLM ki 4 Kamzoriyan", hi:"in kamzoriyon ko solve karna hi poora course hai", html:`
+<p>Poore course ka har topic in 4 problems mein se kisi ko solve karta hai. Yaad rakho ye chaar &mdash; interview mein zaroor poochte hain: <b>&ldquo;What are the limitations of LLMs?&rdquo;</b></p>
+
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--bad)">1 · Knowledge Cutoff</div>
+<p>LLM ek fixed date tak ki data pe train hua hai. Kal ki news nahi jaanta. <b>Solution &rarr; RAG</b> (bahar se fresh data laao).</p></div>
+<div class="box"><div class="bt" style="color:var(--bad)">2 · Stateless (No Memory)</div>
+<p>Har request ekdum nayi hai. Pichli baat yaad nahi. ChatGPT ko memory <em>application</em> deti hai. <b>Solution &rarr; Memory layer</b>.</p></div>
+<div class="box"><div class="bt" style="color:var(--bad)">3 · Fixed Context Window</div>
+<p>Ek baar mein limited text hi bhej sakte ho. Zyada = zyada paisa + latency. <b>Solution &rarr; Context Engineering</b>.</p></div>
+<div class="box"><div class="bt" style="color:var(--bad)">4 · Non-Deterministic</div>
+<p>Same sawaal &rarr; har baar thoda alag jawaab. Reliability ka issue. <b>Solution &rarr; Guardrails, structured output, evals</b>.</p></div>
+</div>
+
+<div class="box why"><div class="bt">🔑 Yeh mindset banao</div>
+<p>Jab bhi koi naya topic aaye, khud se poochho: <em>&ldquo;Iske bina kya problem thi?&rdquo;</em> Har solution kisi ek kamzori ka jawaab hai. Ye soch aapko interview mein trade-offs samjha degi.</p></div>
+
+<div class="box interview"><div class="bt">🎤 Interview mein</div>
+<p>&ldquo;Non-deterministic&rdquo; ka matlab &mdash; parameters (temperature) se factualness badha sakte ho, par <b>guarantee kabhi nahi</b> ki bilkul same words aayenge. Natural language ki yahi khaasiyat hai: ek baat 10 tareeke se keh sakte ho.</p></div>
+`};
+
+/* ---------- PART 2: RAG ---------- */
+M.m3 = {n:3, part:"RAG", title:"RAG kya hai (poora flow)", hi:"Retrieval-Augmented Generation — bahar se data laake jawaab dena", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>LLM ke paas aapka data nahi hai (aapka codebase, company docs). <b>RAG</b> ka matlab: pehle relevant data <em>dhoondo (retrieve)</em>, phir usko sawaal ke saath LLM ko do, phir jawaab banao. Bas itna hi.</p></div>
+
+<h3>RAG ka flow &mdash; step by step</h3>
+<div class="flow">
+<div class="node acc">User query</div><div class="arr">&rarr;</div>
+<div class="node">Agent</div><div class="arr">&rarr;</div>
+<div class="node tl">LLM<br>(query + tools list)</div><div class="arr">&rarr;</div>
+<div class="node">&ldquo;Tool call karo&rdquo;</div>
+</div>
+<div class="flow">
+<div class="node">Tool chala<br>(retrieve)</div><div class="arr">&rarr;</div>
+<div class="node tl">LLM<br>(query + tool result)</div><div class="arr">&rarr;</div>
+<div class="node acc">Final jawaab</div>
+</div>
+
+<p>Yaad rakhne wali baatein is loop mein:</p>
+<ol>
+<li>LLM ko <b>query + tools ki list</b> jaati hai (tool ka naam, description/docstring, arguments).</li>
+<li>LLM sirf <b>batata hai</b> ki kaunsa tool call karna hai &mdash; khud call nahi karta. <em>Tool call aapki application karti hai.</em></li>
+<li>Tool ka result wapas LLM ko jaata hai (kyunki result JSON/error ho sakta hai &mdash; user ko natural language chahiye).</li>
+<li>Ye loop chal sakta hai (tool &rarr; LLM &rarr; tool...) jab tak jawaab ready na ho.</li>
+</ol>
+
+<div class="box why"><div class="bt">🧩 Do alag hisse</div>
+<p><b>1. Data Ingestion</b> (data ko taiyaar karke DB mein daalna) &mdash; ye "RAG" nahi hai, ye setup hai.<br>
+<b>2. Data Retrieval</b> (query aane pe dhoondhna + jawaab) &mdash; <em>yahi asli RAG hai.</em></p></div>
+
+<div class="box interview"><div class="bt">🎤 Interview mein</div>
+<p>&ldquo;Tool ka poora code LLM ko jaata hai kya?&rdquo; &mdash; Nahi! Sirf <b>metadata</b> jaata hai: naam, description (docstring), arguments, return type. Isi wajah se docstring bahut important hai &mdash; LLM usi se decide karta hai tool use karna hai ya nahi.</p></div>
+`};
+
+M.m4 = {n:4, part:"RAG", title:"Chunking aur Embeddings", hi:"data ko tukdon mein todo, phir numbers (vectors) banao", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>Chunking</b> = bade document ko chhote tukdon mein todna. <b>Embedding</b> = har tukde ko numbers ki list (vector) mein badalna, taaki "meaning" compare kar sako.</p></div>
+
+<h3>Chunk size aur overlap</h3>
+<p>Agar plain text ko fixed size pe kaato bina overlap ke, toh ek line beech se toot sakti hai:</p>
+<pre><span class="cm"># "5 week course" — bura chunking (no overlap)</span>
+Chunk 1: "...it is a 5 week"
+Chunk 2: "course starting..."   <span class="cm"># 5 aur course alag ho gaye!</span></pre>
+<p>Isliye <b>chunk overlap</b> rakhte hain &mdash; har chunk thoda pichle se overlap kare, taaki meaning na toote. Chunk size aur overlap ka koi <em>ek sahi jawaab nahi</em> &mdash; data pe depend karta hai.</p>
+
+<div class="lab" id="lab-chunk">
+<div class="lab-head"><span class="tag">Lab 01</span><b>Chunking Visualizer</b></div>
+<div class="lab-body">
+<div class="lab-row">
+<div><label>Chunk size: <span class="val" id="cs-val">40</span> chars</label>
+<input type="range" id="cs" min="12" max="90" value="40"></div>
+<div><label>Overlap: <span class="val" id="ov-val">8</span> chars</label>
+<input type="range" id="ov" min="0" max="30" value="8"></div>
+</div>
+<label>Text (edit karke dekho):</label>
+<textarea id="chunk-txt" rows="3">RAG ka matlab retrieval augmented generation hai jisme hum bahar se data laate hain aur LLM ko dete hain taaki fresh aur sahi jawaab mile.</textarea>
+<div id="chunk-out" style="margin-top:16px;padding:14px;background:var(--code-bg);border-radius:9px;border:1px solid var(--line)"></div>
+<p style="font-size:13px;margin-top:10px;color:var(--ink-faint)">Har rang ek chunk hai. Overlap badhao &mdash; dekho colours kaise ek doosre pe chadhte hain (matlab woh words dono chunks mein aa rahe hain).</p>
+</div></div>
+
+<h3>Embeddings aur dimensions</h3>
+<p>Har embedding ek vector hai jaise <code>[0.2, -0.6, 0.1, ...]</code>. Numbers ki ginti = <b>dimension</b>, jo model pe fix hoti hai (OpenAI ka <code>text-embedding-3-small</code> &rarr; 1536 dimensions).</p>
+<div class="box interview"><div class="bt">🎤 Interview: Embedding dimension ka trade-off</div>
+<p><b>Bada dimension</b> &rarr; behatar semantic understanding, par zyada storage, compute, latency, cost. <b>Chhota dimension</b> &rarr; kam samajh, par sasta aur fast. Koi ek "sahi" size nahi &mdash; budget aur accuracy ke beech balance.</p></div>
+`};
+
+M.m5 = {n:5, part:"RAG", title:"Semantic RAG (Vector Search)", hi:"meaning ke aadhaar pe dhoondhna — sabse basic RAG", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Query ko embed karo &rarr; vector DB mein sabse <em>milte-julte meaning</em> wale chunks dhoondho (cosine similarity se). Isko <b>Semantic RAG</b> ya dense retrieval kehte hain.</p></div>
+
+<p>Ye tab best hai jab query <b>concept</b> ke baare mein ho, na ki exact word ke:</p>
+<ul>
+<li>✅ &ldquo;How does authentication work?&rdquo; &rarr; semantic (koi exact keyword nahi)</li>
+<li>❌ &ldquo;Find <code>BillingError</code>&rdquo; &rarr; yahan exact match chahiye (aage lexical padhenge)</li>
+</ul>
+
+<pre><span class="cm"># Semantic RAG ka dil — 4 steps</span>
+<span class="fn">docs</span>   = load_codebase(repo)          <span class="cm"># 1. Load</span>
+<span class="fn">chunks</span> = splitter.split(docs)          <span class="cm"># 2. Chunk</span>
+<span class="fn">store</span>  = Chroma.from_documents(       <span class="cm"># 3. Embed + store</span>
+             chunks, embedding=embeddings)
+<span class="fn">tool</span>   = create_retriever_tool(         <span class="cm"># 4. Retriever tool</span>
+             store.as_retriever(k=4), ...)</pre>
+
+<div class="box why"><div class="bt">🔧 Key knobs (jo accuracy badalte hain)</div>
+<ul style="margin:4px 0">
+<li><b>Chunk size</b> &mdash; sabse bada lever (aage evals mein data dekhoge)</li>
+<li><b>k</b> &mdash; kitne chunks laane hain (k=4 vs k=1 mein bada farak)</li>
+<li><b>Embedding model</b> &mdash; HuggingFace vs OpenAI</li>
+<li><b>Docstrings</b> &mdash; code mein achhe docstrings retrieval behatar karte hain</li>
+</ul></div>
+
+<div class="box interview"><div class="bt">🎤 Loop control zaroori hai</div>
+<p>Agent baar-baar tool call kar sakta hai (loop). Isko <b>middleware</b> se control karo &mdash; <code>ModelCallLimitMiddleware</code> aur <code>ToolCallLimitMiddleware</code>. Warna: 12 second latency + zyada tokens waste. Accuracy sirf baar-baar call karne se nahi aati &mdash; chunking sudhaaro.</p></div>
+`};
+
+M.m6 = {n:6, part:"RAG", title:"AST Chunking (code ke liye)", hi:"code ko tree bana ke chunk karo — text ki tarah nahi", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Code sirf text nahi hai &mdash; usme <b>structure</b> hai (class, function). <b>AST</b> (Abstract Syntax Tree) code ko tree bana deta hai, phir hum poore function/class ko ek chunk banate hain. Text ki tarah beech se nahi kaatte.</p></div>
+
+<div class="box analogy"><div class="bt">🌳 Analogy</div>
+<p>Normal chunking = book ke pages randomly phaad dena. AST chunking = chapter-wise, section-wise todna. Har tukda poora aur meaningful hota hai.</p></div>
+
+<p>AST wahi cheez hai jo <b>compilers, linters, aur IDE autocomplete</b> use karte hain. <code>x = 1 + 2</code> aisa tree banta hai:</p>
+<pre>Assign
+ &#9500;&#9472; target: Name(x)
+ &#9492;&#9472; value: BinOp
+        &#9500;&#9472; left:  Constant(1)
+        &#9500;&#9472; op:    Add
+        &#9492;&#9472; right: Constant(2)</pre>
+
+<div class="tbl-wrap"><table>
+<tr><th>&nbsp;</th><th>Recursive Text Splitter</th><th>AST Chunking</th></tr>
+<tr><td><b>Kaam</b></td><td>Text patterns (class, def, newline) dhoondh ke kaatta</td><td>Pehle code ko <b>samajhta</b> (tree), phir kaatta</td></tr>
+<tr><td><b>Samajh</b></td><td>Structure nahi samajhta</td><td>Class, function, relationships samajhta</td></tr>
+<tr><td><b>Best for</b></td><td>Plain text</td><td>Code</td></tr>
+</table></div>
+
+<div class="box warn"><div class="bt">⚠️ AST ki blind spot</div>
+<p>AST function/class nodes pe kaatta hai &mdash; <b>module-level imports miss</b> kar deta hai! &ldquo;Which file imports both Task and Status?&rdquo; jaise sawaal pe AST fail hota hai (evals mein 0.000 score). Isliye real systems mein AST akela nahi &mdash; hybrid + graph ke saath. Ek AST ek chhoti file ke liye; poore codebase ke liye <em>graph</em> use hota hai.</p></div>
+`};
+
+M.m7 = {n:7, part:"RAG", title:"Lexical RAG aur BM25", hi:"exact keyword matching — inverted index + ranking", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Jab aapko <b>exact word</b> chahiye &mdash; class ka naam, error code, function name &mdash; tab semantic bekaar hai. <b>Lexical RAG</b> exact keyword match karta hai. Sabse famous algo: <b>BM25</b> (Elasticsearch, Solr ka default).</p></div>
+
+<h3>BM25 = Inverted Index + Ranking</h3>
+<p><b>Inverted index</b>: word &rarr; kaun-kaun se documents mein hai (ek hash map). Lookup O(1) &mdash; bahut fast.</p>
+<pre>"invoice" &rarr; {D0:2, D3:2}   <span class="cm"># D0 aur D3 mein 2-2 baar</span>
+"payment" &rarr; {D1:1, D4:1}</pre>
+
+<p><b>Ranking</b> teen cheezein dekhta hai:</p>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">1 · Term Frequency</div><p>Word jitni baar aaye, utna important &mdash; par <b>diminishing returns</b> (20&rarr;40 baar = zyada important, par double nahi).</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">2 · Word Rarity (IDF)</div><p>Jo word <em>har</em> doc mein hai woh useless. Jo <em>rare</em> hai woh zyada important.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">3 · Length Penalty</div><p>Bade document mein ek word ki value kam &mdash; kyunki wahan bahut saare words hain.</p></div>
+</div>
+
+<div class="lab" id="lab-bm25">
+<div class="lab-head"><span class="tag">Lab 02</span><b>Semantic vs Lexical &mdash; kaun jeetega?</b></div>
+<div class="lab-body">
+<p style="margin-top:0;font-size:13.5px">Query pe click karo &mdash; dekho konsa approach behtar hai:</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px" id="bm25-chips"></div>
+<div id="bm25-out" style="padding:16px;background:var(--code-bg);border-radius:9px;border:1px solid var(--line);font-size:14px"></div>
+</div></div>
+
+<div class="box warn"><div class="bt">⚠️ BM25 ki bimari: "lexical gap"</div>
+<p>Query &ldquo;generate bill&rdquo;, document &ldquo;create invoice&rdquo; &mdash; <b>same matlab, alag words</b>. BM25 fail! Usko pata nahi ki generate=create, bill=invoice. Evals mein akela BM25 code Q&amp;A ke liye <b>sabse bura</b> (faithfulness 0.281 &mdash; galat context se hallucination).</p></div>
+`};
+
+M.m8 = {n:8, part:"RAG", title:"Hybrid RAG aur RRF", hi:"do retrievers milao, phir fuse karo — best of both", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>Hybrid RAG</b> = ek se zyada retriever use karo (jaise semantic + lexical), phir dono ke results ko <em>mila do (fuse)</em>. Semantic meaning pakadta hai, BM25 exact words &mdash; dono ki taakat.</p></div>
+
+<div class="box why"><div class="bt">🔑 Zaroori clarity</div>
+<p>Hybrid sirf semantic+lexical nahi hai! <b>Koi bhi 2+ retrievers</b> = hybrid. Semantic+Graph, Semantic+SQL, ya do alag vector DBs bhi hybrid hai.</p></div>
+
+<h3>RRF &mdash; Reciprocal Rank Fusion</h3>
+<p>Do ranked lists ko bina LLM ke, sirf <b>rank positions</b> se milane ka standard tareeka. Formula:</p>
+<pre>RRF score(doc) = &Sigma;  1 / (k + rank)      <span class="cm"># k = 60 (smoothing)</span></pre>
+<p>Do idea: (1) upar rank wala doc zyada important, (2) jo doc <b>dono lists mein</b> hai woh aur important (dono scores jud jaate hain).</p>
+
+<div class="box analogy"><div class="bt">❓ k = 60 kyun?</div>
+<p>Bina k ke: rank 1 = 1.0, rank 2 = 0.5 &mdash; bahut bada gap, rank 1 sab pe haavi. k=60 ke saath: rank 1 = 0.0164, rank 2 = 0.0161 &mdash; gap smooth. Ab <em>agreement</em> (dono retrievers ka consensus) zyada matter karta hai, ek ka top result nahi.</p></div>
+
+<div class="lab" id="lab-rrf">
+<div class="lab-head"><span class="tag">Lab 03</span><b>RRF Calculator (live)</b></div>
+<div class="lab-body">
+<div class="lab-row">
+<div><label>Smoothing k: <span class="val" id="rrf-k-val">60</span></label>
+<input type="range" id="rrf-k" min="1" max="100" value="60"></div></div>
+<div id="rrf-out"></div>
+<p style="font-size:13px;color:var(--ink-faint);margin-top:10px">k ko 1 karke dekho &mdash; rank-1 doc kaise haavi ho jaata hai. 60 pe &mdash; jo doc dono mein hai woh upar aata hai.</p>
+</div></div>
+
+<div class="box interview"><div class="bt">🎤 Fusion vs Re-ranking</div>
+<p><b>Fusion (RRF)</b>: documents dobara nahi padhte, sirf ranks jodte hain &mdash; fast, no LLM. <b>Re-ranking</b>: documents dobara padhte hain (cross-encoder/LLM) &mdash; accurate par slow. Aksar dono: pehle fusion se 15&rarr;5, phir 5 ko re-rank.</p></div>
+`};
+
+M.m9 = {n:9, part:"RAG", title:"Agentic RAG", hi:"LLM khud decide kare — kahan se, kab, kaise retrieve karna hai", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Fixed pipeline ki jagah, ek <b>extra LLM call</b> decide karta hai: kaunsa retriever use karun? Semantic ya lexical? Ya dono? Ye <b>Agentic RAG</b> hai.</p></div>
+
+<h3>Hybrid vs Agentic &mdash; farak yaad rakho</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Hybrid RAG</th><th>Agentic RAG</th></tr>
+<tr><td>Hamesha <b>saare</b> retrievers call, phir fuse</td><td>LLM <b>decide</b> karta hai kaunsa call karna hai</td></tr>
+<tr><td>No extra LLM call</td><td>Extra LLM call (decision ke liye)</td></tr>
+<tr><td>Fast, deterministic</td><td>Smart, par slow + mehnga</td></tr>
+</table></div>
+<p>Dono saath bhi ho sakte hain! Agar LLM kahe &ldquo;dono call karo&rdquo; &rarr; woh agentic + hybrid dono hai.</p>
+
+<div class="box why"><div class="bt">🔑 Agentic RAG sirf retriever choose karna nahi hai</div>
+<p>Jahaan bhi ek <b>extra LLM call decision</b> ke liye ho, woh agentic RAG hai:</p>
+<ul style="margin:4px 0">
+<li>Kaunsa DB / retriever use karein</li>
+<li>Query decomposition (bade sawaal ko chhote mein todna)</li>
+<li>Corrective / Self-RAG (jawaab validate karna &mdash; aage padhenge)</li>
+<li>Query rewriting</li>
+</ul></div>
+
+<div class="box interview"><div class="bt">🎤 &ldquo;LLM decide kar sakta hai toh Hybrid kyun?&rdquo;</div>
+<p>Kyunki extra LLM call = extra latency + cost + compute. Agar aapko <em>pehle se pata</em> hai ki dono retriever chahiye, toh LLM se poochho hi kyun? Seedha dono call karke fuse kar do. <b>&ldquo;Kar sakte ho&rdquo; ka matlab &ldquo;karna chahiye&rdquo; nahi.</b></p></div>
+`};
+
+/* ---------- PART 3: Advanced RAG ---------- */
+M.m10 = {n:10, part:"Advanced RAG", title:"Graph RAG", hi:"code/data ke relationships ko graph banao", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Kuch sawaal <b>relationships</b> ke baare mein hote hain: &ldquo;create_task call hone pe kaun-kaun se functions chalte hain?&rdquo; Iske liye code ko ek <b>graph</b> banao &mdash; nodes (class/function) aur edges (CALLS, IMPORTS, DEPENDS_ON).</p></div>
+
+<pre><span class="cm"># LLM se relationships extract karo</span>
+TaskService  -[CALLS]-&gt;      AuthService.get_current_user
+TaskService  -[DEPENDS_ON]-&gt; BillingService
+create_task  -[CALLS]-&gt;      Database.create_task</pre>
+
+<p>Query aane pe entities nikaalo, graph mein us node ke aas-paas (neighbourhood, depth=2) ke edges laao, LLM ko do. Neo4j jaise graph DBs iske liye hote hain (course mein <code>networkx</code> se demo).</p>
+
+<div class="box why"><div class="bt">💪 Graph RAG kahan jeetta hai</div>
+<ul style="margin:4px 0">
+<li>&ldquo;Trace the call chain when create_task is called&rdquo; &rarr; <span class="sc-g">1.0/1.0/1.0</span></li>
+<li>&ldquo;What are all methods inside TaskService?&rdquo; &rarr; structure perfect</li>
+<li>&ldquo;Which file imports both Task and Status?&rdquo; &rarr; relationships pakadta hai</li>
+</ul></div>
+<div class="box warn"><div class="bt">⚠️ Graph RAG kahan fail hota hai</div>
+<p><b>Behavioral / value-level</b> sawaal. Graph edges store karta hai (X calls Y), par <em>implementation detail nahi</em> &mdash; kaunsa error raise hua, kaunse fields hain. &ldquo;What happens on wrong password?&rdquo; &rarr; <span class="sc-b">0.000</span>.</p></div>
+
+<div class="box analogy"><div class="bt">🕸️ Graph vs Hierarchy (Tree)</div>
+<p><b>Graph</b>: relationships, cycles ho sakte hain (A&rarr;B&rarr;A). <b>Tree/Hierarchy</b>: similar cheezein group karke summary (aage RAPTOR). Dono alag concepts hain.</p></div>
+`};
+
+M.m11 = {n:11, part:"Advanced RAG", title:"HyDE", hi:"pehle nakli jawaab likho, phir usse dhoondho", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>HyDE</b> = Hypothetical Document Embeddings. User ka sawaal chhota/abstract ho toh &mdash; pehle LLM se ek <em>nakli (hypothetical) jawaab</em> likhwao, phir <b>us jawaab ko embed karke</b> retrieve karo. Nakli jawaab asli documents jaisa dikhta hai, isliye better match milta hai.</p></div>
+
+<div class="box analogy"><div class="bt">💭 Analogy</div>
+<p>Aap library mein ho aur bolte ho &ldquo;mujhe photosynthesis pe kuch chahiye&rdquo; &mdash; librarian confused. Par agar aap ek paragraph likh do jaisa aapko chahiye, woh usse milti-julti book turant dhoondh legi. HyDE wahi karta hai.</p></div>
+
+<pre>User query &rarr; LLM &rarr; nakli document &rarr; embed &rarr; retrieve <b>asli</b> docs
+              (query expansion)              (final jawaab in se banta hai)</pre>
+
+<div class="box warn"><div class="bt">⚠️ Kab use karo, kab nahi</div>
+<p><b>Achha</b>: jab queries abstract/chhoti hon aur system detailed query pe better perform karta ho. <b>Bura</b>: code ke liye &mdash; code bahut specific hota hai, nakli code hallucination la sakta hai. Har change ke baad <em>evals</em> se check karo ki accuracy sach mein badhi ya nahi.</p></div>
+<p class="num" style="font-size:13px;color:var(--ink-faint)">📄 Paper: &ldquo;Precise Zero-Shot Dense Retrieval without Relevance Labels&rdquo; (arXiv:2212.10496)</p>
+`};
+
+M.m12 = {n:12, part:"Advanced RAG", title:"RAPTOR (Hierarchical RAG)", hi:"similar chunks ko group karke summary ka tree banao", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Bahut saare chunks hain, sabme dhoondhna slow hai? Toh <b>similar chunks ko group karo</b>, unki <em>summary</em> banao, phir summaries ko group karo &mdash; ek <b>tree</b> ban jaata hai. Query aaye toh upar se summary dekhke sahi group mein neeche jaao.</p></div>
+
+<p>RAPTOR = <b>R</b>ecursive <b>A</b>bstractive <b>P</b>rocessing for <b>T</b>ree <b>O</b>rganized <b>R</b>etrieval.</p>
+<pre>Level 2:        [Root summary]
+                /            \\
+Level 1:   [Auth group]   [Billing group]   <span class="cm"># summaries</span>
+           /      \\         /       \\
+Level 0: chunk  chunk    chunk    chunk       <span class="cm"># asli chunks (leaves)</span></pre>
+
+<div class="box warn"><div class="bt">⚠️ RAPTOR vs Graph RAG (confuse mat karna)</div>
+<p><b>RAPTOR</b>: similar chunks ki summaries ka tree. Search ke waqt <b>semantic search</b> hoti hai (summary vs query). <b>Graph RAG</b>: entities ke beech relationships. Goal alag hai &mdash; RAPTOR = grouping, Graph = relationships.</p></div>
+<p class="num" style="font-size:13px;color:var(--ink-faint)">📄 Paper: RAPTOR (arXiv:2401.18059)</p>
+`};
+
+M.m13 = {n:13, part:"Advanced RAG", title:"Vectorless RAG / PageIndex", hi:"koi embedding nahi — LLM reasoning se dhoondho", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Core problem: <b>similarity &ne; relevance</b>. &ldquo;Payment failures&rdquo; ka jawaab &ldquo;Refund Processing Timeline&rdquo; mein ho sakta hai &mdash; par words match nahi karte. <b>PageIndex</b> embeddings ki jagah <em>LLM reasoning</em> use karta hai.</p></div>
+
+<div class="box analogy"><div class="bt">📖 Analogy: Book ka index</div>
+<p>Aap SQL dhoondh rahe ho &mdash; kitaab ke <b>index/table of contents</b> se pata chalta hai "Databases" chapter mein milega, "Networking" mein nahi. Chapter ke <em>title</em> se reason karke sahi jagah jaate ho. Bilkul yahi PageIndex karta hai.</p></div>
+
+<p>Index time pe: har file/folder ki LLM-summary ka tree banao (koi vector nahi). Query time pe: agent tree padhta hai, reason karta hai kaunsa node relevant hai, phir <b>sirf woh</b> chunk ka content fetch karta hai.</p>
+
+<div class="box why"><div class="bt">💪 Kab best hai</div>
+<p>Bade, structured, professional documents (legal, jahaan &ldquo;clause 4.2 dekho&rdquo; type references hon) aur bade codebases jahaan hierarchy clear ho. Multiple LLM calls hote hain par saare chunks scan karne se fast &mdash; jaise binary search.</p></div>
+<div class="box interview"><div class="bt">🎤 RAPTOR vs PageIndex</div>
+<p>Dono tree hain. <b>RAPTOR</b> mein search = semantic (summary embed hoti hai). <b>PageIndex/Vectorless</b> mein <em>koi embedding nahi</em> &mdash; LLM reason karke tree navigate karta hai. Yahi core difference.</p></div>
+`};
+
+/* ---------- PART 4: Evaluation ---------- */
+M.m14 = {n:14, part:"Evaluation", title:"RAG Evaluation Metrics", hi:"kaise pata chale RAG achha kaam kar raha hai?", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>RAG mein kuch bhi change karo (chunk size, embedding, retriever) &mdash; kaise pata chalega behtar hua ya bekaar? <b>Metrics</b> se, ek <em>golden dataset</em> ke against.</p></div>
+
+<h3>Retrieval metrics (deterministic — maths se)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Metric</th><th>Kya naapta hai</th><th>Formula (aasan)</th></tr>
+<tr><td><b>Recall@K</b></td><td>Completeness &mdash; kitne sahi docs mile</td><td>sahi mile &divide; total sahi</td></tr>
+<tr><td><b>Precision@K</b></td><td>Accuracy &mdash; jo laaye woh kitne sahi</td><td>sahi mile &divide; total laaye</td></tr>
+<tr><td><b>MRR</b></td><td>Pehla sahi doc kis rank pe</td><td>1 &divide; rank</td></tr>
+<tr><td><b>Hit Rate@K</b></td><td>Ek bhi sahi mila? (haan/naa)</td><td>1 ya 0</td></tr>
+<tr><td><b>nDCG@K</b></td><td>Rank ko weight deke quality</td><td>weighted ranking</td></tr>
+</table></div>
+
+<h3>Generation metrics (LLM-as-judge se)</h3>
+<p>Kuch cheezein maths se nahi naap sakte &mdash; jaise &ldquo;jawaab relevant hai kya?&rdquo; Iske liye <b>ek doosra LLM judge</b> banate hain:</p>
+<ul>
+<li><b>Faithfulness</b> &mdash; jawaab context pe based hai ya hallucination?</li>
+<li><b>Answer Relevancy</b> &mdash; jawaab sawaal se related hai?</li>
+<li><b>Context Precision / Recall</b> &mdash; laaya gaya context kitna sahi?</li>
+<li><b>Factual Correctness</b> &mdash; facts sahi hain?</li>
+</ul>
+
+<div class="box interview"><div class="bt">🎤 Faithfulness = leading indicator</div>
+<p>Bada insight: Faithfulness sirf LLM ki quality nahi, <b>retrieval quality</b> batata hai. Jab context galat aata hai (BM25 vocab mismatch), LLM gaps ko hallucination se bharta hai &rarr; faithfulness gir jaata hai. Toh low faithfulness = retrieval kharab.</p></div>
+`};
+
+M.m15 = {n:15, part:"Evaluation", title:"RAGAS aur Golden Dataset", hi:"library se evals; ground truth ke against compare", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Har metric ka formula khud likhna? Nahi. <b>RAGAS</b> (RAG Assessment) library ye sab kar deti hai. Aur compare kis se karte ho? <b>Golden Dataset</b> se &mdash; sawaal + verified sahi jawaab.</p></div>
+
+<pre><span class="cm"># Golden dataset — verified ground truth</span>
+TEST_CASES = [
+  {<span class="st">"question"</span>: "What is AuthService responsible for?",
+   <span class="st">"reference"</span>: "AuthService handles registration, login, sessions..."},
+  <span class="cm"># ...18 aise cases</span>
+]</pre>
+
+<div class="box why"><div class="bt">🔑 Workflow yaad rakho</div>
+<ol style="margin:4px 0">
+<li>Golden dataset banao (sawaal + sahi jawaab)</li>
+<li>Apne RAG se jawaab nikaalo</li>
+<li>RAGAS se metrics naapo (GPT-4o judge)</li>
+<li>Kuch change karo &rarr; dobara naapo &rarr; compare</li>
+</ol></div>
+
+<div class="box interview"><div class="bt">🎤 Golden dataset kaise banao?</div>
+<p>Manual (best, par mehnat) ya <b>synthetic</b> (LLM se generate). Production mein RAG kharab kar raha ho toh <b>production logs analyze karo</b> &mdash; kaunse queries fail ho rahe, unhe golden dataset mein add karo. LLM-judge same ya alag ho sakta hai; same ho toh <em>bias</em> aa sakta hai.</p></div>
+`};
+
+M.m16 = {n:16, part:"Evaluation", title:"Comparison Learnings (asli data)", hi:"9 configs ke actual RAGAS numbers — ye gold hai", html:`
+<div class="box simple"><div class="bt">🎯 Ye module sabse valuable hai</div>
+<p>Course mein 9 RAG configs ko 18-question golden dataset pe naapa gaya. Ye <b>actual data</b> hai &mdash; interview mein bolo toh sona hai.</p></div>
+
+<div class="tbl-wrap"><table>
+<tr><th>Config</th><th>Precision</th><th>Recall</th><th>Faith.</th><th>Relev.</th></tr>
+<tr><td>Semantic, chunk=256, k=4</td><td class="num sc-b">0.333</td><td class="num sc-b">0.362</td><td class="num sc-w">0.603</td><td class="num sc-w">0.609</td></tr>
+<tr><td>Semantic, chunk=1500, k=4</td><td class="num sc-g">0.778</td><td class="num sc-w">0.650</td><td class="num sc-g">0.821</td><td class="num sc-g">0.821</td></tr>
+<tr><td>Semantic, chunk=1500, k=1</td><td class="num sc-b">0.366</td><td class="num sc-b">0.426</td><td class="num sc-g">0.706</td><td class="num sc-w">0.623</td></tr>
+<tr><td>AST chunks, k=1</td><td class="num sc-w">0.534</td><td class="num sc-w">0.600</td><td class="num sc-g">0.741</td><td class="num sc-w">0.682</td></tr>
+<tr><td>BM25, chunk=256, k=4</td><td class="num sc-b">0.306</td><td class="num sc-b">0.242</td><td class="num sc-b">0.281</td><td class="num sc-b">0.449</td></tr>
+<tr><td>Hybrid (HF+BM25), 256</td><td class="num sc-w">0.667</td><td class="num sc-b">0.466</td><td class="num sc-w">0.649</td><td class="num sc-w">0.685</td></tr>
+<tr><td>Hybrid (OpenAI+BM25), 256</td><td class="num sc-w">0.641</td><td class="num sc-b">0.469</td><td class="num sc-w">0.686</td><td class="num sc-w">0.676</td></tr>
+<tr style="background:var(--amber-soft)"><td><b>🏆 Hybrid (OpenAI+BM25), 1500</b></td><td class="num sc-g">0.889</td><td class="num sc-g">0.824</td><td class="num sc-g">0.873</td><td class="num sc-g">0.825</td></tr>
+<tr><td>GraphRAG, depth=2</td><td class="num sc-b">0.389</td><td class="num sc-b">0.340</td><td class="num sc-g">0.736</td><td class="num sc-b">0.394</td></tr>
+</table></div>
+
+<h3>8 bade learnings</h3>
+<div class="acc"><details><summary>1 · Chunk size sabse bada lever hai</summary><div class="acc-body"><p>256&rarr;1500 (semantic): precision 0.333&rarr;0.778, recall 0.362&rarr;0.650. Chhote chunks function/class ko tod dete hain. Code ke liye meaningful unit = poora function/class, chhoti window nahi.</p></div></details></div>
+<div class="acc"><details><summary>2 · k bhi utna hi important</summary><div class="acc-body"><p>k=4&rarr;1 (same chunk=1500): precision 0.778&rarr;0.366 crash! &ldquo;Find every place X&rdquo;, &ldquo;trace call chain&rdquo; &mdash; inke liye multiple files ke chunks chahiye. Ek chunk kaafi nahi.</p></div></details></div>
+<div class="acc"><details><summary>3 · AST k=1 pe text se behtar, par blind spots</summary><div class="acc-body"><p>AST (0.534/0.600) vs text k=1 (0.366/0.426). Par import/module-level sawaal pe 0.000 &mdash; AST function nodes pe kaatta, imports miss.</p></div></details></div>
+<div class="acc"><details><summary>4 · Faithfulness semantic mein tikta, BM25 mein girta</summary><div class="acc-body"><p>Semantic worst case mein bhi faithfulness &ge;0.6. BM25: 0.281 (sabse kam) &mdash; galat chunks se hallucination.</p></div></details></div>
+<div class="acc"><details><summary>5 · Akela BM25 code Q&amp;A ke liye sabse bura</summary><div class="acc-body"><p>&ldquo;What is AuthService responsible for?&rdquo; &mdash; &ldquo;class AuthService&rdquo; se koi token match nahi. Semantic gap bharta hai, BM25 nahi. BM25 sirf exact-identifier pe jeetta (BillingError &rarr; 1.000).</p></div></details></div>
+<div class="acc"><details><summary>6 · Chunk size &gt; embedding quality</summary><div class="acc-body"><p>HuggingFace&rarr;OpenAI embedding badalne se chunk=256 pe kuch nahi badla (&lt;0.03). Chunk 256&rarr;1500 se massive gain (+0.248 precision). Behtar embedding tooti hui cheez ko theek nahi karta &mdash; pehle complete chunks chahiye.</p></div></details></div>
+<div class="acc"><details><summary>7 · GraphRAG structure mein king, behavior mein blind</summary><div class="acc-body"><p>Call chain, class methods, imports &rarr; perfect. Par &ldquo;kaunsa error raise hua&rdquo;, &ldquo;kaunse fields&rdquo; &rarr; 0.000. Edges store karta hai, implementation detail nahi.</p></div></details></div>
+<div class="acc"><details><summary>8 · Kuch sawaal har config mein mushkil</summary><div class="acc-body"><p>&ldquo;Which methods check ownership?&rdquo; &mdash; multiple method bodies ek saath padhne padte. Koi single retriever poori tarah solve nahi karta.</p></div></details></div>
+
+<div class="box interview"><div class="bt">🎤 Kaunsa RAG kis sawaal ke liye</div>
+<div class="tbl-wrap" style="margin:8px 0 0"><table>
+<tr><th>Sawaal ka type</th><th>Best config</th></tr>
+<tr><td>Single-file detail (error, field)</td><td>Hybrid OpenAI+BM25, 1500</td></tr>
+<tr><td>Exact identifier lookup</td><td>Hybrid 1500 ya BM25</td></tr>
+<tr><td>Class ke saare methods</td><td>GraphRAG ya AST</td></tr>
+<tr><td>Call chain / dependency</td><td>GraphRAG</td></tr>
+<tr><td>Import relationships</td><td>GraphRAG ya Semantic 1500</td></tr>
+</table></div></div>
+`};
+
+/* ---------- PART 5: Context Engineering ---------- */
+M.m17 = {n:17, part:"Context Engineering", title:"Context Window aur Lost in the Middle", hi:"shuru aur end important, beech kho jaata hai", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>LLM ko jo bhi text bhejte ho woh <b>context window</b> hai &mdash; limited, mehnga. Aur ek research: LLM context ke <b>shuru aur end</b> ko achhe se use karta hai, <b>beech ko kho deta hai</b>. Isko &ldquo;Lost in the Middle&rdquo; kehte hain (accuracy U-shape banati hai).</p></div>
+
+<div class="lab" id="lab-lim">
+<div class="lab-head"><span class="tag">Lab 04</span><b>Lost in the Middle &mdash; U-curve</b></div>
+<div class="lab-body">
+<label>Important info context mein kahan rakhi hai? <span class="val" id="lim-val">Middle</span></label>
+<input type="range" id="lim" min="0" max="100" value="50">
+<canvas id="lim-canvas" width="700" height="220" style="margin-top:14px"></canvas>
+<p id="lim-msg" style="font-size:14px;margin-top:6px"></p>
+</div></div>
+
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">End = Recency Effect</div><p>Transformer next word generate karte waqt <b>recent tokens</b> pe zyada dhyan deta hai. Isliye user query aksar end mein rakhte hain.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Start = Primacy Effect</div><p>Training data mein shuru mein aksar <b>instructions/heading</b> hote hain. Isliye LLM shuru ko important maanta hai. Isliye system prompt shuru mein.</p></div>
+</div>
+
+<div class="box interview"><div class="bt">🎤 Interview one-liner</div>
+<p>&ldquo;<b>Recency effect</b> transformer architecture se aata hai (generation dynamics). <b>Primacy effect</b> training data ke structure se aata hai (docs ke shuru mein instructions). Isliye middle weak &mdash; static/important cheezein shuru ya end mein rakho.&rdquo;</p></div>
+<p class="num" style="font-size:13px;color:var(--ink-faint)">📄 Paper: &ldquo;Lost in the Middle&rdquo; (Liu et al.)</p>
+`};
+
+M.m18 = {n:18, part:"Context Engineering", title:"Context Strategies", hi:"prune · compress · select · expand · order", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Context ko behtar banane ke 5 tareeke hain. Interview mein &ldquo;how do you manage context?&rdquo; ka jawaab ye 5 words hain.</p></div>
+
+<div class="box"><div class="bt" style="color:var(--amber)">✂️ 1 · Pruning</div><p>Faltu hataao &mdash; duplicate chunks, stale/purana data, irrelevant cheezein. (De-duplication)</p></div>
+<div class="box"><div class="bt" style="color:var(--amber)">🗜️ 2 · Compression</div><p>Bada context summarize/trim karo. 1000 tokens &rarr; 200 tokens summary.</p></div>
+<div class="box"><div class="bt" style="color:var(--amber)">🎯 3 · Selection</div><p>100 candidate chunks mein se sirf top 10 bhejo (re-ranking ke basis pe).</p></div>
+<div class="box"><div class="bt" style="color:var(--amber)">📈 4 · Expansion</div><p>Ulta &mdash; context <em>badhao</em>. Code mein: function ke saath uske helper methods, imports, class bhi laao. Quality ke liye.</p></div>
+<div class="box"><div class="bt" style="color:var(--amber)">🔀 5 · Ordering</div><p>Lost-in-the-middle yaad hai? Important cheezein shuru/end mein reorder karo.</p></div>
+
+<div class="box why"><div class="bt">🔑 Expansion + Compression saath mein</div>
+<p>Pehle helper functions/class laake context <b>expand</b> karo, phir usko summarize karke <b>compress</b> karo. Aise: information poori, par tokens kam. (Ye Claude Code jaisa real pattern hai.)</p></div>
+`};
+
+M.m19 = {n:19, part:"Context Engineering", title:"Token Budgeting", hi:"HLD jaisa calculation, par tokens ka", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Normal HLD mein storage, QPS, latency calculate karte hain. Yahan hum <b>tokens</b> calculate karte hain &mdash; kyunki wahi paisa hai. Kitna context, kitna cost, kitni latency.</p></div>
+
+<p>Ek typical request kaise banti hai:</p>
+<div class="tbl-wrap"><table>
+<tr><th>Hissa</th><th>Kitna badalta hai</th><th>Approx tokens</th></tr>
+<tr><td>System prompt</td><td>Static (nahi badalta)</td><td class="num">~40,000</td></tr>
+<tr><td>Tool definitions</td><td>Static</td><td class="num">~20,000</td></tr>
+<tr><td>Retrieved context</td><td>Static-ish</td><td class="num">~40,000</td></tr>
+<tr><td><b>User query</b></td><td><b>Dynamic (chhota)</b></td><td class="num">~1,000</td></tr>
+</table></div>
+
+<div class="box why"><div class="bt">🔑 Yeh insight caching ka base hai</div>
+<p>Dekho &mdash; 100k tokens <b>static</b> hai (roz same), sirf 1k dynamic. Isliye static hissa <b>cache</b> ho sakta hai! (Module 33 mein poora math.) Aur isliye providers kehte hain: <em>static content shuru mein rakho</em> (system prompt pehle).</p></div>
+
+<div class="box interview"><div class="bt">🎤 Interview mein</div>
+<p>Token budgeting alag &ldquo;layer&rdquo; nahi &mdash; Safety ya Quality Assurance layer mein handle hota hai. Par calculation aani chahiye: per request cost = (tokens &divide; 1M) &times; price. 10 requests, 101k tokens each, $3/1M &rarr; 3.03 dollars. Caching se ye 10x tak gir sakta hai.</p></div>
+`};
+
+/* ---------- PART 6: Memory ---------- */
+M.m20 = {n:20, part:"Memory", title:"Short-Term Memory (STM)", hi:"ek conversation ki yaadein — checkpointers", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>LLM stateless hai (yaad?). <b>STM</b> = ek chat/session ki poori conversation store karke har baar wapas bhejna. ChatGPT ka ek chat window jaisa.</p></div>
+
+<div class="lab" id="lab-mem">
+<div class="lab-head"><span class="tag">Lab 05</span><b>Stateless vs Memory</b></div>
+<div class="lab-body">
+<div style="display:flex;gap:8px;margin-bottom:14px">
+<button class="chip on" id="mem-off">Memory OFF (stateless)</button>
+<button class="chip" id="mem-on">Memory ON (STM)</button>
+</div>
+<div id="mem-chat" style="font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:16px;border-radius:9px;border:1px solid var(--line);min-height:120px"></div>
+<button class="btn" id="mem-step" style="margin-top:12px">Agli baat bolo &rarr;</button>
+</div></div>
+
+<h3>STM kaise store hoti hai</h3>
+<p>LangChain/LangGraph mein <b>checkpointers (savers)</b> se &mdash; bas conversation ki list save hoti hai. Yeh fancy lagta hai par simple hai:</p>
+<ul>
+<li><b>SqliteSaver</b> &rarr; SQLite mein save</li>
+<li><b>RedisSaver</b> &rarr; Redis mein</li>
+<li><b>PostgresSaver</b> &rarr; Postgres mein</li>
+</ul>
+<p><b>Thread ID</b> se har alag conversation identify hoti hai. Naya thread = nayi memory.</p>
+
+<h4>Jab conversation lambi ho jaaye</h4>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">Sliding Window</div><p>Sirf last N messages rakho, purane hata do. Simple &amp; sasta, par purana context kho jaata hai.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Summarization</div><p>Purane messages ka summary banao, recent raw rakho. Gist bacha rehta hai. (Middleware se add karo.)</p></div>
+</div>
+`};
+
+M.m21 = {n:21, part:"Memory", title:"Long-Term Memory (LTM)", hi:"sessions ke paar yaad rakhna — user preferences", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>STM</b> = ek chat ki yaad. <b>LTM</b> = <em>saare chats ke paar</em> yaad. Jaise ChatGPT ko ek chat mein bataya &ldquo;main developer hoon&rdquo; &mdash; doosre chat mein bhi yaad rehta hai. Yeh LTM hai.</p></div>
+
+<h3>LTM ke 3 types</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--amber)">📅 Episodic</div><p>Specific ghatnaayein/interactions &mdash; &ldquo;pichli baar aapne X kiya tha&rdquo;.</p></div>
+<div class="box"><div class="bt" style="color:var(--amber)">📚 Semantic</div><p>Facts about user &mdash; naam, job, location, preferences.</p></div>
+<div class="box" style="grid-column:1/-1"><div class="bt" style="color:var(--amber)">⚙️ Procedural</div><p>&ldquo;Kaise behave karna hai&rdquo; rules &mdash; &ldquo;hamesha bullet points mein jawaab do&rdquo;, &ldquo;concise raho&rdquo;. User batata hai, agent save karta hai, har future session mein apply.</p></div>
+</div>
+
+<h3>STM + LTM saath mein</h3>
+<pre><span class="cm"># Do alag layers, do alag databases</span>
+thread_id  &rarr; SqliteSaver  &rarr; is chat ke messages     (STM)
+user_id    &rarr; SqliteStore  &rarr; behavior rules, facts   (LTM)</pre>
+<p>Code mein: ek <b>tool</b> banate hain (<code>save_rule</code>) jo LLM call karta hai jab user behavior batata hai. Rule <code>SqliteStore</code> mein save, har session ke system prompt mein load. Restart ke baad bhi rule zinda.</p>
+
+<div class="box interview"><div class="bt">🎤 STM vs LTM one-liner</div>
+<p>&ldquo;STM = single conversation/thread (checkpointer). LTM = across sessions, user-level (store). LTM ke 3 types: episodic (events), semantic (facts), procedural (behavior rules).&rdquo;</p></div>
+`};
+
+/* ---------- PART 7: Vector DB ---------- */
+M.m22 = {n:22, part:"Vector DB", title:"HNSW", hi:"10M+ vectors mein milliseconds mein nearest dhoondhna", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>10 million vectors hain, query aayi &mdash; sabse cosine similarity nikaalo? Woh <b>O(N)</b>, 10-30 second lagenge (~3000 operations &times; 10M). Bekaar! <b>HNSW</b> ek graph banata hai jisse milliseconds mein approximate nearest neighbours milte hain.</p></div>
+
+<p><b>HNSW</b> = Hierarchical Navigable Small World. Chroma, Qdrant, Pinecone, Weaviate, FAISS, pgvector, Milvus &mdash; sabka default.</p>
+
+<div class="box analogy"><div class="bt">🔗 Analogy: Skip List / Express Highway</div>
+<p>Linked list mein 1 se 55 tak jaana &mdash; 55 steps (O(N)). Par agar upar ek &ldquo;express layer&rdquo; ho jo 20, 40, 60 pe jump kare &mdash; toh pehle upar se paas pahuncho, phir neeche detail mein. ~log(N) steps! HNSW yahi karta hai, par vectors ke saath &mdash; upar ki layers &ldquo;express routes&rdquo;, neeche ki layer har vector.</p></div>
+
+<div class="lab" id="lab-hnsw">
+<div class="lab-head"><span class="tag">Lab 06</span><b>HNSW &mdash; layer-by-layer navigation</b></div>
+<div class="lab-body">
+<canvas id="hnsw-canvas" width="700" height="320"></canvas>
+<div style="display:flex;gap:10px;margin-top:12px">
+<button class="btn" id="hnsw-go">Query dhoondho &rarr;</button>
+<button class="btn ghost" id="hnsw-reset">Reset</button>
+</div>
+<p id="hnsw-msg" style="font-size:13.5px;margin-top:8px;color:var(--ink-soft)"></p>
+</div></div>
+
+<div class="box interview"><div class="bt">🎤 Interview: &ldquo;Cosine similarity kyun nahi?&rdquo;</div>
+<p>&ldquo;Cosine samajhne ke liye best hai, par 10M vectors pe brute-force O(N) &mdash; 10-30 sec. Production vector DBs <b>HNSW</b> use karte hain: multi-layer graph, upar express routes, neeche dense connections. Query top se neeche navigate karti hai, poore index ka chhota hissa visit karti hai. Recall high, latency low, dynamic inserts &mdash; bina training/clustering. Malkov &amp; Yashunin, 2018.&rdquo;</p></div>
+`};
+
+/* ---------- PART 8: Capstone ---------- */
+M.m23 = {n:23, part:"Capstone", title:"Project Setup (Poetry + pipx)", hi:"apna Claude Code — CLI package jo kahin bhi chale", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Goal: aisa package jo aap kisi bhi folder mein <code>educosys_claude</code> type karo aur woh chal jaaye &mdash; bilkul Claude Code jaisa. Iske liye <b>Poetry</b> (dependencies) + <b>pipx</b> (global CLI) use karte hain.</p></div>
+
+<h3>Poetry &mdash; pip ki jagah</h3>
+<p>Poetry virtual environment, dependencies, versions &mdash; sab khud manage karta hai. <code>requirements.txt</code> ki zaroorat nahi.</p>
+<pre><span class="kw">poetry</span> init                    <span class="cm"># pyproject.toml banao</span>
+<span class="kw">poetry</span> add langchain openai   <span class="cm"># dependency add</span>
+<span class="kw">poetry</span> install               <span class="cm"># sab install</span>
+<span class="kw">poetry</span> run educosys_claude   <span class="cm"># run</span></pre>
+
+<h3>Entry point &mdash; pyproject.toml</h3>
+<pre>[tool.poetry.scripts]
+educosys_claude = <span class="st">"educosys_claude.main:run"</span>
+<span class="cm"># matlab: "educosys_claude" type karo &rarr; main.py ka run() chalega</span></pre>
+
+<h3>pipx &mdash; global CLI</h3>
+<p>pipx package ko <b>apne alag environment mein</b> install karke command ko <b>global path</b> pe daal deta hai (npx jaisa). Ab kisi bhi folder mein command chalti hai.</p>
+<pre><span class="kw">pipx</span> install .        <span class="cm"># is folder se global CLI banao</span>
+<span class="cm"># ab kahin bhi:</span>
+educosys_claude          <span class="cm"># chal gaya! 🎉</span></pre>
+
+<div class="box why"><div class="bt">🔧 Basic setup checklist</div>
+<ul style="margin:4px 0">
+<li><code>.env</code> &mdash; secrets (API keys). GitHub pe <b>kabhi</b> nahi.</li>
+<li><code>.gitignore</code> &mdash; secrets, cache, venv chhupao</li>
+<li><code>config.yaml</code> &mdash; settings (LLM, model, DB). GitHub pe <b>ja sakta</b> hai.</li>
+<li><code>config.py</code> &mdash; YAML load karo</li>
+</ul></div>
+<div class="box interview"><div class="bt">🎤 .env vs config kyun dono?</div>
+<p>.env = secrets (push nahi hote). config = settings jaise kaunsa LLM/DB (push ho sakte). config badalke aap OpenAI se Anthropic switch kar sakte ho bina code chhue.</p></div>
+`};
+
+M.m24 = {n:24, part:"Capstone", title:"Layered Architecture", hi:"har layer ka ek kaam — modular, extensible", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Poora RAG ek file mein? Nahi! Production code <b>modular</b> hota hai &mdash; har layer ka ek kaam, koi layer doosre ke andar haath nahi daalti. LLM switch karna ho toh sirf config badlo, code nahi.</p></div>
+
+<h3>Layers (upar se neeche)</h3>
+<pre><span class="kw">CLI / REPL</span>    <span class="cm"># user se baat — input/output, commands</span>
+    &darr;
+<span class="kw">Agent</span>         <span class="cm"># dimaag — sochna, tool call decide karna</span>
+    &darr;
+<span class="kw">Tools</span>         <span class="cm"># haath — file padho, command chalao, search</span>
+    &darr;
+<span class="kw">Skills</span>        <span class="cm"># composed workflows — "review this PR"</span>
+    &darr;
+<span class="kw">MCP</span>           <span class="cm"># external integrations — GitHub, Slack, Jira</span>
+    &darr;
+<span class="kw">Context / RAG</span> <span class="cm"># knowledge — index + retrieve</span></pre>
+
+<h3>Cross-cutting layers</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">Context</div><p>Indexers, Retrievers, Memory</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">LLM</div><p>Factory &mdash; <code>get_llm()</code>, <code>get_embedder()</code></p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Observability</div><p>Logging, tracing (LangSmith/LangFuse)</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Safety</div><p>Guardrails, human-in-the-loop</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Freshness</div><p>Re-indexing jab code badle</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Evals / QA</div><p>Quality checks, token budgeting</p></div>
+</div>
+
+<div class="box why"><div class="bt">🏭 Factory Pattern</div>
+<p>Jab bhi kuch <b>banana</b> ho (LLM, indexer, retriever, agent) &mdash; <b>factory</b> use karo. Config dekhke sahi object banata hai. Naya retriever add karna ho? Sirf ek <code>if</code> factory mein &mdash; baaki code untouched. Yahi <em>extensibility</em> hai.</p></div>
+`};
+
+/* ---------- PART 9: Harness ---------- */
+M.m25 = {n:25, part:"Harness", title:"Tools", hi:"agent ke haath — bas Python functions", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>Tool</b> ek fancy word hai &mdash; asal mein sirf ek <b>function</b> hai. Terminal command chalana, file padhna/likhna &mdash; sab tools. LLM decide karta hai kaunsa call karna, aapki app call karti hai.</p></div>
+
+<pre><span class="kw">@tool</span>
+<span class="kw">def</span> <span class="fn">run_command</span>(command: str) -&gt; str:
+    <span class="st">"""Run a shell command and return output"""</span>  <span class="cm"># &larr; ye docstring LLM padhta hai!</span>
+    result = subprocess.run(command, shell=True, capture_output=True)
+    <span class="kw">return</span> result.stdout</pre>
+
+<p>Common tools jo har coding agent ko chahiye:</p>
+<ul>
+<li><b>Terminal</b> &mdash; command chalao (destructive commands block karo!)</li>
+<li><b>Filesystem</b> &mdash; CRUD (create, read, update, delete files)</li>
+<li><b>Retriever tool</b> &mdash; RAG (vector DB se laana)</li>
+</ul>
+
+<div class="box warn"><div class="bt">⚠️ Tools ko organize karo</div>
+<p>Saare tools ek file mein? Nahi! <code>terminal_tools.py</code>, <code>filesystem_tools.py</code> alag. Aur ek <b>separate layer</b> banao. Warna jaise class mein <code>rm -rf</code> block kiya par LLM ne <code>rm -f</code> chala diya &mdash; isliye guardrails zaroori (Module 29).</p></div>
+
+<div class="box interview"><div class="bt">🎤 Tool ka kya jaata hai LLM ko?</div>
+<p>Naam, description (docstring), arguments (signature), return type. Poora code nahi. Docstring hi &ldquo;description&rdquo; hai &mdash; isliye achhe docstrings likhna zaroori.</p></div>
+`};
+
+M.m26 = {n:26, part:"Harness", title:"MCP (Model Context Protocol)", hi:"tools expose karne ka standard — jaise HTTP", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Har company apne tools expose kar rahi hai (GitHub, Slack). Har baar khud code likho? Nahi! <b>MCP</b> ek <em>standard</em> hai tools expose/use karne ka &mdash; jaise HTTP APIs ke liye standard hai. Anthropic ne banaya, ab sab use karte hain.</p></div>
+
+<div class="box analogy"><div class="bt">🔌 Analogy: USB-C port</div>
+<p>USB-C laptop, phone, tablet &mdash; sab pe chalta hai kyunki ek standard hai. MCP AI apps ke liye USB-C hai. GitHub apna &ldquo;MCP server&rdquo; deta hai, aap 2 line config mein use kar lo &mdash; poora code (list files, create PR, push) mil jaata hai.</p></div>
+
+<h3>Architecture: Host · Client · Server</h3>
+<div class="flow">
+<div class="node acc">Aapki App<br>(HOST)</div><div class="arr">&rarr;</div>
+<div class="node tl">Client 1</div><div class="arr">&harr;</div>
+<div class="node">GitHub Server</div>
+</div>
+<div class="flow">
+<div class="node acc">HOST</div><div class="arr">&rarr;</div>
+<div class="node tl">Client 2</div><div class="arr">&harr;</div>
+<div class="node">Filesystem Server</div>
+</div>
+<ul>
+<li><b>Host</b> = aapki application</li>
+<li><b>Client</b> = har server ke liye ek (1-to-1 mapping)</li>
+<li><b>Server</b> = tools ka set (GitHub, filesystem, etc.)</li>
+</ul>
+
+<h3>Transport: stdio vs HTTP</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">stdio</div><p>Server aapke <b>apne system pe</b> ek alag process mein chalta hai (npx/python command se). Local resources kaafi hon toh.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Streamable HTTP</div><p>Server <b>kahin aur</b> chalta hai, aap URL pe HTTP call karte ho.</p></div>
+</div>
+
+<pre><span class="cm"># itni si config mein GitHub ke saare tools mil jaate hain</span>
+{<span class="st">"github"</span>: {
+   <span class="st">"command"</span>: <span class="st">"npx"</span>,
+   <span class="st">"args"</span>: [<span class="st">"-y"</span>, <span class="st">"@modelcontextprotocol/server-github"</span>],
+   <span class="st">"transport"</span>: <span class="st">"stdio"</span>
+}}</pre>
+
+<div class="box why"><div class="bt">🔑 Custom server (FastMCP se)</div>
+<p>Apne tools bhi expose kar sakte ho &mdash; <code>FastMCP</code> se. Apna <code>@mcp.tool()</code> lagao, <code>mcp.run(transport="stdio")</code>. Ab koi bhi aapke tools use kar sakta hai.</p></div>
+<div class="box interview"><div class="bt">🎤 MCP vs Tool vs Skill</div>
+<p><b>Tool</b> = ek function. <b>MCP</b> = tools expose karne ka protocol (client+server setup). <b>Skill</b> = instructions ka folder (agla module). MCP aur Skills ko compare mat karo &mdash; alag cheezein hain.</p></div>
+`};
+
+M.m27 = {n:27, part:"Harness", title:"Skills", hi:"instructions ka folder — progressive disclosure", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>Skill</b> = ek folder jisme <code>SKILL.md</code> file hai &mdash; usme plain English instructions, examples, aur optionally scripts. Repeated kaam ke liye (PPT banao, PDF process karo, code review karo). Anthropic ka standard.</p></div>
+
+<pre>skills/
+ &#9492;&#9472; frontend_design/
+     &#9500;&#9472; SKILL.md          <span class="cm"># MUST — name, description + instructions</span>
+     &#9500;&#9472; scripts/          <span class="cm"># optional — code</span>
+     &#9492;&#9472; references/       <span class="cm"># optional — examples</span></pre>
+
+<h3>Progressive Disclosure &mdash; sabse important concept</h3>
+<p>Poora SKILL.md prompt mein nahi bhej sakte (bahut bada). Toh 3 levels mein load hota hai:</p>
+<div class="tbl-wrap"><table>
+<tr><th>Level</th><th>Kya</th><th>Kab load</th><th>Tokens</th></tr>
+<tr><td>1</td><td><b>Metadata</b> (name + description)</td><td>Hamesha</td><td class="num">~100</td></tr>
+<tr><td>2</td><td>Instructions</td><td>Jab skill choose ho</td><td class="num">~5,000</td></tr>
+<tr><td>3</td><td>Resources / scripts</td><td>Jab zaroorat ho</td><td class="num">on demand</td></tr>
+</table></div>
+<p>SKILL.md ke top pe hamesha 3 dash ke beech metadata hota hai:</p>
+<pre>---
+name: pdf-processing
+description: Use when user wants anything with PDF files
+---
+(baaki instructions...)</pre>
+
+<div class="box why"><div class="bt">🔑 Internally kya hota hai (registry)</div>
+<p>Code skills folder scan karta hai, har SKILL.md se sirf <b>name + description</b> nikaalta hai, system prompt mein daalta hai. Jab LLM kahe &ldquo;ye skill chahiye&rdquo; &mdash; ek tool (<code>load_skill</code>) poori instructions load karta hai. Yahi progressive disclosure hai &mdash; kam tokens.</p></div>
+
+<div class="box warn"><div class="bt">⚠️ Skills = security risk</div>
+<p>Doosron ki skills use kar rahe ho? Unme kuch bhi likha ho sakta hai (&ldquo;delete all files&rdquo; &mdash; prompt injection). <b>Verified, high-star</b> skills hi use karo, ya khud likho.</p></div>
+<div class="box interview"><div class="bt">🎤 Skills kam tokens use karte hain</div>
+<p>Progressive disclosure ki wajah se skills aksar tools se <b>kam tokens</b> use karte hain &mdash; sirf metadata load hota hai jab tak zaroorat na ho. Aur non-technical log bhi bana sakte hain (bas English).</p></div>
+`};
+
+/* ---------- PART 10: Safety ---------- */
+M.m28 = {n:28, part:"Safety", title:"Human in the Loop (HITL)", hi:"khatarnak action se pehle insaan se poochho", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Kuch actions se pehle insaan ki permission zaroori &mdash; file delete, payment, external download. <b>HITL</b> = tool call se pehle rok ke (interrupt) user se approve/reject poochna. <b>Middleware</b> se hota hai.</p></div>
+
+<p>Flow: query &rarr; LLM &rarr; &ldquo;ye tool call karo&rdquo; &rarr; <b>INTERRUPT</b> (rukо!) &rarr; user decide kare &rarr; resume.</p>
+
+<h3>User ke 4 options</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--good)">Approve</div><p>Haan, chalao</p></div>
+<div class="box"><div class="bt" style="color:var(--warn)">Edit</div><p>Ruko, arguments badlo phir chalao</p></div>
+<div class="box"><div class="bt" style="color:var(--bad)">Reject</div><p>Mat karo (+ reason LLM ko batao)</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Respond</div><p>Follow-up jawaab do</p></div>
+</div>
+
+<pre><span class="cm"># Har tool ke liye alag allowed decisions</span>
+HumanInTheLoopMiddleware(interrupt_on={
+  <span class="st">"delete_file"</span>: {<span class="st">"allowed_decisions"</span>: [<span class="st">"approve"</span>, <span class="st">"reject"</span>]},
+  <span class="st">"write_file"</span>:  {<span class="st">"allowed_decisions"</span>: [<span class="st">"approve"</span>, <span class="st">"edit"</span>, <span class="st">"reject"</span>]},
+  <span class="st">"run_command"</span>: {<span class="st">"allowed_decisions"</span>: [...],
+                   <span class="st">"when"</span>: is_dangerous_command},  <span class="cm"># sirf khatarnak pe</span>
+})</pre>
+
+<div class="box why"><div class="bt">🔑 Memory zaroori hai HITL ke liye</div>
+<p>Interrupt hone pe conversation ruk jaati hai, phir resume hoti hai &mdash; isliye <b>checkpointer</b> chahiye, warna LLM ko pata nahi chalega ki pehle kya ho raha tha. Bina memory HITL nahi chalta.</p></div>
+
+<div class="box interview"><div class="bt">🎤 Terms sahi use karo</div>
+<p>&ldquo;Destructive tasks&rdquo;, &ldquo;critical tasks&rdquo;, &ldquo;conditional interrupts&rdquo; &mdash; interview mein ye proper terms bolo. &ldquo;Conditional interrupt&rdquo; = sirf tab roko jab command khatarnak ho (ek function true/false return karta hai).</p></div>
+`};
+
+M.m29 = {n:29, part:"Safety", title:"Guardrails", hi:"PII, banned words, unsafe output — sab middleware", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p><b>Guardrails</b> = safety checks. PII (password, card, API key) leak na ho, banned words (hack, malware) block hon, unsafe output na jaaye. Sab <b>middleware</b> se &mdash; agent chalne se pehle/baad mein check.</p></div>
+
+<h3>PII handling ke 4 tareeke</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Strategy</th><th>Kya karta hai</th></tr>
+<tr><td><b>Redact</b></td><td>Value ko <code>[REDACTED_email]</code> se replace</td></tr>
+<tr><td><b>Mask</b></td><td>Partial chhupao &mdash; card ke last 4 digit dikhao</td></tr>
+<tr><td><b>Hash</b></td><td>Value ko hash se replace</td></tr>
+<tr><td><b>Block</b></td><td>Request hi rok do (error)</td></tr>
+</table></div>
+
+<h3>Do type ke guardrails</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">Deterministic</div><p>Rules/regex/keyword matching. Fast, sure. Jaise banned words list, credit card pattern.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Model-based</div><p>Ek LLM judge karta hai output safe hai ya nahi. Flexible, par slow.</p></div>
+</div>
+
+<pre><span class="cm"># Middleware chain — order matters!</span>
+[ContentFilterMiddleware(banned=[<span class="st">"hack"</span>,<span class="st">"malware"</span>]),  <span class="cm"># before_agent</span>
+ PIIMiddleware(<span class="st">"email"</span>, strategy=<span class="st">"redact"</span>),
+ PIIMiddleware(<span class="st">"credit_card"</span>, strategy=<span class="st">"mask"</span>),
+ PIIMiddleware(<span class="st">"openai_api_key"</span>, strategy=<span class="st">"block"</span>),
+ SafetyGuardrailMiddleware(model)]                       <span class="cm"># after_agent</span></pre>
+
+<div class="box why"><div class="bt">🔑 PII input pe hi block karo</div>
+<p>Password/card LLM ko <b>bhejo hi mat</b> &mdash; input pe redact/block karo, output ka intezaar mat karo. Banned words (hack) ke liye model ko bhej ke rephrase karwa sakte ho, par credentials <em>kabhi</em> nahi.</p></div>
+<div class="box interview"><div class="bt">🎤 &ldquo;Safety kaise handle karte ho?&rdquo;</div>
+<p>Teen shabd: <b>Middleware, Human-in-the-loop, Guardrails.</b> Guardrails deterministic (regex/keywords) ya model-based (LLM judge). PII strategies: redact/mask/hash/block. Custom detectors bhi bana sakte ho (regex).</p></div>
+`};
+
+/* ---------- PART 11: Long-Running Tasks ---------- */
+M.m30 = {n:30, part:"Long Tasks", title:"Planner aur Task Store", hi:"bada kaam → plan → subtasks → SQLite mein save", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>&ldquo;Ek poora to-do app banao&rdquo; &mdash; ye ek call mein nahi hota. Pehle <b>plan</b> banao (subtasks mein todo), user se approve karwao, phir DB mein save karke ek-ek karke chalao. Ye <b>long-running tasks</b> hai &mdash; interview ka hot topic.</p></div>
+
+<h3>React Agent vs Planner Agent</h3>
+<p>Ab tak jo banaya woh <b>ReAct</b> (Reasoning + Action) agent tha &mdash; loop mein tool call. Bade kaam ke liye <b>Planner</b> agent chahiye jo pehle poora plan banaye.</p>
+
+<h3>Planner &mdash; structured output</h3>
+<p>Plan ek fixed format mein chahiye (taaki DB mein daal sako). Iske liye <b>Pydantic + structured response</b>:</p>
+<pre><span class="kw">class</span> <span class="fn">PlannedTask</span>(BaseModel):
+    id: str                    <span class="cm"># task_001</span>
+    title: str
+    task_type: str             <span class="cm"># design/implement/test/review...</span>
+    depends_on: list[str]      <span class="cm"># kaunse tasks pehle hone chahiye</span>
+    output_files: list[str]
+    acceptance_criteria: list[str]  <span class="cm"># "done" ka matlab — judge ke liye</span></pre>
+
+<h3>Task Store &mdash; crash safety</h3>
+<p>Sab SQLite mein save &mdash; agar beech mein crash ho jaaye toh resume kar sako. Har task ka status:</p>
+<div class="flow" style="font-size:11.5px">
+<div class="node">PENDING</div><div class="arr">&rarr;</div>
+<div class="node acc">IN_PROGRESS</div><div class="arr">&rarr;</div>
+<div class="node tl">COMPLETED</div>
+</div>
+<p style="font-size:13px;color:var(--ink-faint)">...aur FAILED, BLOCKED, SKIPPED bhi. Retry hone pe wapas PENDING.</p>
+
+<div class="box why"><div class="bt">🔑 Production-grade details</div>
+<ul style="margin:4px 0">
+<li><b>WAL mode</b> SQLite &mdash; crash-safe, concurrent reads</li>
+<li><b>Atomic claim</b> &mdash; <code>UPDATE ... WHERE status='pending'</code>, rowcount check &mdash; do process ek task na uthaayein</li>
+<li><b>Retry via SQL CASE</b> &mdash; retries bache toh PENDING, warna FAILED</li>
+</ul></div>
+`};
+
+M.m31 = {n:31, part:"Long Tasks", title:"Executor, DAG aur Recovery", hi:"dependencies solve karo, parallel chalao, crash se recover", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Tasks ready hue &mdash; ab kaunsa pehle? <b>Dependencies</b> ke hisaab se. Jinke dependencies poore ho gaye woh chala do (parallel bhi). Crash ho toh <b>recover</b> karo. Ye executor ka kaam hai.</p></div>
+
+<h3>DAG &mdash; cycles se bacho</h3>
+<p>Task A, B pe depend kare aur B, A pe &mdash; toh infinite loop! Isliye tasks ko <b>topological order</b> mein rakhte hain (Directed Acyclic Graph &mdash; no cycles). Planner ko prompt mein bolte hain: &ldquo;valid DAG, no cycles: architecture &rarr; schema &rarr; config &rarr; core &rarr; tests&rdquo;.</p>
+
+<div class="lab" id="lab-dag">
+<div class="lab-head"><span class="tag">Lab 07</span><b>DAG Executor &mdash; dependencies dekho</b></div>
+<div class="lab-body">
+<p style="margin-top:0;font-size:13.5px">&ldquo;Run&rdquo; dabao &mdash; dekho tasks apni dependencies poori hone ke baad hi kaise chalte hain:</p>
+<div id="dag-tasks" style="display:flex;flex-direction:column;gap:8px;margin:14px 0"></div>
+<div style="display:flex;gap:10px">
+<button class="btn" id="dag-go">&#9654; Run executor</button>
+<button class="btn ghost" id="dag-reset">Reset</button>
+</div>
+</div></div>
+
+<h3>Kaise pick karte hain (get_ready_tasks)</h3>
+<p>Ek task tab &ldquo;ready&rdquo; hai jab: (1) status PENDING ho, AUR (2) uske saare <code>depends_on</code> COMPLETED/SKIPPED hon. Jo ready hain woh <b>parallel</b> chal sakte hain. Agar kuch ready nahi par kuch IN_PROGRESS hai &mdash; 5 sec <b>sleep</b> karke dobara check (poll).</p>
+
+<h3>Dependency results pass karna (memory)</h3>
+<p>Task 8 ko task 6-7 ke results chahiye? Har task complete hone pe uska <b>summary result</b> save hota hai. Agla task apni dependencies ke results system prompt mein le leta hai &mdash; bina shared checkpointer ke memory.</p>
+
+<h3>Recovery (crash safety)</h3>
+<p>Startup pe: jo task <b>IN_PROGRESS</b> pada hai (process mar gaya tha) &mdash; usko wapas PENDING karo (retry bache toh), warna FAILED. Single-process serial execution mein IN_PROGRESS = orphaned, bina heartbeat ke.</p>
+
+<div class="box why"><div class="bt">🔑 Multi-agent + LLM-as-judge</div>
+<p>Har task type ke liye <b>alag tools + alag LLM</b> &mdash; design ke liye reasoning model, test ke liye terminal tools (least privilege). Aur har task ke baad ek <b>LLM judge</b> (score 0-10) check karta hai acceptance criteria poore hue &mdash; nahi toh retry.</p></div>
+`};
+
+/* ---------- PART 12: Ops & Interview ---------- */
+M.m32 = {n:32, part:"Ops", title:"Freshness aur Re-indexing", hi:"code badle toh index update — watchdog + debouncing", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>Aapne function ka naam badla <code>order_manager</code> &rarr; <code>order_handler</code>. Ab agar puchho &ldquo;order_handler kahan hai?&rdquo; aur agent kahe &ldquo;aisa kuch nahi&rdquo; &mdash; bura! Kyunki index purana hai. <b>Freshness</b> = code badle toh index turant update.</p></div>
+
+<h3>4 re-indexing triggers</h3>
+<ol>
+<li><b>Startup</b> pe &mdash; jab CLI spin up ho, pehli baar index</li>
+<li><b>Manual</b> &mdash; user <code>/re-index</code> chalaye</li>
+<li><b>File change</b> &mdash; koi file badle (AI ya human), auto re-index</li>
+<li><b>Post-task</b> &mdash; bada feature banne ke baad (graph/dependency index update)</li>
+</ol>
+
+<h3>File change detection &mdash; watchdog</h3>
+<p>OS-level watcher (<code>watchdog</code> library) file changes pe event deta hai. Par poora project re-index? Nahi &mdash; sirf badla hua chunk/function.</p>
+
+<div class="box why"><div class="bt">⏱️ Debouncing &mdash; interview favourite</div>
+<p>User type kar raha hai &ldquo;a&rdquo;, &ldquo;ab&rdquo;, &ldquo;abc&rdquo; &mdash; har keystroke pe re-index? Pagalpan! <b>Debouncing</b>: change ke baad thoda ruko (say 5 sec). Agar us beech aur change aaya &mdash; timer reset. Jab 5 sec tak koi change na ho &mdash; tabhi re-index. Matlab &ldquo;user ke rukne ka intezaar karo&rdquo;.</p></div>
+
+<div class="box interview"><div class="bt">🎤 &ldquo;Code change ho toh kya karoge?&rdquo;</div>
+<p>&ldquo;<b>Incremental re-indexing</b> &mdash; watchdog se change detect, <b>debounce</b> karke (har second nahi), sirf affected chunks/functions re-index (metadata se locate). Poora project nahi. Startup, manual, file-change, aur post-task &mdash; 4 triggers.&rdquo;</p></div>
+`};
+
+M.m33 = {n:33, part:"Ops", title:"Caching (prompt cache ka math)", hi:"static prompt cache karo — 10x sasta", html:`
+<div class="box simple"><div class="bt">🎯 Simple words mein</div>
+<p>System prompt roz same rehta hai (100k tokens), sirf user query badalti hai (1k). Toh static hissa <b>cache</b> kyun na karein? <b>Prompt caching</b> yahi karta hai &mdash; providers model level pe cache karte hain.</p></div>
+
+<h3>Pricing ka twist (Claude Sonnet example)</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Type</th><th>Price / 1M tokens</th></tr>
+<tr><td>Normal input</td><td class="num">$3.00</td></tr>
+<tr><td>Cache <b>write</b> (pehli baar)</td><td class="num sc-w">$3.75 (mehnga!)</td></tr>
+<tr><td>Cache <b>hit</b> (baad mein)</td><td class="num sc-g">$0.30 (10x sasta!)</td></tr>
+</table></div>
+<p>Pehli query mehngi (cache likhna), baaki saari sasti (cache se padhna).</p>
+
+<div class="lab" id="lab-cache">
+<div class="lab-head"><span class="tag">Lab 08</span><b>Cache Cost Calculator</b></div>
+<div class="lab-body">
+<div class="lab-row">
+<div><label>Static tokens (system+tools+context): <span class="val" id="ca-st-val">100</span>k</label>
+<input type="range" id="ca-st" min="10" max="200" value="100"></div>
+<div><label>Kitni queries: <span class="val" id="ca-q-val">10</span></label>
+<input type="range" id="ca-q" min="1" max="50" value="10"></div>
+</div>
+<div id="cache-out"></div>
+</div></div>
+
+<h3>OpenAI vs Anthropic</h3>
+<div class="grid2">
+<div class="box"><div class="bt" style="color:var(--teal)">OpenAI</div><p><b>Implicit</b> &mdash; khud kar leta hai. Aapka control kam. Minimum ~1024 tokens chahiye, warna cache nahi.</p></div>
+<div class="box"><div class="bt" style="color:var(--teal)">Anthropic</div><p><b>Explicit</b> &mdash; aap <code>cache_control</code> mention karo, TTL set karo. Zyada control.</p></div>
+</div>
+
+<div class="box interview"><div class="bt">🎤 Caching ki key baatein</div>
+<ul style="margin:4px 0">
+<li><b>Static content shuru mein</b> rakho (system prompt) &mdash; wahi cache hota hai</li>
+<li>Cache <b>keyword pe</b> hota hai, meaning pe nahi &mdash; ek word badlo, cache miss</li>
+<li>Internally <b>KV cache</b> &mdash; not persistent, TTL hota hai</li>
+<li><b>Warm-up query</b> trick: pehle 1 query bhejo, phir parallel bhejo &mdash; sab cache hit</li>
+<li>Caching <b>har layer</b> pe ho sakti hai (retrieval, embeddings, etc.)</li>
+</ul></div>
+`};
+
+M.m34 = {n:34, part:"Ops", title:"Full Architecture aur Interview Prep", hi:"sab kuch jodo — whiteboard pe Claude Code design karo", html:`
+<div class="box simple"><div class="bt">🎯 Ye final module hai</div>
+<p>Agar interview mein &ldquo;Design Claude Code&rdquo; poochein &mdash; ye poora flow hai. Sab layers ek saath. Ab tak jo padha, yahan judta hai.</p></div>
+
+<h3>Poora request flow</h3>
+<pre><span class="kw">User query</span>
+   &darr;
+<span class="kw">Facade / CLI</span>          <span class="cm"># help, ask, plan, status, re-index</span>
+   &darr;
+<span class="kw">Security layer</span>       <span class="cm"># rate-limit, injection/PII scan, content filter</span>
+   &darr;
+<span class="kw">Query classifier</span>     <span class="cm"># ask (simple) ya plan (long-running)?</span>
+   &darr;
+ &#9500;&#9472; ASK  &rarr; Agent orchestrator &rarr; ReAct agent
+ &#9474;         &#9500;&#9472; Tools: retriever, filesystem, terminal, MCP
+ &#9474;         &#9492;&#9472; Skills
+ &#9492;&#9472; PLAN &rarr; Task orchestrator &rarr; planner &rarr; approval
+           &rarr; task store (SQLite) &rarr; executor (DAG) &rarr; LLM-judge
+
+<span class="cm"># Cross-cutting (har jagah):</span>
+Context (hybrid index + memory) · LLM factory · Safety
+Freshness · Evals/QA · Observability · Caching</pre>
+
+<h3>Debug query ka flow (example)</h3>
+<ol>
+<li>Startup pe indexing ho chuki (hybrid: vector + lexical + graph)</li>
+<li>Query &rarr; facade &rarr; agent &rarr; LLM: &ldquo;retrieve karo&rdquo;</li>
+<li>Retriever tool &rarr; chunks laao &rarr; LLM analyze kare</li>
+<li>LLM: &ldquo;filesystem tool se file badlo&rdquo; &rarr; file change</li>
+<li>Result &rarr; LLM &rarr; final jawaab &rarr; user</li>
+</ol>
+
+<h3>Interview questions checklist</h3>
+<div class="acc"><details><summary>RAG ke sawaal</summary><div class="acc-body"><p>Types (semantic/lexical/hybrid/graph/agentic), kaunsa kab, cosine kyun nahi (HNSW), fusion vs re-rank, chunk size ka impact, RAG evals kaise. Faithfulness = retrieval quality indicator.</p></div></details></div>
+<div class="acc"><details><summary>Context & Memory</summary><div class="acc-body"><p>Lost in the middle (primacy/recency), 5 strategies (prune/compress/select/expand/order), token budgeting, STM vs LTM (+3 LTM types), checkpointers vs store.</p></div></details></div>
+<div class="acc"><details><summary>Harness & Safety</summary><div class="acc-body"><p>MCP (host/client/server, stdio vs http), skills (progressive disclosure), HITL, guardrails (deterministic vs model-based, PII strategies).</p></div></details></div>
+<div class="acc"><details><summary>Long-running tasks (bada topic)</summary><div class="acc-body"><p>Planner vs ReAct, structured output, task store (WAL, atomic claim), DAG/topological sort, parallel execution, dependency results, crash recovery, LLM-as-judge per task.</p></div></details></div>
+<div class="acc"><details><summary>Ops</summary><div class="acc-body"><p>Freshness (watchdog + debouncing + incremental), caching (prompt cache math, KV cache, OpenAI vs Anthropic), observability (LangSmith vs LangFuse for self-hosting).</p></div></details></div>
+
+<div class="box why"><div class="bt">🚀 Last advice (course se)</div>
+<p>Concept clear ho gaya &mdash; ab <b>khud code likho</b>. Padhne se confidence nahi aata, likhne se aata hai. Sample project le lo, ek-ek RAG type khud implement karo, evals chalao, apna mini Claude Code banao. Wahi last aur sabse zaroori step hai. Aap kar loge! 💪</p></div>
+`};
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+let navHTML='', contentHTML='';
+const order = [];
+PARTS.forEach((p,pi)=>{
+  navHTML += `<div class="sb-part"><div class="sb-part-t"><span class="sb-part-n">P${pi+1}</span>${p.t}</div>`;
+  p.mods.forEach(id=>{
+    const m=M[id]; order.push(id);
+    navHTML += `<a class="sb-link" href="#${id}" data-id="${id}"><span class="n">${m.n}</span><span>${m.title}</span><span class="dot"></span></a>`;
+  });
+  navHTML += `</div>`;
+});
+nav.innerHTML = navHTML;
+
+order.forEach((id,i)=>{
+  const m=M[id];
+  const prev = i>0 ? M[order[i-1]] : null;
+  const next = i<order.length-1 ? M[order[i+1]] : null;
+  let navBtns = '<div class="mod-nav">';
+  navBtns += prev ? `<a href="#${order[i-1]}"><div class="dir">&larr; Pichla</div><div class="ttl">${prev.title}</div></a>` : '<span></span>';
+  navBtns += next ? `<a class="next" href="#${order[i+1]}"><div class="dir">Agla &rarr;</div><div class="ttl">${next.title}</div></a>` : '<span></span>';
+  navBtns += '</div>';
+  contentHTML += `<section class="mod" id="${id}">
+    <div class="mod-tag"><span class="pill">Module ${m.n}</span><span>${m.part}</span></div>
+    <h2 class="mod-h">${m.title}</h2>
+    <p class="mod-hi">${m.hi}</p>
+    ${m.html}
+    <button class="done-btn" data-done="${id}"><span class="ck">○</span> Is module ko &ldquo;Ho gaya&rdquo; mark karo</button>
+    ${navBtns}
+  </section>`;
+});
+content.innerHTML = contentHTML;
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+const root=document.documentElement, sidebar=document.getElementById('sidebar'),
+      backdrop=document.getElementById('backdrop');
+function openSB(){sidebar.classList.add('open');backdrop.classList.add('show')}
+function closeSB(){sidebar.classList.remove('open');backdrop.classList.remove('show')}
+document.getElementById('menuBtn').onclick=()=>sidebar.classList.contains('open')?closeSB():openSB();
+backdrop.onclick=closeSB;
+
+// theme
+function getTheme(){try{return localStorage.getItem('aai-theme')}catch(e){return null}}
+function setTheme(t){root.setAttribute('data-theme',t);try{localStorage.setItem('aai-theme',t)}catch(e){}}
+const saved=getTheme(); if(saved)setTheme(saved);
+function toggleTheme(){
+  const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  setTheme(cur==='dark'?'light':'dark');
+}
+document.getElementById('themeBtn').onclick=toggleTheme;
+document.getElementById('themeBtnM').onclick=toggleTheme;
+
+// sidebar link click -> close on mobile
+nav.querySelectorAll('.sb-link').forEach(a=>a.onclick=()=>{if(innerWidth<=960)closeSB()});
+
+// progress bar + scrollspy
+const links=[...nav.querySelectorAll('.sb-link')];
+const secs=order.map(id=>document.getElementById(id));
+function onScroll(){
+  const st=scrollY, h=document.body.scrollHeight-innerHeight;
+  document.getElementById('progress').style.width=(h>0?st/h*100:0)+'%';
+  let cur=order[0];
+  secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<=120)cur=order[i]});
+  links.forEach(a=>{
+    const on=a.dataset.id===cur; a.classList.toggle('active',on);
+    if(on){const r=a.getBoundingClientRect(),p=nav.getBoundingClientRect();
+      if(r.top<p.top||r.bottom>p.bottom)a.scrollIntoView({block:'nearest'});}
+  });
+}
+addEventListener('scroll',onScroll,{passive:true}); addEventListener('resize',onScroll); onScroll();
+
+// done marks
+function getDone(){try{return JSON.parse(localStorage.getItem('aai-done')||'{}')}catch(e){return {}}}
+function saveDone(d){try{localStorage.setItem('aai-done',JSON.stringify(d))}catch(e){}}
+let done=getDone();
+function refreshDone(){
+  document.querySelectorAll('[data-done]').forEach(b=>{
+    const id=b.dataset.done,on=!!done[id];
+    b.classList.toggle('done',on);
+    b.querySelector('.ck').textContent=on?'●':'○';
+    b.childNodes[1].textContent=on?' Ho gaya! ✓':' Is module ko “Ho gaya” mark karo';
+  });
+  links.forEach(a=>a.classList.toggle('done',!!done[a.dataset.id]));
+}
+document.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.done; done[id]=!done[id]; if(!done[id])delete done[id];
+  saveDone(done); refreshDone();
+});
+refreshDone();
+
+/* ---------- LAB 1: Chunking ---------- */
+(function(){
+  const cs=document.getElementById('cs'),ov=document.getElementById('ov'),
+        txt=document.getElementById('chunk-txt'),out=document.getElementById('chunk-out');
+  if(!cs)return;
+  const cols=['var(--amber)','var(--teal)','#8b7 fd6'.replace(' ',''),'#e07a5f','#6a994e','#c98a16'];
+  function bg(i){const c=['rgba(216,132,42,.28)','rgba(29,143,130,.28)','rgba(139,127,214,.28)','rgba(224,122,95,.28)','rgba(106,153,78,.28)'];return c[i%c.length]}
+  function draw(){
+    const size=+cs.value,over=Math.min(+ov.value,size-2),t=txt.value;
+    document.getElementById('cs-val').textContent=size;
+    document.getElementById('ov-val').textContent=over;
+    const step=Math.max(1,size-over); let html='';
+    // build char ownership -> count how many chunks each char belongs to
+    const owners=Array.from({length:t.length},()=>[]);
+    let ci=0;
+    for(let s=0;s<t.length;s+=step){const e=Math.min(s+size,t.length);for(let j=s;j<e;j++)owners[j].push(ci);ci++;if(e>=t.length)break;}
+    for(let j=0;j<t.length;j++){
+      const o=owners[j];
+      let style;
+      if(o.length>1){style=`background:linear-gradient(90deg,${bg(o[0])},${bg(o[o.length-1])});box-shadow:inset 0 -2px 0 var(--amber)`;}
+      else{style=`background:${bg(o[0]||0)}`;}
+      html+=`<span class="chunk" style="${style}">${t[j].replace(' ',' ')}</span>`;
+    }
+    out.innerHTML=html+`<div style="margin-top:12px;font-size:12px;color:var(--ink-faint)">Total chunks: <b style="color:var(--amber)">${ci}</b> &middot; underline = overlap zone (dono chunks mein)</div>`;
+  }
+  [cs,ov,txt].forEach(el=>el.oninput=draw); draw();
+})();
+
+/* ---------- LAB 2: BM25 vs Semantic ---------- */
+(function(){
+  const chips=document.getElementById('bm25-chips'),out=document.getElementById('bm25-out');
+  if(!chips)return;
+  const Q=[
+    {q:"Find BillingError",w:"lexical",why:"Exact identifier — <b>BM25 jeetega</b>. ‘BillingError’ ek exact string hai, semantic ki zaroorat nahi.",s:"BM25 1.000 / Semantic 0.000"},
+    {q:"How does auth work?",w:"semantic",why:"Concept-based, koi exact keyword nahi. <b>Semantic jeetega</b> — ‘auth’ aur ‘class AuthService’ mein token match nahi.",s:"Semantic 1.000 / BM25 0.148"},
+    {q:"What fields does Task have?",w:"semantic",why:"Behavioral detail. <b>Semantic (bade chunk)</b> jeetega — poora dataclass chahiye.",s:"Semantic ✓ / BM25 ✗"},
+    {q:"Where is SlackWebhook used?",w:"lexical",why:"Exact class name. <b>BM25 jeetega</b> — direct token match.",s:"BM25 strong"},
+    {q:"How does billing work + errors?",w:"both",why:"Mixed! Concept (‘billing work’) + exact (‘errors’). <b>Hybrid best</b> — dono chahiye.",s:"Hybrid 1500 wins"},
+  ];
+  Q.forEach((item,i)=>{const c=document.createElement('button');c.className='chip';c.textContent=item.q;c.onclick=()=>{
+    [...chips.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    const col=item.w==='lexical'?'var(--teal)':item.w==='semantic'?'var(--amber)':'var(--good)';
+    out.innerHTML=`<div style="font-family:var(--mono);font-size:12px;color:${col};font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">&rarr; ${item.w} wins</div><p style="margin:0 0 10px">${item.why}</p><div class="num" style="font-size:12.5px;color:var(--ink-faint)">Eval data: ${item.s}</div>`;
+  };chips.appendChild(c);});
+  chips.firstChild.click();
+})();
+
+/* ---------- LAB 3: RRF ---------- */
+(function(){
+  const k=document.getElementById('rrf-k'),out=document.getElementById('rrf-out');
+  if(!k)return;
+  const SEM=["BillingService","create_task","PermissionPolicy","AuthService"];
+  const LEX=["check_task_limit","TASK_LIMITS","models.Task","create_task"];
+  function draw(){
+    const K=+k.value; document.getElementById('rrf-k-val').textContent=K;
+    const sc={},src={};
+    SEM.forEach((d,i)=>{const s=1/(K+i+1);sc[d]=(sc[d]||0)+s;(src[d]=src[d]||[]).push('sem');});
+    LEX.forEach((d,i)=>{const s=1/(K+i+1);sc[d]=(sc[d]||0)+s;(src[d]=src[d]||[]).push('lex');});
+    const ranked=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+    const max=ranked[0][1];
+    let h='<div style="font-family:var(--mono);font-size:12px">';
+    ranked.forEach(([d,s],i)=>{
+      const both=src[d].length===2, w=(s/max*100);
+      h+=`<div style="margin:7px 0">
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px">
+          <span style="color:var(--ink)">${i+1}. ${d} ${both?'<span style="color:var(--good)">◄ dono!</span>':''}</span>
+          <span class="num" style="color:var(--amber)">${s.toFixed(4)}</span></div>
+        <div style="height:8px;background:var(--panel-2);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${w}%;background:${both?'var(--good)':'linear-gradient(90deg,var(--amber),var(--teal))'};border-radius:6px;transition:.3s"></div></div>
+      </div>`;
+    });
+    out.innerHTML=h+'</div>';
+  }
+  k.oninput=draw; draw();
+})();
+
+/* ---------- LAB 4: Lost in the Middle ---------- */
+(function(){
+  const sl=document.getElementById('lim'),cv=document.getElementById('lim-canvas'),msg=document.getElementById('lim-msg');
+  if(!cv)return; const ctx=cv.getContext('2d');
+  function cssv(n){return getComputedStyle(document.body).getPropertyValue(n).trim()}
+  function acc(x){ // U-curve: high at 0 and 1, low at .5
+    const d=Math.abs(x-0.5)*2; return 0.45+0.5*Math.pow(d,1.4);
+  }
+  function draw(){
+    const W=cv.width,H=cv.height,pos=+sl.value/100;
+    ctx.clearRect(0,0,W,H);
+    const pad=40, w=W-pad*2, h=H-pad*2;
+    // axis
+    ctx.strokeStyle=cssv('--line');ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad,pad);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+    // curve
+    ctx.beginPath();
+    for(let i=0;i<=100;i++){const x=pad+w*i/100,a=acc(i/100),y=(H-pad)-h*a;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+    const grad=ctx.createLinearGradient(pad,0,W-pad,0);
+    grad.addColorStop(0,cssv('--amber'));grad.addColorStop(.5,cssv('--bad'));grad.addColorStop(1,cssv('--teal'));
+    ctx.strokeStyle=grad;ctx.lineWidth=3;ctx.stroke();
+    // marker
+    const mx=pad+w*pos,a=acc(pos),my=(H-pad)-h*a;
+    ctx.beginPath();ctx.moveTo(mx,pad);ctx.lineTo(mx,H-pad);ctx.strokeStyle=cssv('--ink-faint');ctx.setLineDash([4,4]);ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(mx,my,7,0,7);ctx.fillStyle=cssv('--amber');ctx.fill();ctx.strokeStyle=cssv('--ground');ctx.lineWidth=2;ctx.stroke();
+    // labels
+    ctx.fillStyle=cssv('--ink-faint');ctx.font='11px monospace';ctx.textAlign='center';
+    ctx.fillText('START',pad,H-pad+18);ctx.fillText('MIDDLE',W/2,H-pad+18);ctx.fillText('END',W-pad,H-pad+18);
+    ctx.save();ctx.translate(14,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('Accuracy',0,0);ctx.restore();
+    // label val
+    const lab=pos<0.2?'Start':pos>0.8?'End':pos<0.4||pos>0.6?'Edge-ish':'Middle';
+    document.getElementById('lim-val').textContent=lab;
+    const pct=Math.round(a*100);
+    if(pos>=0.4&&pos<=0.6)msg.innerHTML=`<b style="color:var(--bad)">Middle mein ~${pct}% accuracy</b> — LLM yahan info kho deta hai! Important cheez idhar mat rakho.`;
+    else msg.innerHTML=`<b style="color:var(--teal)">~${pct}% accuracy</b> — Start/End best hai. Yahan rakho important info.`;
+  }
+  sl.oninput=draw; new MutationObserver(draw).observe(root,{attributes:true,attributeFilter:['data-theme']});
+  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw);
+  setTimeout(draw,50); draw();
+})();
+
+/* ---------- LAB 6: HNSW ---------- */
+(function(){
+  const cv=document.getElementById('hnsw-canvas'),msg=document.getElementById('hnsw-msg');
+  if(!cv)return; const ctx=cv.getContext('2d');
+  function cssv(n){return getComputedStyle(document.body).getPropertyValue(n).trim()}
+  const W=cv.width,H=cv.height, layers=[3,6,14];
+  let nodes=[], path=[], anim=null;
+  function build(){
+    nodes=[];
+    layers.forEach((cnt,li)=>{
+      const y=50+li*100, arr=[];
+      for(let i=0;i<cnt;i++){arr.push({x:60+(W-120)*(i+.5)/cnt+(Math.random()*20-10),y,li});}
+      nodes.push(arr);
+    });
+  }
+  function draw(hl){
+    ctx.clearRect(0,0,W,H);
+    // layer labels + intra-layer links
+    nodes.forEach((arr,li)=>{
+      ctx.fillStyle=cssv('--ink-faint');ctx.font='10px monospace';ctx.textAlign='left';
+      ctx.fillText(li===0?'Layer 2 (express)':li===1?'Layer 1':'Layer 0 (all vectors)',10,50+li*100-20);
+      ctx.strokeStyle=cssv('--line');ctx.lineWidth=1;
+      for(let i=0;i<arr.length-1;i++){ctx.beginPath();ctx.moveTo(arr[i].x,arr[i].y);ctx.lineTo(arr[i+1].x,arr[i+1].y);ctx.stroke();}
+    });
+    // path
+    if(path.length){
+      ctx.strokeStyle=cssv('--amber');ctx.lineWidth=2.5;ctx.beginPath();
+      path.forEach((n,i)=>i?ctx.lineTo(n.x,n.y):ctx.moveTo(n.x,n.y));ctx.stroke();
+    }
+    // nodes
+    nodes.forEach((arr)=>arr.forEach(n=>{
+      const inPath=path.includes(n),isHl=n===hl;
+      ctx.beginPath();ctx.arc(n.x,n.y,isHl?9:6,0,7);
+      ctx.fillStyle=isHl?cssv('--teal'):inPath?cssv('--amber'):cssv('--panel-2');
+      ctx.fill();ctx.strokeStyle=inPath||isHl?cssv('--amber'):cssv('--line');ctx.lineWidth=2;ctx.stroke();
+    }));
+    // target marker (bottom)
+  }
+  function go(){
+    if(anim)return; path=[];
+    // pick target on bottom layer
+    const bottom=nodes[2], target=bottom[Math.floor(bottom.length*0.72)];
+    // greedy: start top-left, descend nearest to target.x
+    let steps=[];
+    for(let li=0;li<3;li++){
+      const arr=nodes[li];
+      let best=arr[0];arr.forEach(n=>{if(Math.abs(n.x-target.x)<Math.abs(best.x-target.x))best=n;});
+      // add a couple hops within layer for effect
+      steps.push(best);
+    }
+    let i=0;
+    msg.textContent='Top layer se shuru — express route pe target ke paas jump...';
+    anim=setInterval(()=>{
+      if(i>=steps.length){clearInterval(anim);anim=null;
+        draw(target);
+        msg.innerHTML=`<b style="color:var(--teal)">Mil gaya!</b> Sirf ${path.length} nodes visit kiye — poore ${layers.reduce((a,b)=>a+b)} mein se. Ye hai ~log(N) navigation. 🎯`;
+        return;}
+      path.push(steps[i]);
+      msg.textContent=i===0?'Layer 2 (express) — bade jumps se target ke paas':i===1?'Layer 1 — thoda paas aaye':'Layer 0 — exact neighbourhood mil gaya';
+      draw(steps[i]); i++;
+    },700);
+  }
+  document.getElementById('hnsw-go').onclick=go;
+  document.getElementById('hnsw-reset').onclick=()=>{if(anim){clearInterval(anim);anim=null;}path=[];build();draw();msg.textContent='';};
+  new MutationObserver(()=>draw()).observe(root,{attributes:true,attributeFilter:['data-theme']});
+  build();draw();
+})();
+
+/* ---------- LAB 5: Memory ---------- */
+(function(){
+  const off=document.getElementById('mem-off'),on=document.getElementById('mem-on'),
+        chat=document.getElementById('mem-chat'),step=document.getElementById('mem-step');
+  if(!chat)return;
+  let mode='off', i=0;
+  const convo=[
+    {u:"Mera naam Vipul hai.",on:"Namaste Vipul! Kaise help karun?",off:"Namaste! Kaise help karun?"},
+    {u:"Mera naam kya hai?",on:"Aapka naam Vipul hai 😊",off:"Mujhe nahi pata — aapne bataya nahi."},
+    {u:"Main AI seekh raha hoon.",on:"Great Vipul! AI mein kaafi scope hai.",off:"Great! AI mein kaafi scope hai."},
+    {u:"Main kya seekh raha hoon?",on:"Aap AI seekh rahe hain (aur naam Vipul hai).",off:"Mujhe yaad nahi — har baat nayi hai mere liye."},
+  ];
+  function render(){
+    let h='';
+    for(let j=0;j<i;j++){const c=convo[j];
+      h+=`<div style="margin-bottom:10px"><span style="color:var(--amber)">You:</span> ${c.u}<br><span style="color:var(--teal)">Bot:</span> ${mode==='on'?c.on:c.off}</div>`;}
+    if(i===0)h='<span style="color:var(--ink-faint)">&ldquo;Agli baat bolo&rdquo; dabao...</span>';
+    chat.innerHTML=h;
+  }
+  off.onclick=()=>{mode='off';off.classList.add('on');on.classList.remove('on');render()};
+  on.onclick=()=>{mode='on';on.classList.add('on');off.classList.remove('on');render()};
+  step.onclick=()=>{i=(i>=convo.length)?0:i+1;render()};
+  render();
+})();
+
+/* ---------- LAB 7: DAG ---------- */
+(function(){
+  const box=document.getElementById('dag-tasks');
+  if(!box)return;
+  const T=[
+    {id:'design',t:'Architecture design',dep:[]},
+    {id:'schema',t:'DB schema',dep:['design']},
+    {id:'config',t:'Config setup',dep:['design']},
+    {id:'backend',t:'Backend API',dep:['schema','config']},
+    {id:'frontend',t:'Frontend UI',dep:['config']},
+    {id:'tests',t:'Tests',dep:['backend','frontend']},
+  ];
+  let status={}; T.forEach(t=>status[t.id]='pending'); let running=false;
+  function render(){
+    box.innerHTML=T.map(t=>{
+      const s=status[t.id];
+      const col=s==='completed'?'var(--good)':s==='in_progress'?'var(--amber)':'var(--ink-faint)';
+      const ic=s==='completed'?'✓':s==='in_progress'?'●':'○';
+      const dep=t.dep.length?`depends: ${t.dep.join(', ')}`:'no deps — ready';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:var(--code-bg)">
+        <span style="color:${col};font-size:16px;width:16px">${ic}</span>
+        <div style="flex:1"><div style="font-weight:600;font-size:13.5px;color:var(--ink)">${t.t}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)">${dep}</div></div>
+        <span style="font-family:var(--mono);font-size:11px;color:${col};text-transform:uppercase">${s.replace('_',' ')}</span>
+      </div>`;
+    }).join('');
+  }
+  function ready(){return T.filter(t=>status[t.id]==='pending'&&t.dep.every(d=>status[d]==='completed'))}
+  function run(){
+    if(running)return; running=true;
+    const tick=()=>{
+      const inProg=T.find(t=>status[t.id]==='in_progress');
+      if(inProg){status[inProg.id]='completed';render();setTimeout(tick,500);return;}
+      const r=ready();
+      if(r.length){status[r[0].id]='in_progress';render();setTimeout(tick,650);return;}
+      running=false; // done
+    };
+    tick();
+  }
+  document.getElementById('dag-go').onclick=run;
+  document.getElementById('dag-reset').onclick=()=>{if(running)return;T.forEach(t=>status[t.id]='pending');render()};
+  render();
+})();
+
+/* ---------- LAB 8: Cache cost ---------- */
+(function(){
+  const st=document.getElementById('ca-st'),q=document.getElementById('ca-q'),out=document.getElementById('cache-out');
+  if(!st)return;
+  const DYN=1, IN=3, CW=3.75, CH=0.30; // per 1M tokens; dynamic 1k
+  function draw(){
+    const S=+st.value, Q=+q.value;
+    document.getElementById('ca-st-val').textContent=S;
+    document.getElementById('ca-q-val').textContent=Q;
+    // no cache: every query pays (S + DYN)k at $3
+    const noCache=Q*((S+DYN)/1000)*IN;
+    // cache: 1st query writes S at 3.75 + dyn; rest S hit at 0.30 + dyn
+    const first=(S/1000)*CW + (DYN/1000)*IN;
+    const rest=(Q-1)*((S/1000)*CH + (DYN/1000)*IN);
+    const cache=first+rest;
+    const save=noCache>0?(1-cache/noCache)*100:0;
+    out.innerHTML=`<div class="tbl-wrap" style="margin:0"><table><tr><th>Scenario</th><th>Cost (${Q} queries)</th></tr>
+      <tr><td>Bina caching</td><td class="num sc-b">$${noCache.toFixed(3)}</td></tr>
+      <tr><td>Prompt caching ke saath</td><td class="num sc-g">$${cache.toFixed(3)}</td></tr>
+      </table></div>
+      <div style="margin-top:14px;text-align:center;font-family:var(--mono)">
+        <div style="font-size:30px;font-weight:700;color:var(--good)">${save.toFixed(1)}% saved</div>
+        <div style="font-size:12px;color:var(--ink-faint)">pehli query cache write (mehngi), baaki ${Q-1} cache hit (10x sasti)</div>
+      </div>`;
+  }
+  st.oninput=draw; q.oninput=draw; draw();
+})();
+</script>
