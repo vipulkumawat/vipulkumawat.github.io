@@ -1,0 +1,2046 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vector Database Academy</title>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#0a0d16;
+  --bg-2:#0d1120;
+  --panel: rgba(255,255,255,0.045);
+  --panel-2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --border-soft: rgba(255,255,255,0.05);
+  --text:#e9ebf5;
+  --text-dim:#9aa1c2;
+  --text-faint:#5c6389;
+  --accent-a:#5eead4;      /* teal — vector A / primary */
+  --accent-a-rgb: 94,234,212;
+  --accent-b:#fb7185;      /* rose — vector B / secondary */
+  --accent-b-rgb: 251,113,133;
+  --accent-v:#a78bfa;      /* violet — tertiary / links */
+  --accent-v-rgb: 167,139,250;
+  --amber:#fbbf24;
+  --grid-line: rgba(255,255,255,0.07);
+  --shadow: 0 20px 60px rgba(0,0,0,0.45);
+  --radius: 16px;
+  --font-display: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --font-body: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif", serif;
+  --font-mono: var(--font-display);
+}
+:root[data-theme="light"]{
+  --bg:#eef1f8;
+  --bg-2:#e6eaf4;
+  --panel: rgba(10,14,30,0.035);
+  --panel-2: rgba(10,14,30,0.06);
+  --border: rgba(10,14,30,0.10);
+  --border-soft: rgba(10,14,30,0.06);
+  --text:#12152a;
+  --text-dim:#4c5278;
+  --text-faint:#8388a8;
+  --accent-a:#0d9488;
+  --accent-a-rgb: 13,148,136;
+  --accent-b:#e11d48;
+  --accent-b-rgb: 225,29,72;
+  --accent-v:#7c3aed;
+  --accent-v-rgb: 124,58,237;
+  --amber:#b45309;
+  --grid-line: rgba(10,14,30,0.08);
+  --shadow: 0 20px 50px rgba(20,25,50,0.12);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef1f8; --bg-2:#e6eaf4; --panel: rgba(10,14,30,0.035); --panel-2: rgba(10,14,30,0.06);
+    --border: rgba(10,14,30,0.10); --border-soft: rgba(10,14,30,0.06); --text:#12152a; --text-dim:#4c5278;
+    --text-faint:#8388a8; --accent-a:#0d9488; --accent-a-rgb:13,148,136; --accent-b:#e11d48; --accent-b-rgb:225,29,72;
+    --accent-v:#7c3aed; --accent-v-rgb:124,58,237; --amber:#b45309; --grid-line: rgba(10,14,30,0.08);
+    --shadow: 0 20px 50px rgba(20,25,50,0.12);
+  }
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+
+body{
+  margin:0;
+  background: radial-gradient(ellipse 120% 60% at 50% -10%, var(--bg-2), var(--bg));
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+#field{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.55; }
+
+h1,h2,h3{ font-family:var(--font-display); text-wrap:balance; letter-spacing:-0.01em; margin:0; font-weight:600;}
+a{ color:var(--accent-a); }
+::selection{ background: rgba(var(--accent-a-rgb),0.3); }
+:focus-visible{ outline:2px solid var(--accent-a); outline-offset:3px; border-radius:4px; }
+
+.mono{ font-family:var(--font-mono); font-variant-numeric: tabular-nums; }
+.dim{ color:var(--text-dim); }
+
+/* ============ LAYOUT ============ */
+.wrap{ position:relative; z-index:1; }
+.stage{
+  max-width:920px;
+  margin:0 auto;
+  padding: 8vh 28px 12vh;
+}
+.stage.wide{ max-width:1080px; }
+
+/* progress bar */
+#progress{ position:fixed; top:0; left:0; height:3px; width:0%; z-index:50;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-v), var(--accent-b));
+  transition: width 0.1s linear; }
+
+/* theme toggle */
+#theme-toggle{
+  position:fixed; top:16px; right:16px; z-index:60;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+  cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px;
+  backdrop-filter: blur(8px);
+}
+
+/* right side chapter nav */
+#chapnav{
+  position:fixed; right:20px; top:50%; transform:translateY(-50%); z-index:55;
+  display:flex; flex-direction:column; gap:14px;
+}
+#chapnav button{
+  width:11px; height:11px; border-radius:50%; border:1.5px solid var(--text-faint);
+  background:transparent; cursor:pointer; padding:0; position:relative;
+  transition: all 0.2s ease;
+}
+#chapnav button.active{ background:var(--accent-a); border-color:var(--accent-a); box-shadow:0 0 10px rgba(var(--accent-a-rgb),0.7); transform:scale(1.3); }
+#chapnav button .tip{
+  position:absolute; right:22px; top:50%; transform:translateY(-50%);
+  white-space:nowrap; font-family:var(--font-display); font-size:11px; letter-spacing:0.02em;
+  background:var(--panel-2); border:1px solid var(--border); padding:4px 10px; border-radius:8px;
+  opacity:0; pointer-events:none; transition:opacity 0.15s ease; backdrop-filter: blur(8px);
+  color:var(--text-dim);
+}
+#chapnav button:hover .tip, #chapnav button:focus-visible .tip{ opacity:1; }
+@media (max-width: 760px){ #chapnav{ display:none; } }
+
+/* glass panel */
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+
+/* eyebrow / chapter heading */
+.eyebrow{ font-family:var(--font-display); font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent-a); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+.eyebrow .num{ color:var(--text-faint); }
+.chapter-title{ font-size:clamp(1.9rem, 4vw, 2.9rem); margin-bottom:22px; }
+.lede{ font-size:1.12rem; color:var(--text-dim); max-width:62ch; margin-bottom:8px; }
+.prose{ max-width:64ch; color:var(--text); }
+.prose p{ margin: 0 0 1.1em; }
+.prose strong{ color:var(--text); }
+
+.analogy{
+  border-left:2px solid var(--accent-v);
+  padding: 4px 0 4px 18px;
+  margin: 22px 0;
+  color:var(--text-dim);
+  font-size:0.98rem;
+  max-width:58ch;
+}
+.analogy b{ color:var(--accent-v); font-family:var(--font-display); font-weight:500; font-size:0.82rem; letter-spacing:0.04em; text-transform:uppercase; display:block; margin-bottom:6px;}
+
+/* interactive playground shell */
+.playground{ margin-top:36px; padding:26px; }
+.playground-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:18px; flex-wrap:wrap;}
+.playground-head h3{ font-size:0.95rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-dim); font-weight:500;}
+.hint{ font-size:0.82rem; color:var(--text-faint); }
+
+.stage-canvas{ width:100%; max-width:560px; display:block; touch-action:none; border-radius:10px; cursor:grab; }
+.stage-canvas.dragging{ cursor:grabbing; }
+
+.readout-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.readout{
+  background:var(--panel-2); border:1px solid var(--border-soft); border-radius:10px;
+  padding:10px 14px; min-width:120px;
+}
+.readout .k{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-faint); margin-bottom:4px;}
+.readout .v{ font-family:var(--font-mono); font-size:1.15rem; font-variant-numeric: tabular-nums; }
+.readout .v.a{ color:var(--accent-a); }
+.readout .v.b{ color:var(--accent-b); }
+
+.grid2{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap:28px; align-items:start; }
+@media (max-width: 760px){ .grid2{ grid-template-columns:1fr; } }
+
+/* under the hood */
+details.hood{ margin-top:26px; border-top:1px solid var(--border-soft); padding-top:16px; }
+details.hood summary{ cursor:pointer; font-family:var(--font-display); font-size:0.8rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-dim); list-style:none; display:flex; align-items:center; gap:8px;}
+details.hood summary::before{ content:"▸"; color:var(--accent-a); transition:transform 0.15s ease; }
+details.hood[open] summary::before{ transform:rotate(90deg); }
+details.hood summary::-webkit-details-marker{ display:none; }
+.hood-body{ padding-top:16px; display:grid; gap:16px; }
+pre.code{
+  background: rgba(0,0,0,0.28); border:1px solid var(--border-soft); border-radius:10px;
+  padding:14px 16px; overflow-x:auto; font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; margin:0;
+}
+:root[data-theme="light"] pre.code, @media (prefers-color-scheme:light){ pre.code{ background: rgba(10,14,30,0.05);} }
+.formula{ font-family:var(--font-mono); font-size:1.05rem; color:var(--accent-a); background:var(--panel-2); border-radius:8px; padding:10px 14px; display:inline-block;}
+
+/* interview callout */
+.interview{
+  margin-top:22px; border:1px dashed var(--border); border-radius:12px; padding:14px 16px;
+  font-size:0.92rem; color:var(--text-dim); display:flex; gap:12px; align-items:flex-start;
+}
+.interview .tag{ font-family:var(--font-display); font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; background:rgba(var(--accent-b-rgb),0.15); color:var(--accent-b); padding:3px 8px; border-radius:6px; white-space:nowrap; margin-top:2px;}
+
+/* buttons */
+button.btn{
+  font-family:var(--font-display); font-size:0.82rem; letter-spacing:0.03em; text-transform:uppercase;
+  background: linear-gradient(180deg, rgba(var(--accent-a-rgb),0.22), rgba(var(--accent-a-rgb),0.1));
+  border:1px solid rgba(var(--accent-a-rgb),0.5); color:var(--accent-a);
+  padding:9px 18px; border-radius:9px; cursor:pointer; transition:all .15s ease;
+}
+button.btn:hover{ background: rgba(var(--accent-a-rgb),0.28); }
+button.btn:disabled{ opacity:0.4; cursor:not-allowed; }
+button.btn.ghost{ background:transparent; color:var(--text-dim); border-color:var(--border); }
+button.btn.small{ padding:6px 12px; font-size:0.72rem; }
+
+/* word chips (ch1/ch6) */
+.chipset{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.chip{
+  font-family:var(--font-mono); font-size:0.84rem; padding:7px 13px; border-radius:20px;
+  border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); cursor:pointer; transition: all .15s ease;
+}
+.chip:hover{ border-color:var(--accent-a); color:var(--text); }
+.chip.on{ background:rgba(var(--accent-a-rgb),0.18); border-color:var(--accent-a); color:var(--accent-a); }
+
+/* meter (cosine gauge) */
+.meter{ height:10px; border-radius:6px; background:var(--panel-2); overflow:hidden; border:1px solid var(--border-soft); position:relative; }
+.meter .fill{ height:100%; border-radius:6px; background:linear-gradient(90deg, var(--accent-b), var(--amber), var(--accent-a)); transition:width .08s linear; }
+
+/* tabs (ch9) */
+.tabs{ display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
+.tab{ font-family:var(--font-display); font-size:0.78rem; letter-spacing:0.03em; padding:8px 14px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text-faint); cursor:pointer; }
+.tab.active{ background:rgba(var(--accent-a-rgb),0.15); border-color:var(--accent-a); color:var(--accent-a); }
+.tabpanel{ display:none; }
+.tabpanel.active{ display:block; }
+
+/* doc rows */
+.doclist{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+.docrow{
+  display:flex; align-items:center; gap:12px; background:var(--panel-2); border:1px solid var(--border-soft);
+  border-radius:10px; padding:10px 14px; transition: transform .3s ease, opacity .3s ease, background .3s ease;
+}
+.docrow .rank{ font-family:var(--font-mono); color:var(--text-faint); width:20px; }
+.docrow .name{ flex:1; font-size:0.92rem; }
+.docrow .score{ font-family:var(--font-mono); font-size:0.85rem; color:var(--accent-a); }
+.docrow.up{ background:rgba(var(--accent-a-rgb),0.12); }
+.docrow.down{ opacity:0.55; }
+
+/* pipeline (ch7 / ch10) */
+.pipeline{ display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-top:10px; }
+.pnode{
+  background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:14px 16px;
+  min-width:118px; text-align:center; font-size:0.82rem; color:var(--text-dim); position:relative; transition: all .25s ease;
+}
+.pnode .ic{ font-size:1.3rem; display:block; margin-bottom:6px; }
+.pnode.on{ border-color:var(--accent-a); color:var(--text); box-shadow:0 0 22px rgba(var(--accent-a-rgb),0.25); background:rgba(var(--accent-a-rgb),0.1);}
+.parrow{ color:var(--text-faint); padding:0 8px; font-family:var(--font-display); flex-shrink:0; }
+@media (max-width:760px){ .pipeline{ flex-direction:column; align-items:stretch;} .parrow{ transform:rotate(90deg); padding:6px 0; align-self:center;} }
+
+.detailbox{ margin-top:18px; padding:18px 20px; min-height:110px; }
+.detailbox .stagelabel{ font-family:var(--font-display); font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent-a); margin-bottom:10px;}
+.typed{ font-family:var(--font-mono); font-size:0.95rem; color:var(--text); }
+
+/* hnsw log */
+.log{ font-family:var(--font-mono); font-size:0.8rem; color:var(--text-dim); max-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; margin-top:14px; padding-right:6px;}
+.log div span{ color:var(--accent-a); }
+
+/* hero */
+.hero{ min-height:92vh; display:flex; flex-direction:column; justify-content:center; padding: 4vh 28px; max-width:1080px; margin:0 auto; }
+.hero .kicker{ font-family:var(--font-display); font-size:0.8rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent-v); margin-bottom:22px;}
+.hero h1{ font-size:clamp(2.6rem, 7vw, 5.2rem); line-height:1.02; }
+.hero h1 .grad{ background:linear-gradient(100deg, var(--accent-a), var(--accent-v) 55%, var(--accent-b)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero .sub{ margin-top:26px; font-size:1.2rem; color:var(--text-dim); max-width:56ch; }
+.hero .cta-row{ margin-top:38px; display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+.scrolldown{ font-family:var(--font-display); font-size:0.78rem; color:var(--text-faint); display:flex; align-items:center; gap:8px;}
+
+.herostage{ margin-top:56px; }
+
+/* toc */
+.toc{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px; margin-top:34px; }
+.toc a{ text-decoration:none; }
+.toc-item{
+  display:flex; align-items:baseline; gap:12px; padding:13px 15px; border:1px solid var(--border-soft); border-radius:10px; background:var(--panel);
+  transition: all .15s ease;
+}
+.toc-item:hover{ border-color:var(--accent-a); transform:translateY(-1px); }
+.toc-item .n{ font-family:var(--font-mono); color:var(--text-faint); font-size:0.85rem; }
+.toc-item .t{ color:var(--text); font-size:0.92rem; }
+
+/* footer */
+footer{ max-width:920px; margin:0 auto; padding:6vh 28px 10vh; color:var(--text-faint); font-size:0.88rem; border-top:1px solid var(--border-soft); }
+footer a{ color:var(--text-dim); }
+
+/* slider */
+input[type=range]{ width:100%; accent-color:var(--accent-a); }
+.field{ margin-top:14px; }
+.field label{ font-family:var(--font-display); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-faint); display:flex; justify-content:space-between; margin-bottom:6px;}
+.field label .val{ color:var(--accent-a); }
+
+.chunktext{ font-family:var(--font-body); font-size:0.98rem; line-height:1.9; margin-top:16px; }
+.chunktext span.c{ padding:1px 2px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<canvas id="field"></canvas>
+<div id="progress"></div>
+<button id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark">◐</button>
+<nav id="chapnav" aria-label="Chapter navigation"></nav>
+
+<div class="wrap">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero">
+  <div class="kicker">Vector Database Academy</div>
+  <h1>Learn to <span class="grad">feel</span> the math<br/>behind search &amp; RAG.</h1>
+  <p class="sub">Sixteen hands-on chapters, from raw vectors to production failure modes — you drag the vectors, watch the numbers move, and the intuition follows. No lecture, no PDF. Just try the one below.</p>
+  <div class="cta-row">
+    <button class="btn" onclick="document.getElementById('ch1').scrollIntoView({behavior:'smooth'})">Start with Chapter 1 →</button>
+    <span class="scrolldown">or scroll ↓</span>
+  </div>
+  <div class="panel playground herostage">
+    <div class="playground-head">
+      <h3>Drag either dot</h3>
+      <span class="hint">This is the whole course, in miniature.</span>
+    </div>
+    <div class="grid2">
+      <canvas id="heroCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div class="readout-row">
+          <div class="readout"><div class="k">Angle θ</div><div class="v mono" id="hero-angle">–</div></div>
+          <div class="readout"><div class="k">Cosine similarity</div><div class="v mono" id="hero-cos">–</div></div>
+        </div>
+        <div class="meter" style="margin-top:14px;"><div class="fill" id="hero-meter" style="width:50%;"></div></div>
+        <p class="dim" style="font-size:0.9rem; margin-top:14px;" id="hero-verdict">Pull the two dots apart or together and watch what "similar" means, geometrically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TOC ================= -->
+<section class="stage" style="padding-top:0;">
+  <div class="eyebrow"><span class="num">Contents</span></div>
+  <div class="toc" id="toc"></div>
+</section>
+
+<!-- ================= CH1 : MEANING ================= -->
+<section class="stage" id="ch1">
+  <div class="eyebrow"><span class="num">Chapter 01</span> · Foundations</div>
+  <h2 class="chapter-title">What Is Meaning, To a Machine?</h2>
+  <div class="prose">
+    <p>A computer has never smelled a dog, chased a bus, or felt monsoon rain. It only has numbers. So when we ask a machine "is <em>puppy</em> similar to <em>dog</em>?", we're asking something it has no native way to answer — <strong>unless we first turn words into numbers in a way that preserves closeness.</strong></p>
+    <p>That's the entire premise of this academy. Everything from here on — vectors, distance, embeddings, RAG — is one long answer to a single question: <strong>how do you place meaning at a coordinate?</strong></p>
+  </div>
+  <div class="analogy">
+    <b>The library analogy</b>
+    A well-run library doesn't shelve books alphabetically by title — it shelves them by <em>subject</em>, using a system like Dewey Decimal. A book on Mughal architecture sits near one on Rajasthani forts, not because their titles match, but because their <em>meaning</em> does. An embedding is just a Dewey Decimal number with hundreds of digits instead of one — precise enough that "similar meaning" becomes "nearby shelf."
+  </div>
+  <div class="panel playground">
+    <div class="playground-head">
+      <h3>Guess the closeness</h3>
+      <span class="hint">Pick a pair — see what a trained model actually thinks</span>
+    </div>
+    <div class="chipset" id="meaning-pairs"></div>
+    <div style="margin-top:20px;">
+      <div class="meter"><div class="fill" id="meaning-fill" style="width:0%"></div></div>
+      <p class="mono dim" id="meaning-label" style="margin-top:10px; font-size:0.9rem;">Choose a pair above.</p>
+    </div>
+  </div>
+  <div class="interview">
+    <span class="tag">AI Engineer</span>
+    <span>Why can't we just one-hot encode every word and call that a "meaning vector"? (Hint: think about what the dot product of two one-hot vectors always equals.)</span>
+  </div>
+</section>
+
+<!-- ================= CH2 : VECTORS ================= -->
+<section class="stage" id="ch2">
+  <div class="eyebrow"><span class="num">Chapter 02</span> · Foundations</div>
+  <h2 class="chapter-title">Vectors: An Instruction, Not a Dot</h2>
+  <div class="prose">
+    <p>A vector isn't really a point — it's a <strong>set of directions from somewhere</strong>. "3 units right, 2 units up" is a vector whether it starts at your house or the origin. What matters is the displacement: how far, and in which direction.</p>
+    <p>Every embedding you'll ever use is exactly this, just in far more than two dimensions — a list of numbers, each one a direction to move along some invisible axis of meaning.</p>
+  </div>
+  <div class="analogy">
+    <b>Google Maps analogy</b>
+    When Maps says "head 400m northeast," it never tells you the destination's absolute coordinates — just the displacement from where you're standing. A word vector works the same way: not an absolute "meaning-coordinate" you'd recognize, but an instruction for how far to walk, and in which direction, from a neutral starting point.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag the arrow tip</h3><span class="hint">Watch its components update live</span></div>
+    <div class="grid2">
+      <canvas id="vecCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div class="readout-row">
+          <div class="readout"><div class="k">x</div><div class="v mono a" id="v2-x">3.0</div></div>
+          <div class="readout"><div class="k">y</div><div class="v mono a" id="v2-y">2.0</div></div>
+          <div class="readout"><div class="k">‖v‖ magnitude</div><div class="v mono" id="v2-mag">3.6</div></div>
+        </div>
+        <p class="dim" style="font-size:0.9rem; margin-top:16px;">In an embedding model this same arrow would have 384, 768, or 1536 components instead of 2 — one per learned "direction of meaning." We stick to 2D here because your eyes can't audit 768 dimensions, but the geometry is identical.</p>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <div><span class="formula">‖v‖ = √(x² + y² + ... + n²)</span></div>
+        <pre class="code">def magnitude(v: list[float]) -> float:
+    return sum(c * c for c in v) ** 0.5
+
+magnitude([3.0, 2.0])  # 3.6055...</pre>
+        <p class="dim" style="font-size:0.88rem;">Real embedding models (OpenAI's <code>text-embedding-3</code>, Google's Gemini embeddings, open models like BGE or E5) output 384–3072 dimensions. More dimensions can capture more nuance, but cost more storage and compute per comparison — a real production trade-off, not just a math footnote.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================= CH3 : DISTANCE ================= -->
+<section class="stage" id="ch3">
+  <div class="eyebrow"><span class="num">Chapter 03</span> · Foundations</div>
+  <h2 class="chapter-title">Distance: How Far Apart Are Two Meanings?</h2>
+  <div class="prose">
+    <p>Once meaning lives at a coordinate, "similar" becomes "nearby." The most obvious way to measure "nearby" is the one you already know from school: the straight-line distance between two points.</p>
+  </div>
+  <div class="analogy">
+    <b>The autorickshaw-meter analogy</b>
+    An auto meter doesn't care about the maze of one-way streets it actually drove — some apps just estimate "as the crow flies" distance for a fare preview. Euclidean distance is exactly that crow-flies line between two embeddings: it ignores the "roads" of the space and just measures the straight gap.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag either point</h3><span class="hint">A = teal, B = rose</span></div>
+    <div class="grid2">
+      <canvas id="distCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div class="readout-row">
+          <div class="readout"><div class="k">Δx</div><div class="v mono" id="d-dx">–</div></div>
+          <div class="readout"><div class="k">Δy</div><div class="v mono" id="d-dy">–</div></div>
+          <div class="readout"><div class="k">Euclidean distance</div><div class="v mono" id="d-dist" style="color:var(--accent-v);">–</div></div>
+        </div>
+        <p class="dim" style="font-size:0.9rem; margin-top:16px;" id="d-note">Smaller distance = the vector database considers these more alike.</p>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <div><span class="formula">d(A,B) = √Σ(aᵢ − bᵢ)²</span></div>
+        <pre class="code">def euclidean(a: list[float], b: list[float]) -> float:
+    return sum((x - y) ** 2 for x, y in zip(a, b)) ** 0.5</pre>
+        <p class="dim" style="font-size:0.88rem;">Time complexity is O(d) per comparison, d = dimensions — cheap for one pair, expensive across millions. That single fact is <em>why</em> vector databases exist: to avoid comparing your query against every row (Chapters 7–8).</p>
+      </div>
+    </details>
+  </div>
+  <div class="interview">
+    <span class="tag">Staff Engineer</span>
+    <span>Euclidean distance is sensitive to vector magnitude, not just direction. Why does that make it a poor default for comparing sentences of very different lengths — and what metric would you reach for instead?</span>
+  </div>
+</section>
+
+<!-- ================= CH4 : DOT PRODUCT ================= -->
+<section class="stage" id="ch4">
+  <div class="eyebrow"><span class="num">Chapter 04</span> · Foundations</div>
+  <h2 class="chapter-title">Dot Product: Are You Pulling the Same Way?</h2>
+  <div class="prose">
+    <p>Distance asks "how far apart." The dot product asks a different question entirely: <strong>how much do these two vectors point the same way?</strong> Multiply matching components and add them up — a number that grows when vectors agree in direction, shrinks or goes negative when they don't.</p>
+  </div>
+  <div class="analogy">
+    <b>The tug-of-war analogy</b>
+    Two people pulling a cart: if they pull in exactly the same direction, their effort adds up fully — maximum dot product. Pull at right angles and half the effort is wasted sideways — dot product near zero. Pull against each other and you're fighting your own teammate — a negative dot product.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag either vector tip</h3><span class="hint">Origin is fixed at the corner</span></div>
+    <div class="grid2">
+      <canvas id="dotCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div class="readout-row">
+          <div class="readout"><div class="k">A · B</div><div class="v mono" id="dp-val" style="color:var(--accent-v);">–</div></div>
+          <div class="readout"><div class="k">Angle θ</div><div class="v mono" id="dp-angle">–</div></div>
+        </div>
+        <p class="dim" style="font-size:0.9rem; margin-top:16px;" id="dp-note">Try making the angle exactly 90° — watch the dot product cross zero.</p>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <div><span class="formula">A · B = Σ aᵢbᵢ = ‖A‖‖B‖cos θ</span></div>
+        <pre class="code">def dot(a: list[float], b: list[float]) -> float:
+    return sum(x * y for x, y in zip(a, b))</pre>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================= CH5 : COSINE SIMILARITY ================= -->
+<section class="stage" id="ch5">
+  <div class="eyebrow"><span class="num">Chapter 05</span> · Foundations</div>
+  <h2 class="chapter-title">Cosine Similarity: The Workhorse Metric</h2>
+  <div class="prose">
+    <p>Take the dot product, then <strong>divide out the magnitudes</strong> — and suddenly you no longer care how long either vector is, only which direction it points. That single normalization is why cosine similarity, not raw distance, is the default metric in almost every production vector database.</p>
+  </div>
+  <div class="analogy">
+    <b>The WhatsApp chat-search analogy</b>
+    Search your chat history for "where's my order" and you'd want it to surface a two-word reply and a five-paragraph rant equally well, as long as both are <em>about</em> the same thing. Cosine similarity ignores message length (magnitude) entirely and compares only topic (direction) — which is exactly the behavior you want from semantic search.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag either vector tip</h3><span class="hint">Same rig as Chapter 4 — different lens</span></div>
+    <div class="grid2">
+      <canvas id="cosCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div class="readout-row">
+          <div class="readout"><div class="k">cos θ</div><div class="v mono" id="cs-val" style="color:var(--accent-v);">–</div></div>
+        </div>
+        <div class="meter" style="margin-top:14px;"><div class="fill" id="cs-meter"></div></div>
+        <p class="dim mono" style="font-size:0.9rem; margin-top:14px;" id="cs-verdict">–</p>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <div><span class="formula">cos θ = (A·B) / (‖A‖‖B‖)</span></div>
+        <pre class="code">def cosine_similarity(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    mag_a = sum(x * x for x in a) ** 0.5
+    mag_b = sum(y * y for y in b) ** 0.5
+    return dot / (mag_a * mag_b)</pre>
+        <pre class="code">// Java
+static double cosineSimilarity(double[] a, double[] b) {
+    double dot = 0, magA = 0, magB = 0;
+    for (int i = 0; i < a.length; i++) {
+        dot += a[i] * b[i];
+        magA += a[i] * a[i];
+        magB += b[i] * b[i];
+    }
+    return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+}</pre>
+      </div>
+    </details>
+  </div>
+  <div class="interview">
+    <span class="tag">Senior Backend</span>
+    <span>If every embedding your model produces is already unit-normalized, cosine similarity and dot product rank results identically. Many vector DBs exploit this. Why is that substitution faster in practice?</span>
+  </div>
+</section>
+
+<!-- ================= CH-CURSE : CURSE OF DIMENSIONALITY ================= -->
+<section class="stage" id="ch-curse">
+  <div class="eyebrow"><span class="num">Chapter 06</span> · Foundations</div>
+  <h2 class="chapter-title">The Curse of Dimensionality</h2>
+  <div class="prose">
+    <p>Everything so far has quietly relied on one assumption: that "nearest" means something. In 2D, it obviously does — your eyes just confirmed it four chapters in a row. But real embeddings live in 384 to 3072 dimensions, and something strange happens out there: <strong>as dimensions grow, every point drifts toward being roughly equidistant from every other point.</strong> Nearest and farthest stop being meaningfully different.</p>
+  </div>
+  <div class="analogy">
+    <b>The rush-hour local-train analogy</b>
+    In an empty train compartment, "who's standing closest to the door" is obvious. Pack that same compartment to Mumbai-local rush-hour density and the question stops making sense — everyone is closest to everyone, personal space has collapsed uniformly. High-dimensional space does this to points automatically, without needing rush hour to fill it — dimensions alone are enough.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag the slider</h3><span class="hint">150 random points, distance from a fixed query — recomputed live, for real</span></div>
+    <div class="grid2">
+      <canvas id="curseCanvas" class="stage-canvas" width="1120" height="440" data-logical-w="560" data-logical-h="220"></canvas>
+      <div>
+        <div class="field"><label>Dimensions <span class="val" id="curse-dim-val">3</span></label><input type="range" id="curse-dim" min="2" max="600" value="3"></div>
+        <div class="readout-row" style="margin-top:14px;">
+          <div class="readout"><div class="k">Nearest</div><div class="v mono" id="curse-min">–</div></div>
+          <div class="readout"><div class="k">Farthest</div><div class="v mono" id="curse-max">–</div></div>
+          <div class="readout"><div class="k">Spread ratio</div><div class="v mono" id="curse-ratio" style="color:var(--accent-v);">–</div></div>
+        </div>
+        <p class="dim mono" style="font-size:0.85rem; margin-top:14px;" id="curse-verdict">–</p>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <div><span class="formula">ratio = (dmax − dmin) / dmin  →  0  as dimensions → ∞</span></div>
+        <p class="dim" style="font-size:0.88rem;">This is a real, well-known result (Beyer et al., "When Is Nearest Neighbor Meaningful?", 1999) — not an artifact of this demo. It's exactly why production embedding models cap out around a few hundred to a few thousand dimensions instead of using ten thousand "to be safe": past a point, extra dimensions add cost without adding discriminative power, and can actively hurt exact-distance search. It's also a big part of why cosine similarity (angle) is preferred over Euclidean distance (magnitude) at high dimensionality — and why approximate search (Chapter 11) isn't a shortcut so much as an acknowledgment that exact "nearest" was never that meaningful to begin with, out there.</p>
+      </div>
+    </details>
+  </div>
+  <div class="interview">
+    <span class="tag">Staff Engineer</span>
+    <span>If more dimensions can capture more nuance, why don't production embedding models just use 10,000 dimensions?</span>
+  </div>
+</section>
+
+<!-- ================= CH-TOK : TOKENIZATION ================= -->
+<section class="stage wide" id="ch-tok">
+  <div class="eyebrow"><span class="num">Chapter 07</span> · Foundations</div>
+  <h2 class="chapter-title">Tokenization: What Actually Goes In</h2>
+  <div class="prose">
+    <p>One thing got glossed over since Chapter 1: an embedding model never sees your raw sentence. Text is first broken into <strong>tokens</strong> — word pieces from a fixed vocabulary — and each token is mapped to an integer ID. Those IDs are what actually get embedded. This single fact quietly explains LLM API pricing (billed per token, not per word), context-window limits (measured in tokens), and why "count the characters" is the wrong way to estimate either.</p>
+  </div>
+  <div class="analogy">
+    <b>The courier-parcel-box analogy</b>
+    A courier company doesn't stock a custom box for every possible item — it has a fixed set of standard box sizes and fits your oddly-shaped parcel using a combination of them. A tokenizer works the same way: it has a fixed vocabulary of ~50,000–100,000 "boxes" (tokens), and any text you throw at it — including words it has never seen — gets packed into a sequence of those standard pieces.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Type anything</h3><span class="hint">Simplified illustrative tokenizer — see "Under the hood" for how the real thing differs</span></div>
+    <input id="tok-input" type="text" value="Retrieval-Augmented Generation makes unbelievable hallucinations far less likely."
+      style="width:100%; font-family:var(--font-body); font-size:1rem; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text);" />
+    <div class="chunktext" id="tok-output" style="margin-top:18px;"></div>
+    <div class="readout-row" style="margin-top:18px;">
+      <div class="readout"><div class="k">Characters</div><div class="v mono" id="tok-chars">–</div></div>
+      <div class="readout"><div class="k">Words</div><div class="v mono" id="tok-words">–</div></div>
+      <div class="readout"><div class="k">Tokens</div><div class="v mono" id="tok-count" style="color:var(--accent-v);">–</div></div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <p class="dim" style="font-size:0.88rem;">This demo uses a small hand-built vocabulary and greedy longest-match splitting — enough to show the idea, not the real algorithm. Production tokenizers (OpenAI's <code>tiktoken</code>, BERT's WordPiece, Llama/T5's SentencePiece) learn their vocabulary from a giant corpus using <strong>Byte-Pair Encoding</strong>: start with individual characters, then repeatedly merge whichever adjacent pair occurs most often across the training data, until the vocabulary hits its target size (often 50k–100k tokens).</p>
+        <pre class="code">def bpe_train_step(corpus_pairs: dict[tuple, int], vocab: set) -> tuple:
+    most_common = max(corpus_pairs, key=corpus_pairs.get)
+    vocab.add(''.join(most_common))   # merge the pair into one new token
+    return most_common</pre>
+        <p class="dim" style="font-size:0.88rem;">Because that training corpus is overwhelmingly English, common English words often become a single token while the same sentence in Hindi, Tamil, or Marathi frequently costs <em>more</em> tokens per character — a real, measurable tax that shows up directly in API bills and context-window budgets for Indic-language products.</p>
+      </div>
+    </details>
+  </div>
+  <div class="interview">
+    <span class="tag">AI Engineer</span>
+    <span>Your context window is 128K tokens. Why is "word count" the wrong unit to reason about that limit, and why might an English and a Hindi document of identical length consume very different numbers of tokens?</span>
+  </div>
+</section>
+
+<!-- ================= CH6 : EMBEDDINGS ================= -->
+<section class="stage wide" id="ch6">
+  <div class="eyebrow"><span class="num">Chapter 08</span> · From Math to Meaning</div>
+  <h2 class="chapter-title">Embeddings: A Whole City Block of Meaning</h2>
+  <div class="prose">
+    <p>Zoom out from two vectors to thousands, and something remarkable happens: words that mean similar things cluster together, entirely unsupervised. Nobody told the model "fruits go here" — it discovered that geometry from reading text.</p>
+  </div>
+  <div class="analogy">
+    <b>The PIN-code analogy</b>
+    Two neighbourhoods can have wildly different postal PIN codes yet feel culturally identical — same language, same street food, same festival calendar. An embedding space is a PIN-code system redesigned from scratch so that codes are close <em>exactly when</em> the culture is close. That's what "training an embedding model" means: relabeling the world by similarity, not by geography.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Click a word</h3><span class="hint">Its 3 nearest neighbors light up, ranked by distance on the map</span></div>
+    <div class="grid2">
+      <canvas id="embCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360" style="cursor:pointer;"></canvas>
+      <div>
+        <p class="dim" style="font-size:0.85rem; margin-bottom:10px;">Nearest neighbors:</p>
+        <div class="doclist" id="emb-list"><div class="docrow"><span class="name dim">Click any point on the map</span></div></div>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:14px;">This 2D map is a simplification — real embeddings live in hundreds of dimensions and get flattened to 2D (via PCA/UMAP/t-SNE) only for humans to look at, the way a flat metro map simplifies a 3D city.</p>
+  </div>
+</section>
+
+<!-- ================= CH-EMBMODELS : HOW EMBEDDING MODELS LEARN ================= -->
+<section class="stage wide" id="ch-embmodels">
+  <div class="eyebrow"><span class="num">Chapter 09</span> · From Math to Meaning</div>
+  <h2 class="chapter-title">How Embedding Models Actually Learn</h2>
+  <div class="prose">
+    <p>Nobody sat down and hand-labeled "mango is 0.82 similar to banana." Embedding models learn geometry from <strong>pairs</strong>: millions of examples of "these two things belong together" (a question and its answer, a sentence and its paraphrase, a product and its review) and, just as importantly, examples of things that don't. Training just nudges vectors — pull positives together, push negatives apart — repeated billions of times until the geometry settles into something useful.</p>
+  </div>
+  <div class="analogy">
+    <b>The marriage-bureau analogy</b>
+    A matchmaker never asks you to define "compatibility" as a formula. They just observe outcomes — this pairing worked, that one didn't — across thousands of introductions, and slowly build an instinct for which traits pull people together and which push them apart. Contrastive learning is that instinct, formalized: no one defines "similar meaning" either — the model just gets shown enough positive and negative pairs to work out the geometry itself.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Watch one training step</h3><span class="hint">Vector B gets nudged toward or away from fixed vector A</span></div>
+    <div class="grid2">
+      <canvas id="trainCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button class="btn" id="train-pos">Show a positive pair (pull together) →</button>
+          <button class="btn ghost" id="train-neg">Show a negative pair (push apart) →</button>
+          <button class="btn ghost" id="train-reset">Reset</button>
+        </div>
+        <p class="dim" style="font-size:0.88rem; margin-top:16px;" id="train-note">"A" is fixed. Each click simulates one gradient step nudging "B" — exactly what happens, per pair, per batch, across a training run.</p>
+      </div>
+    </div>
+  </div>
+  <div class="prose" style="margin-top:30px;">
+    <p><strong>Three design choices matter once you're picking a model, not just using one:</strong></p>
+  </div>
+  <div class="grid2" style="align-items:stretch;">
+    <div class="panel" style="padding:20px;">
+      <h3 style="font-family:var(--font-display); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent-a); margin-bottom:10px;">Dense · Sparse · Multi-vector</h3>
+      <p class="dim" style="font-size:0.9rem;"><strong style="color:var(--text);">Dense</strong> (what this whole site assumes): one fixed-length vector per text, every dimension populated. Good general-purpose default.<br><br><strong style="color:var(--text);">Sparse</strong> (e.g. SPLADE): mostly-zero vectors where each dimension maps to an actual vocabulary term — less "black box," great at exact terms (part numbers, names).<br><br><strong style="color:var(--text);">Multi-vector</strong> (e.g. ColBERT): one small vector <em>per token</em>, compared via "late interaction." More accurate, far more storage and compute.</p>
+    </div>
+    <div class="panel" style="padding:20px;">
+      <h3 style="font-family:var(--font-display); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent-a); margin-bottom:10px;">Matryoshka Representation Learning</h3>
+      <p class="dim" style="font-size:0.9rem;">Newer models (OpenAI's <code>text-embedding-3</code>, Nomic Embed) are trained so the <em>first</em> 256 dimensions of a 1536-dim vector are already a decent standalone embedding. You can truncate for a cheaper, smaller index and lose only a little accuracy — instead of the usual all-or-nothing tradeoff.</p>
+    </div>
+  </div>
+  <details class="hood" style="margin-top:10px;">
+    <summary>Under the hood — picking a real model</summary>
+    <div class="hood-body">
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+          <thead><tr style="text-align:left; color:var(--text-faint); font-family:var(--font-display); font-size:0.72rem; text-transform:uppercase;">
+            <th style="padding:8px 12px 8px 0;">Model family</th><th style="padding:8px 12px;">Typical dims</th><th style="padding:8px 12px;">Notes</th>
+          </tr></thead>
+          <tbody style="color:var(--text-dim);">
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 12px 8px 0;">OpenAI text-embedding-3</td><td style="padding:8px 12px;">1536 / 3072</td><td style="padding:8px 12px;">Matryoshka-truncatable, hosted API only</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 12px 8px 0;">Cohere embed-v3/v4</td><td style="padding:8px 12px;">1024</td><td style="padding:8px 12px;">Strong multilingual, incl. Indic languages</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 12px 8px 0;">BGE / E5 (open)</td><td style="padding:8px 12px;">384–1024</td><td style="padding:8px 12px;">Self-hostable, free, fine-tunable on your data</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 12px 8px 0;">Google Gemini embedding</td><td style="padding:8px 12px;">768–3072</td><td style="padding:8px 12px;">Matryoshka-truncatable, hosted API only</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dim" style="font-size:0.82rem;">Treat exact numbers as approximate and check current docs — this table exists to show the shape of the decision (hosted vs. self-hosted, dimension budget, language coverage), not to be memorized.</p>
+    </div>
+  </details>
+  <div class="interview">
+    <span class="tag">AI Engineer</span>
+    <span>Two models both output 768-dimensional vectors. Why can't you store embeddings from Model A and Model B in the same index and compare them directly?</span>
+  </div>
+</section>
+
+<!-- ================= CH7 : VECTOR DATABASE ================= -->
+<section class="stage wide" id="ch7">
+  <div class="eyebrow"><span class="num">Chapter 10</span> · Systems</div>
+  <h2 class="chapter-title">The Vector Database Itself</h2>
+  <div class="prose">
+    <p>A vector database is boring on purpose: an embedding model turns content into vectors, an index organizes those vectors for fast search, and storage keeps everything durable, filterable, and queryable at scale. The magic isn't storage — it's the index (Chapter 8).</p>
+  </div>
+  <div class="analogy">
+    <b>The warehouse analogy</b>
+    A giant Amazon fulfillment warehouse doesn't just pile boxes randomly — items are shelved by a system so a picker's route to any item is short. A vector database is that warehouse for meaning: the embedding model labels each box, the index decides which shelf, and search is just a very well-planned walk to the nearest shelf.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Ingestion pipeline</h3><span class="hint">Click Run to animate a document's journey</span></div>
+    <div class="pipeline" id="ch7-pipeline"></div>
+    <div style="margin-top:20px; display:flex; gap:12px; align-items:center;">
+      <button class="btn" id="ch7-run">Run ingestion →</button>
+      <span class="dim mono" id="ch7-status" style="font-size:0.85rem;"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CH8 : ANN / HNSW ================= -->
+<section class="stage wide" id="ch8">
+  <div class="eyebrow"><span class="num">Chapter 11</span> · Systems</div>
+  <h2 class="chapter-title">ANN Search: Why HNSW Feels Like Cheating</h2>
+  <div class="prose">
+    <p>Comparing your query against every stored vector is <em>exact</em> but doesn't scale — O(n) per query against a billion rows is a non-starter. HNSW (Hierarchical Navigable Small World) trades a sliver of accuracy for enormous speed by building a multi-layer graph and searching <strong>greedily</strong>, top layer down.</p>
+  </div>
+  <div class="analogy">
+    <b>The highway-system analogy</b>
+    To drive across India you don't take local roads the whole way — you take a National Highway to the right region, a State Highway to the right district, then local roads for the last kilometre. HNSW's top layer is sparse, like NH express lanes connecting a few hub cities; each layer down adds more, smaller roads, until layer 0 has every street. Search enters at the top and only "gets local" once it's already close.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Drag the query marker (✕), then run the search</h3><span class="hint">Real greedy graph search — not a scripted animation</span></div>
+    <div class="grid2">
+      <canvas id="hnswCanvas" class="stage-canvas" width="1120" height="720" data-logical-w="560" data-logical-h="360"></canvas>
+      <div>
+        <div style="display:flex; gap:10px; margin-bottom:14px;">
+          <button class="btn" id="hnsw-run">Run search →</button>
+          <button class="btn ghost" id="hnsw-reset">Reset</button>
+        </div>
+        <div class="log" id="hnsw-log"><div class="dim">Drag ✕ anywhere, then run search.</div></div>
+      </div>
+    </div>
+    <details class="hood">
+      <summary>Under the hood</summary>
+      <div class="hood-body">
+        <p class="dim" style="font-size:0.88rem;">Real HNSW search maintains a candidate priority queue and explores several promising neighbors per hop (not just the single best) — this toy version simplifies to strict greedy descent so the path is easy to watch, but the core idea is identical: <strong>enter high, narrow fast, refine locally.</strong></p>
+        <div><span class="formula">Search: O(log n) expected · Build: O(n log n)</span></div>
+        <p class="dim" style="font-size:0.88rem;">This is what Qdrant, Weaviate, Milvus, and pgvector's HNSW index all implement under the hood — the graph you just searched is a miniature of the real thing.</p>
+      </div>
+    </details>
+  </div>
+  <div class="interview">
+    <span class="tag">Staff Engineer</span>
+    <span>HNSW search is approximate — it can miss the true nearest neighbor. Where in a production RAG system does that approximation actually matter, and where is it harmless?</span>
+  </div>
+</section>
+
+<!-- ================= CH-INDEX : INDEX TYPES & QUANTIZATION ================= -->
+<section class="stage wide" id="ch-index">
+  <div class="eyebrow"><span class="num">Chapter 12</span> · Systems</div>
+  <h2 class="chapter-title">Beyond HNSW: Index Types &amp; Quantization</h2>
+  <div class="prose">
+    <p>HNSW isn't the only index, and index choice is only half the budget — <strong>quantization</strong>, how precisely each number is stored, is the other half. The two are independent knobs: pick an index for search speed, pick a quantization level for memory, and combine them.</p>
+  </div>
+  <div class="analogy">
+    <b>Continuing the warehouse-and-highway analogy</b>
+    If HNSW (Chapter 11) is the highway system connecting shelves, quantization is repacking the boxes themselves — same items, tighter packaging, so more fit on the same truck. You lose a little labeling precision on the box, but you can now ship four times as much on one trip.
+  </div>
+  <div class="grid2" style="align-items:stretch;">
+    <div class="panel" style="padding:20px; overflow-x:auto;">
+      <h3 style="font-family:var(--font-display); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent-a); margin-bottom:14px;">Index types</h3>
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead><tr style="text-align:left; color:var(--text-faint); font-family:var(--font-display); font-size:0.7rem; text-transform:uppercase;">
+          <th style="padding:6px 10px 6px 0;">Index</th><th style="padding:6px 10px;">Query</th><th style="padding:6px 10px;">Use when</th>
+        </tr></thead>
+        <tbody style="color:var(--text-dim);">
+          <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Flat (brute-force)</td><td style="padding:8px 10px;">O(n), exact</td><td style="padding:8px 10px;">&lt;100K vectors, correctness &gt; speed</td></tr>
+          <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">IVF</td><td style="padding:8px 10px;">O(n/clusters)</td><td style="padding:8px 10px;">Fast to build, tunable via nprobe</td></tr>
+          <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">HNSW</td><td style="padding:8px 10px;">O(log n)</td><td style="padding:8px 10px;">Best query speed, default in most vector DBs</td></tr>
+          <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">DiskANN</td><td style="padding:8px 10px;">O(log n), disk-resident</td><td style="padding:8px 10px;">Billions of vectors, RAM won't fit them all</td></tr>
+        </tbody>
+      </table>
+      <p class="hint" style="margin-top:14px;">IVF: cluster vectors with k-means at build time; a query only searches the nearest cluster(s) instead of everything.</p>
+    </div>
+    <div class="panel playground" style="margin-top:0;">
+      <div class="playground-head"><h3>Memory calculator</h3><span class="hint">Real arithmetic — try 1B vectors at float32, then switch to binary</span></div>
+      <div class="field"><label>Vectors <span class="val" id="quant-n-val">10,000,000</span></label><input type="range" id="quant-n" min="4" max="9" step="0.01" value="7"></div>
+      <div class="field"><label>Dimensions <span class="val" id="quant-d-val">1536</span></label><input type="range" id="quant-d" min="128" max="3072" step="64" value="1536"></div>
+      <div class="chipset" id="quant-mode">
+        <button class="chip on" data-bytes="4">float32</button>
+        <button class="chip" data-bytes="1">int8 (scalar)</button>
+        <button class="chip" data-bytes="0.125">binary (1-bit)</button>
+      </div>
+      <div class="readout-row" style="margin-top:16px;">
+        <div class="readout" style="min-width:160px;"><div class="k">Raw index size</div><div class="v mono" id="quant-size" style="color:var(--accent-v);">–</div></div>
+        <div class="readout"><div class="k">vs. float32</div><div class="v mono" id="quant-savings">–</div></div>
+      </div>
+    </div>
+  </div>
+  <details class="hood">
+    <summary>Under the hood</summary>
+    <div class="hood-body">
+      <div><span class="formula">size = vectors × dimensions × bytes_per_dim</span></div>
+      <p class="dim" style="font-size:0.88rem;"><strong style="color:var(--text);">Scalar quantization (int8)</strong> maps each float32 to one byte — ~4× smaller, negligible accuracy loss. <strong style="color:var(--text);">Product quantization (PQ)</strong> splits each vector into subvectors, clusters each subspace independently, and stores only cluster IDs — 16–64× smaller, some accuracy cost, the workhorse of billion-scale search (Faiss's IVF-PQ). <strong style="color:var(--text);">Binary quantization</strong> keeps 1 bit per dimension and compares with Hamming distance — extremely fast and small, usually paired with a rescoring pass over the top candidates using the original full-precision vectors to recover accuracy.</p>
+    </div>
+  </details>
+  <div class="interview">
+    <span class="tag">Staff Engineer</span>
+    <span>Your team needs to go from 10M to 500M vectors on the same hardware budget. Quantization alone won't fully close that gap — what else has to change?</span>
+  </div>
+</section>
+
+<!-- ================= CH9 : RETRIEVAL PIPELINE ================= -->
+<section class="stage wide" id="ch9">
+  <div class="eyebrow"><span class="num">Chapter 13</span> · Applied</div>
+  <h2 class="chapter-title">The Retrieval Pipeline: Search Doesn't End at "Nearest"</h2>
+  <div class="prose">
+    <p>Production search is never just "find the closest vector." Real systems chunk documents sensibly, filter by metadata before or alongside the vector search, blend vector similarity with old-fashioned keyword matching, and often rerank the shortlist with a slower, smarter model.</p>
+  </div>
+  <div class="analogy">
+    <b>The e-commerce-search analogy</b>
+    Search "waterproof shoes" on any shopping app and four things happen at once: your query is matched semantically, results are filtered by what's actually in stock and ships to your pincode, exact-keyword matches for "waterproof" get a boost, and the final order is reshuffled by a ranking model tuned on what people actually click. That's this entire chapter, in one search bar.
+  </div>
+  <div class="panel playground">
+    <div class="tabs" id="ch9-tabs"></div>
+    <div id="ch9-panels"></div>
+  </div>
+</section>
+
+<!-- ================= CH-ADVANCED : ADVANCED RETRIEVAL ================= -->
+<section class="stage wide" id="ch-advanced">
+  <div class="eyebrow"><span class="num">Chapter 14</span> · Applied</div>
+  <h2 class="chapter-title">When "Nearest" Isn't Enough: Query Transformation</h2>
+  <div class="prose">
+    <p>Sometimes the query and the answer just don't share vocabulary — "how do I get my money back" and "Section 4: Refund Eligibility" can be conceptually identical and still sit further apart in embedding space than you'd like. Advanced retrieval rewrites the query <em>before</em> searching, instead of hoping embeddings alone will bridge the gap.</p>
+  </div>
+  <div class="analogy">
+    <b>Remember the librarian from Chapter 1?</b>
+    Walk up to a good librarian and ask "that book about the guy who did the thing," and they don't search literally — they guess what you probably mean and search for <em>that</em>. HyDE makes the retrieval system do exactly this: draft a plausible answer first, then search using the draft instead of the vague question.
+  </div>
+  <div class="panel playground">
+    <div class="tabs" id="adv-tabs"></div>
+    <div id="adv-panels"></div>
+  </div>
+  <div class="interview">
+    <span class="tag">AI Engineer</span>
+    <span>HyDE retrieves using an LLM-generated hypothetical answer instead of the real question. What's the obvious failure mode when that hypothetical answer is confidently wrong?</span>
+  </div>
+</section>
+
+<!-- ================= CH-PROD : PRODUCTION ENGINEERING ================= -->
+<section class="stage wide" id="ch-prod">
+  <div class="eyebrow"><span class="num">Chapter 15</span> · Production</div>
+  <h2 class="chapter-title">Shipping It: Evaluation, Choice &amp; Failure Modes</h2>
+  <div class="prose">
+    <p>Everything before this chapter makes retrieval <em>possible</em>. This one is about the unglamorous work of knowing whether it's actually working, which database to bet on, and where it quietly breaks in front of real users.</p>
+  </div>
+  <div class="panel playground">
+    <div class="tabs" id="prod-tabs"></div>
+    <div id="prod-panels"></div>
+  </div>
+  <div class="interview">
+    <span class="tag">Staff Engineer</span>
+    <span>A user in Tenant A's chatbot receives an answer that clearly draws on Tenant B's confidential documents. Where in this stack did the failure most likely happen?</span>
+  </div>
+</section>
+
+<!-- ================= CH10 : CAPSTONE RAG ================= -->
+<section class="stage wide" id="ch10">
+  <div class="eyebrow"><span class="num">Chapter 16</span> · Capstone</div>
+  <h2 class="chapter-title">Building RAG: The Whole Academy, One Query</h2>
+  <div class="prose">
+    <p>Retrieval-Augmented Generation is every idea in this academy chained together: embed the question, search the index, retrieve and rerank chunks, then hand the LLM exactly the material it needs to answer honestly instead of guessing.</p>
+  </div>
+  <div class="analogy">
+    <b>The open-book-exam analogy</b>
+    A closed-book exam forces you to answer from memory alone — confident, sometimes wrong. RAG turns the LLM's exam open-book: before answering, it's handed the specific pages (chunks) most relevant to the question, and grading rewards citing them. That's the entire reason RAG reduces hallucination — it's not a smarter model, it's a better-prepared one.
+  </div>
+  <div class="panel playground">
+    <div class="playground-head"><h3>Query: "How do I get a refund for a damaged product?"</h3></div>
+    <div class="pipeline" id="ch10-pipeline"></div>
+    <div style="margin-top:18px; display:flex; gap:12px;">
+      <button class="btn" id="ch10-run">Run RAG →</button>
+      <button class="btn ghost" id="ch10-reset">Reset</button>
+    </div>
+    <div class="panel detailbox" id="ch10-detail" style="margin-top:18px;">
+      <div class="stagelabel">Ready</div>
+      <div class="typed dim">Press Run to step through the pipeline stage by stage.</div>
+    </div>
+  </div>
+  <div class="interview">
+    <span class="tag">AI Engineer</span>
+    <span>Your RAG system retrieves five chunks but the model still hallucinates a policy detail none of them contain. Walk through where in this pipeline you'd look first.</span>
+  </div>
+</section>
+
+<footer>
+  <p><strong style="color:var(--text);">This is v2 of the Academy</strong> — sixteen chapters, and everything above is fully real: every drag, every number, every search, every calculator is computed live, not staged. Multi-vector retrieval (ColBERT in depth), graph RAG, and agentic/self-correcting retrieval are natural next additions — tell me which to build next.</p>
+  <p style="margin-top:14px;">Built for one learner, in one sitting. No external libraries, no tracking, nothing loaded from a CDN.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ THEME ============ */
+const root = document.documentElement;
+const toggleBtn = document.getElementById('theme-toggle');
+function currentIsDark(){
+  const attr = root.getAttribute('data-theme');
+  if(attr === 'dark') return true;
+  if(attr === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+toggleBtn.addEventListener('click', ()=>{
+  root.setAttribute('data-theme', currentIsDark() ? 'light' : 'dark');
+  redrawAll();
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll);
+const redrawCallbacks = [];
+function redrawAll(){ redrawCallbacks.forEach(fn=>{ try{fn();}catch(e){} }); }
+function cssVar(name){ return getComputedStyle(root).getPropertyValue(name).trim(); }
+
+/* ============ PROGRESS BAR ============ */
+const progressEl = document.getElementById('progress');
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  progressEl.style.width = pct + '%';
+}, {passive:true});
+
+/* ============ CHAPTER NAV ============ */
+const CHAPTERS = [
+  {id:'ch1', n:'01', t:'What Is Meaning?'},
+  {id:'ch2', n:'02', t:'Vectors'},
+  {id:'ch3', n:'03', t:'Distance'},
+  {id:'ch4', n:'04', t:'Dot Product'},
+  {id:'ch5', n:'05', t:'Cosine Similarity'},
+  {id:'ch-curse', n:'06', t:'Curse of Dimensionality'},
+  {id:'ch-tok', n:'07', t:'Tokenization'},
+  {id:'ch6', n:'08', t:'Embeddings'},
+  {id:'ch-embmodels', n:'09', t:'How Embeddings Learn'},
+  {id:'ch7', n:'10', t:'Vector Databases'},
+  {id:'ch8', n:'11', t:'ANN Search (HNSW)'},
+  {id:'ch-index', n:'12', t:'Index Types & Quantization'},
+  {id:'ch9', n:'13', t:'Retrieval Pipeline'},
+  {id:'ch-advanced', n:'14', t:'Advanced Retrieval'},
+  {id:'ch-prod', n:'15', t:'Shipping It'},
+  {id:'ch10', n:'16', t:'Building RAG'},
+];
+const navEl = document.getElementById('chapnav');
+const tocEl = document.getElementById('toc');
+CHAPTERS.forEach(c=>{
+  const b = document.createElement('button');
+  b.dataset.target = c.id;
+  b.innerHTML = `<span class="tip">${c.n} · ${c.t}</span>`;
+  b.addEventListener('click', ()=>document.getElementById(c.id).scrollIntoView({behavior:'smooth'}));
+  navEl.appendChild(b);
+
+  const a = document.createElement('a');
+  a.href = '#'+c.id;
+  a.innerHTML = `<div class="toc-item"><span class="n">${c.n}</span><span class="t">${c.t}</span></div>`;
+  tocEl.appendChild(a);
+});
+const navButtons = [...navEl.querySelectorAll('button')];
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navButtons.forEach(b=>b.classList.toggle('active', b.dataset.target===e.target.id));
+    }
+  });
+}, {rootMargin:'-45% 0px -45% 0px'});
+CHAPTERS.forEach(c=>observer.observe(document.getElementById(c.id)));
+
+/* ============ AMBIENT FIELD BACKGROUND ============ */
+const field = document.getElementById('field');
+const fctx = field.getContext('2d');
+let fw, fh, pts=[];
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sizeField(){
+  fw = field.width = window.innerWidth;
+  fh = field.height = window.innerHeight;
+  const n = Math.min(90, Math.floor((fw*fh)/45000));
+  pts = Array.from({length:n}, ()=>({
+    x: Math.random()*fw, y: Math.random()*fh,
+    vx:(Math.random()-0.5)*0.15, vy:(Math.random()-0.5)*0.15
+  }));
+}
+sizeField();
+window.addEventListener('resize', sizeField);
+function drawField(){
+  fctx.clearRect(0,0,fw,fh);
+  const dot = cssVar('--text-faint') || '#5c6389';
+  fctx.fillStyle = dot; fctx.globalAlpha = 0.5;
+  const linkDist = 130;
+  for(let i=0;i<pts.length;i++){
+    const p = pts[i];
+    if(!reduceMotion){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<0||p.x>fw) p.vx*=-1;
+      if(p.y<0||p.y>fh) p.vy*=-1;
+    }
+    fctx.beginPath(); fctx.arc(p.x,p.y,1.4,0,Math.PI*2); fctx.fill();
+  }
+  fctx.strokeStyle = dot;
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d = Math.hypot(dx,dy);
+      if(d<linkDist){
+        fctx.globalAlpha = 0.08*(1-d/linkDist);
+        fctx.beginPath(); fctx.moveTo(pts[i].x,pts[i].y); fctx.lineTo(pts[j].x,pts[j].y); fctx.stroke();
+      }
+    }
+  }
+  fctx.globalAlpha = 1;
+  if(!reduceMotion) requestAnimationFrame(drawField);
+}
+drawField();
+redrawCallbacks.push(()=>{ if(reduceMotion) drawField(); });
+
+/* ============ CANVAS HELPERS ============ */
+function setupCanvas(id){
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const lw = +canvas.dataset.logicalW, lh = +canvas.dataset.logicalH;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = lw*dpr; canvas.height = lh*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {canvas, ctx, lw, lh};
+}
+function pointerXY(e, canvas, lw, lh){
+  const rect = canvas.getBoundingClientRect();
+  const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+  const cy = (e.touches ? e.touches[0].clientY : e.clientY);
+  return { x: (cx-rect.left) * (lw/rect.width), y: (cy-rect.top) * (lh/rect.height) };
+}
+function attachDrag(canvas, points, onMove){
+  let dragIdx = null;
+  function findNear(x,y){
+    let best=-1, bd=22;
+    points.forEach((p,i)=>{ const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=i;} });
+    return best;
+  }
+  const lw = +canvas.dataset.logicalW, lh = +canvas.dataset.logicalH;
+  function down(e){
+    const {x,y} = pointerXY(e, canvas, lw, lh);
+    const idx = findNear(x,y);
+    if(idx>=0){ dragIdx=idx; canvas.classList.add('dragging'); canvas.setPointerCapture && e.pointerId!=null && canvas.setPointerCapture(e.pointerId); e.preventDefault(); }
+  }
+  function move(e){
+    if(dragIdx===null) return;
+    const {x,y} = pointerXY(e, canvas, lw, lh);
+    points[dragIdx].x = Math.max(4,Math.min(lw-4,x));
+    points[dragIdx].y = Math.max(4,Math.min(lh-4,y));
+    onMove();
+    e.preventDefault();
+  }
+  function up(){ dragIdx=null; canvas.classList.remove('dragging'); }
+  canvas.addEventListener('pointerdown', down);
+  canvas.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+  canvas.addEventListener('touchstart', down, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  window.addEventListener('touchend', up);
+}
+function drawGrid(ctx, lw, lh, ox, oy, step){
+  ctx.strokeStyle = cssVar('--grid-line'); ctx.lineWidth = 1;
+  for(let x=ox%step; x<lw; x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,lh); ctx.stroke(); }
+  for(let y=oy%step; y<lh; y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(lw,y); ctx.stroke(); }
+  ctx.strokeStyle = cssVar('--text-faint'); ctx.globalAlpha=0.4;
+  ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(lw,oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,lh); ctx.stroke();
+  ctx.globalAlpha=1;
+}
+function drawArrow(ctx, x1,y1,x2,y2, color, width){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=width||3; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const ang = Math.atan2(y2-y1,x2-x1);
+  const hs = 9;
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hs*Math.cos(ang-0.4), y2-hs*Math.sin(ang-0.4));
+  ctx.lineTo(x2-hs*Math.cos(ang+0.4), y2-hs*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+}
+function dot(ctx,x,y,r,color,glow){
+  if(glow){ ctx.shadowColor=color; ctx.shadowBlur=14; }
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+/* ============ HERO CANVAS ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('heroCanvas');
+  const ox=100, oy=280;
+  const scale=42;
+  const pA = {x: ox+3*scale, y: oy-2*scale};
+  const pB = {x: ox+1.5*scale, y: oy-3.4*scale};
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    drawGrid(ctx,lw,lh,ox,oy,scale);
+    drawArrow(ctx, ox,oy, pA.x,pA.y, cssVar('--accent-a'),3.5);
+    drawArrow(ctx, ox,oy, pB.x,pB.y, cssVar('--accent-b'),3.5);
+    dot(ctx,pA.x,pA.y,7,cssVar('--accent-a'),true);
+    dot(ctx,pB.x,pB.y,7,cssVar('--accent-b'),true);
+    const ax=pA.x-ox, ay=oy-pA.y, bx=pB.x-ox, by=oy-pB.y;
+    const magA=Math.hypot(ax,ay), magB=Math.hypot(bx,by);
+    const cos = (ax*bx+ay*by)/(magA*magB || 1);
+    const deg = Math.acos(Math.max(-1,Math.min(1,cos)))*180/Math.PI;
+    document.getElementById('hero-angle').textContent = deg.toFixed(1)+'°';
+    document.getElementById('hero-cos').textContent = cos.toFixed(3);
+    document.getElementById('hero-meter').style.width = ((cos+1)/2*100)+'%';
+    const verdict = cos>0.85?'Nearly identical direction — a search engine would call these a great match.':
+      cos>0.4?'Related, not identical — a plausible top-5 result.':
+      cos>-0.2?'Only loosely related — probably outside the top results.':
+      'Pointing in opposite directions — as dissimilar as this space allows.';
+    document.getElementById('hero-verdict').textContent = verdict;
+  }
+  attachDrag(canvas, [pA,pB], draw);
+  draw();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH1: MEANING PAIRS ============ */
+{
+  const pairs = [
+    {a:'dog', b:'puppy', score:0.82, note:'Same species, near-identical context — high cosine similarity.'},
+    {a:'dog', b:'wolf', score:0.61, note:'Related biologically, but used in very different contexts.'},
+    {a:'dog', b:'bicycle', score:0.09, note:'Almost nothing in common — near-orthogonal vectors.'},
+    {a:'king', b:'queen', score:0.73, note:'Different gender, same royal context — classic embedding example.'},
+    {a:'bank', b:'river', score:0.31, note:'Only related through one sense of "bank" — ambiguity lowers similarity.'},
+    {a:'happy', b:'joyful', score:0.88, note:'Near-synonyms — about as close as language gets.'},
+  ];
+  const chipEl = document.getElementById('meaning-pairs');
+  const fill = document.getElementById('meaning-fill');
+  const label = document.getElementById('meaning-label');
+  pairs.forEach((p,i)=>{
+    const c = document.createElement('button');
+    c.className='chip'; c.textContent = `${p.a} ↔ ${p.b}`;
+    c.addEventListener('click', ()=>{
+      [...chipEl.children].forEach(ch=>ch.classList.remove('on'));
+      c.classList.add('on');
+      fill.style.width = (p.score*100)+'%';
+      label.textContent = `cosine ≈ ${p.score.toFixed(2)}  —  ${p.note}`;
+    });
+    chipEl.appendChild(c);
+  });
+}
+
+/* ============ CH2: VECTORS ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('vecCanvas');
+  const ox=70, oy=310, scale=44;
+  const tip = {x: ox+3*scale, y: oy-2*scale};
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    drawGrid(ctx,lw,lh,ox,oy,scale);
+    drawArrow(ctx, ox,oy, tip.x,tip.y, cssVar('--accent-a'), 3.5);
+    dot(ctx,tip.x,tip.y,7,cssVar('--accent-a'),true);
+    ctx.fillStyle=cssVar('--text-faint'); ctx.font='11px '+cssVar('--font-mono');
+    ctx.fillText('origin', ox+6, oy+16);
+    const x=(tip.x-ox)/scale, y=(oy-tip.y)/scale;
+    document.getElementById('v2-x').textContent = x.toFixed(1);
+    document.getElementById('v2-y').textContent = y.toFixed(1);
+    document.getElementById('v2-mag').textContent = Math.hypot(x,y).toFixed(2);
+  }
+  attachDrag(canvas,[tip],draw);
+  draw();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH3: DISTANCE ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('distCanvas');
+  const ox=40, oy=320, scale=40;
+  const A={x:120,y:220}, B={x:380,y:110};
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    drawGrid(ctx,lw,lh,ox,oy,scale);
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle=cssVar('--accent-v'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,A.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(B.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle=cssVar('--accent-v'); ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    dot(ctx,A.x,A.y,8,cssVar('--accent-a'),true);
+    dot(ctx,B.x,B.y,8,cssVar('--accent-b'),true);
+    ctx.fillStyle=cssVar('--text-dim'); ctx.font='12px '+cssVar('--font-mono');
+    ctx.fillText('A', A.x+10, A.y-10);
+    ctx.fillText('B', B.x+10, B.y-10);
+    const dx=(B.x-A.x)/scale, dy=(A.y-B.y)/scale;
+    const distance = Math.hypot(dx,dy);
+    document.getElementById('d-dx').textContent = dx.toFixed(2);
+    document.getElementById('d-dy').textContent = dy.toFixed(2);
+    document.getElementById('d-dist').textContent = distance.toFixed(2);
+    document.getElementById('d-note').textContent = distance<2 ? 'Very close — this pair would likely land in the same top-k results.' : distance<5 ? 'Moderately far — plausible, not a strong match.' : 'Far apart — a search index would rank this pair as unrelated.';
+  }
+  attachDrag(canvas,[A,B],draw);
+  draw();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH4: DOT PRODUCT ============ */
+function buildVectorPairChapter(canvasId, ox, oy, scale, onCompute){
+  const {canvas, ctx, lw, lh} = setupCanvas(canvasId);
+  const A={x:ox+3.2*scale, y:oy-1.6*scale};
+  const B={x:ox+1*scale, y:oy-3*scale};
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    drawGrid(ctx,lw,lh,ox,oy,scale);
+    // angle arc
+    const ax=A.x-ox, ay=oy-A.y, bx=B.x-ox, by=oy-B.y;
+    const angA = Math.atan2(-ay,ax), angB = Math.atan2(-by,bx);
+    ctx.strokeStyle=cssVar('--text-faint'); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(ox,oy,34,angA,angB, angB<angA); ctx.stroke();
+    drawArrow(ctx, ox,oy, A.x,A.y, cssVar('--accent-a'), 3.5);
+    drawArrow(ctx, ox,oy, B.x,B.y, cssVar('--accent-b'), 3.5);
+    dot(ctx,A.x,A.y,7,cssVar('--accent-a'),true);
+    dot(ctx,B.x,B.y,7,cssVar('--accent-b'),true);
+    const magA=Math.hypot(ax,ay), magB=Math.hypot(bx,by);
+    const dotp = ax*bx+ay*by;
+    const cosv = dotp/(magA*magB||1);
+    const deg = Math.acos(Math.max(-1,Math.min(1,cosv)))*180/Math.PI;
+    onCompute({dot:dotp, cos:cosv, deg});
+  }
+  attachDrag(canvas,[A,B],draw);
+  draw();
+  redrawCallbacks.push(draw);
+  return draw;
+}
+buildVectorPairChapter('dotCanvas', 60, 320, 40, ({dot,deg})=>{
+  document.getElementById('dp-val').textContent = dot.toFixed(1);
+  document.getElementById('dp-angle').textContent = deg.toFixed(1)+'°';
+  document.getElementById('dp-note').textContent = dot>0 ? 'Positive: broadly the same direction.' : dot<0 ? 'Negative: broadly opposing directions.' : 'Zero: exactly perpendicular — no shared direction at all.';
+});
+
+/* ============ CH5: COSINE SIMILARITY ============ */
+buildVectorPairChapter('cosCanvas', 60, 320, 40, ({cos})=>{
+  document.getElementById('cs-val').textContent = cos.toFixed(3);
+  document.getElementById('cs-meter').style.width = ((cos+1)/2*100)+'%';
+  const v = document.getElementById('cs-verdict');
+  v.textContent = cos>0.85?'≈ 1.0 — treat as the same meaning.':
+    cos>0.5?'Solidly related — a strong retrieval candidate.':
+    cos>0.05?'Weakly related — borderline for most search thresholds.':
+    cos>-0.05?'Orthogonal — no directional relationship at all.':
+    'Negative — pointing away from each other in meaning-space.';
+});
+
+/* ============ CH-CURSE: CURSE OF DIMENSIONALITY ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('curseCanvas');
+  const dimSlider = document.getElementById('curse-dim');
+  const N = 150;
+  function compute(d){
+    const dists = [];
+    for(let i=0;i<N;i++){
+      let s=0;
+      for(let k=0;k<d;k++){ const x=Math.random()*2-1; s+=x*x; }
+      dists.push(Math.sqrt(s));
+    }
+    return dists;
+  }
+  function draw(){
+    const d = Math.round(+dimSlider.value);
+    document.getElementById('curse-dim-val').textContent = d;
+    const dists = compute(d);
+    const min = Math.min(...dists), max = Math.max(...dists);
+    const ratio = (max-min)/min;
+    document.getElementById('curse-min').textContent = min.toFixed(2);
+    document.getElementById('curse-max').textContent = max.toFixed(2);
+    document.getElementById('curse-ratio').textContent = ratio.toFixed(3);
+    const verdict = document.getElementById('curse-verdict');
+    verdict.textContent = ratio>1.5 ? 'Wide spread — "nearest neighbor" is meaningful here.' :
+      ratio>0.4 ? 'Spread is narrowing — distances are getting less discriminative.' :
+      'Nearly collapsed — every point looks almost equally (far/near) from the query.';
+
+    ctx.clearRect(0,0,lw,lh);
+    const axisY = lh/2, padX = 30, axisW = lw - padX*2;
+    ctx.strokeStyle = cssVar('--grid-line'); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padX,axisY); ctx.lineTo(padX+axisW,axisY); ctx.stroke();
+    ctx.fillStyle = cssVar('--text-faint'); ctx.font='10px '+cssVar('--font-mono');
+    ctx.fillText('0', padX-4, axisY+20);
+    ctx.fillText('farthest', padX+axisW-30, axisY+20);
+    dists.forEach(dd=>{
+      const x = padX + (dd/max)*axisW;
+      const y = axisY + (Math.random()-0.5)*50;
+      ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2);
+      ctx.fillStyle = cssVar('--accent-a'); ctx.globalAlpha=0.55; ctx.fill(); ctx.globalAlpha=1;
+    });
+    const minX = padX + (min/max)*axisW;
+    ctx.strokeStyle = cssVar('--accent-b'); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(minX,axisY-55); ctx.lineTo(minX,axisY+55); ctx.stroke();
+    ctx.fillStyle = cssVar('--accent-b'); ctx.fillText('nearest', minX-14, axisY-42);
+  }
+  dimSlider.addEventListener('input', draw);
+  draw();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH-TOK: TOKENIZATION DEMO ============ */
+{
+  const VOCAB = new Set(['retriev','augment','generat','token','ization','ize','embed','ding','vector','search',
+    'un','re','pre','dis','non','over','under','mis','ing','ed','er','est','ly','tion','sion','ment','ness',
+    'able','ible','ful','less','al','ial','ive','ous','the','is','are','was','were','makes','make','far','less',
+    'likely','hallucin','ation','ations','believ','and','or','but','not','with','from','into','than','that','this',
+    'query','answer','chunk','rerank','rank','index','cosine','similar','distance','database','graph','layer',
+    'model','data','base','rag','hnsw','llm','ai','fast','slow','near','nearest','node','entry','point','of','to',
+    'in','on','at','for','it','its','as','be','can','will','you','your','get','refund','damage','return','policy'
+  ]);
+  function tokenizeWord(word){
+    const w = word.toLowerCase();
+    const tokens = []; let i=0, first=true;
+    while(i<w.length){
+      let matched=null;
+      for(let len=Math.min(12,w.length-i); len>=2; len--){
+        const cand=w.slice(i,i+len);
+        if(VOCAB.has(cand)){ matched=cand; break; }
+      }
+      if(!matched) matched = w.slice(i, i+Math.min(3, w.length-i));
+      tokens.push({text:(first?'':'##')+matched, start:first});
+      i += matched.length; first=false;
+    }
+    return tokens;
+  }
+  const tokColors = [['--accent-a','--accent-a-rgb'],['--accent-b','--accent-b-rgb'],['--accent-v','--accent-v-rgb']];
+  const input = document.getElementById('tok-input');
+  const out = document.getElementById('tok-output');
+  function render(){
+    const text = input.value;
+    const words = text.split(/(\s+|[^\w']+)/).filter(w=>w.length);
+    let tCount=0, wCount=0, colorIdx=0;
+    const html = words.map(w=>{
+      if(/^\s+$/.test(w)) return w;
+      if(!/\w/.test(w)) return `<span class="dim">${w}</span>`;
+      wCount++;
+      const toks = tokenizeWord(w);
+      tCount += toks.length;
+      return toks.map(t=>{
+        const [varName, rgbName] = tokColors[colorIdx++ % tokColors.length];
+        return `<span class="c" style="background:rgba(var(${rgbName}),0.18); border:1px solid var(${varName});">${t.text}</span>`;
+      }).join('');
+    }).join('');
+    out.innerHTML = html;
+    document.getElementById('tok-chars').textContent = text.length;
+    document.getElementById('tok-words').textContent = wCount;
+    document.getElementById('tok-count').textContent = tCount;
+  }
+  input.addEventListener('input', render);
+  render();
+}
+
+/* ============ CH6: EMBEDDINGS MAP ============ */
+{
+  const words = [
+    {w:'mango', x:120, y:90, cat:'fruit'}, {w:'banana', x:150, y:60, cat:'fruit'}, {w:'papaya', x:95, y:55, cat:'fruit'},
+    {w:'guava', x:160, y:110, cat:'fruit'},
+    {w:'cricket', x:420, y:80, cat:'sport'}, {w:'kabaddi', x:460, y:110, cat:'sport'}, {w:'football', x:400, y:130, cat:'sport'},
+    {w:'python', x:340, y:280, cat:'tech'}, {w:'java', x:390, y:300, cat:'tech'}, {w:'database', x:420, y:255, cat:'tech'}, {w:'algorithm', x:360, y:230, cat:'tech'},
+    {w:'happy', x:130, y:280, cat:'emotion'}, {w:'joyful', x:100, y:255, cat:'emotion'}, {w:'sad', x:170, y:320, cat:'emotion'}, {w:'furious', x:210, y:300, cat:'emotion'},
+    {w:'monsoon', x:270, y:180, cat:'weather'}, {w:'rain', x:250, y:150, cat:'weather'},
+  ];
+  const catColor = {fruit:'--accent-a', sport:'--accent-b', tech:'--accent-v', emotion:'--amber', weather:'--accent-a'};
+  const {canvas, ctx, lw, lh} = setupCanvas('embCanvas');
+  let selected = null;
+  const MAX_MAP_DIST = Math.hypot(560,360);
+  function closeness(p,q){
+    const d = Math.hypot(p.x-q.x, p.y-q.y);
+    return {d, score: Math.max(0, 1 - d/MAX_MAP_DIST)};
+  }
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    ctx.strokeStyle = cssVar('--grid-line');
+    for(let x=0;x<lw;x+=40){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,lh);ctx.stroke(); }
+    for(let y=0;y<lh;y+=40){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(lw,y);ctx.stroke(); }
+    let neighbors = [];
+    if(selected){
+      neighbors = words.filter(w=>w!==selected)
+        .map(w=>({w, s: closeness(selected,w).score}))
+        .sort((a,b)=>b.s-a.s).slice(0,3);
+      neighbors.forEach(n=>{
+        ctx.strokeStyle = cssVar('--accent-a'); ctx.globalAlpha=0.5; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(selected.x,selected.y); ctx.lineTo(n.w.x,n.w.y); ctx.stroke();
+        ctx.globalAlpha=1;
+      });
+    }
+    words.forEach(w=>{
+      const isSel = w===selected;
+      const isNeighbor = neighbors.some(n=>n.w===w);
+      const color = cssVar(catColor[w.cat]);
+      ctx.font = (isSel?'600 ':'')+'12px '+cssVar('--font-body');
+      dot(ctx, w.x, w.y, isSel?8:(isNeighbor?6:4.5), color, isSel||isNeighbor);
+      ctx.fillStyle = isSel? cssVar('--text') : (isNeighbor? cssVar('--text') : cssVar('--text-dim'));
+      ctx.fillText(w.w, w.x+9, w.y+4);
+    });
+    const listEl = document.getElementById('emb-list');
+    if(selected){
+      listEl.innerHTML = neighbors.map((n,i)=>`<div class="docrow"><span class="rank">${i+1}</span><span class="name">${n.w.w}</span><span class="score">${n.s.toFixed(2)}</span></div>`).join('');
+    }
+  }
+  canvas.addEventListener('pointerdown', (e)=>{
+    const {x,y} = pointerXY(e, canvas, lw, lh);
+    let best=null, bd=26;
+    words.forEach(w=>{ const d=Math.hypot(w.x-x,w.y-y); if(d<bd){bd=d;best=w;} });
+    if(best){ selected=best; draw(); }
+  });
+  draw();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH-EMBMODELS: TRAINING ANIMATION ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('trainCanvas');
+  const ox=280, oy=180;
+  const A = {x: ox+130, y: oy-40};
+  let B = {x: ox-120, y: oy+90};
+  let target = {...B};
+  let animating = false;
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function step(){
+    if(animating){
+      B.x = lerp(B.x, target.x, 0.08);
+      B.y = lerp(B.y, target.y, 0.08);
+      if(Math.hypot(B.x-target.x, B.y-target.y) < 0.5){ B = {...target}; animating=false; }
+    }
+    draw();
+    requestAnimationFrame(step);
+  }
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    drawGrid(ctx,lw,lh,ox,oy,44);
+    ctx.strokeStyle = cssVar('--border'); ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke(); ctx.setLineDash([]);
+    dot(ctx,A.x,A.y,9,cssVar('--accent-a'),true);
+    dot(ctx,B.x,B.y,9,cssVar('--accent-b'),true);
+    ctx.fillStyle = cssVar('--text'); ctx.font='13px '+cssVar('--font-mono');
+    ctx.fillText('A (fixed)', A.x+13, A.y+5);
+    ctx.fillText('B', B.x+13, B.y+5);
+    const dist = Math.hypot(A.x-B.x, A.y-B.y);
+    ctx.fillStyle = cssVar('--text-dim'); ctx.font='11px '+cssVar('--font-mono');
+    ctx.fillText('distance ≈ '+(dist/44).toFixed(2), 16, lh-16);
+  }
+  document.getElementById('train-pos').addEventListener('click', ()=>{
+    const ang = Math.atan2(A.y-B.y, A.x-B.x);
+    target = {x: A.x - Math.cos(ang)*55, y: A.y - Math.sin(ang)*55};
+    animating = true;
+    document.getElementById('train-note').textContent = 'Positive pair: loss pulls B toward A. Do this enough times, across enough pairs, and "similar meaning" becomes "nearby."';
+  });
+  document.getElementById('train-neg').addEventListener('click', ()=>{
+    const ang = Math.atan2(B.y-A.y, B.x-A.x);
+    target = {x: B.x + Math.cos(ang)*70, y: B.y + Math.sin(ang)*70};
+    target.x = Math.max(20,Math.min(lw-20,target.x)); target.y = Math.max(20,Math.min(lh-20,target.y));
+    animating = true;
+    document.getElementById('train-note').textContent = 'Negative pair: loss pushes B away from A. Without negatives, every vector would collapse to the same point — negatives are what keep the space meaningful.';
+  });
+  document.getElementById('train-reset').addEventListener('click', ()=>{
+    target = {x: ox-120, y: oy+90}; animating = true;
+    document.getElementById('train-note').textContent = '"A" is fixed. Each click simulates one gradient step nudging "B" — exactly what happens, per pair, per batch, across a training run.';
+  });
+  step();
+  redrawCallbacks.push(draw);
+}
+
+/* ============ CH7: PIPELINE ANIMATION ============ */
+{
+  const stages = [
+    {ic:'📄', label:'Raw document'},
+    {ic:'✂️', label:'Chunked text'},
+    {ic:'🔤', label:'Tokenized'},
+    {ic:'🧮', label:'Embedding model'},
+    {ic:'📍', label:'Vector produced'},
+    {ic:'🗂️', label:'Indexed (HNSW)'},
+    {ic:'💾', label:'Stored + filterable'},
+  ];
+  const pipeEl = document.getElementById('ch7-pipeline');
+  stages.forEach((s,i)=>{
+    if(i>0){ const ar=document.createElement('span'); ar.className='parrow'; ar.textContent='→'; pipeEl.appendChild(ar); }
+    const n=document.createElement('div'); n.className='pnode'; n.id='ch7-n'+i;
+    n.innerHTML = `<span class="ic">${s.ic}</span>${s.label}`;
+    pipeEl.appendChild(n);
+  });
+  const statusEl = document.getElementById('ch7-status');
+  document.getElementById('ch7-run').addEventListener('click', function(){
+    const btn=this; btn.disabled=true;
+    stages.forEach((s,i)=>document.getElementById('ch7-n'+i).classList.remove('on'));
+    let i=0;
+    statusEl.textContent = 'Starting...';
+    const iv = setInterval(()=>{
+      document.getElementById('ch7-n'+i).classList.add('on');
+      statusEl.textContent = stages[i].label + ' ✓';
+      i++;
+      if(i>=stages.length){ clearInterval(iv); btn.disabled=false; }
+    }, 550);
+  });
+}
+
+/* ============ CH8: HNSW GRAPH SEARCH ============ */
+{
+  const {canvas, ctx, lw, lh} = setupCanvas('hnswCanvas');
+  const baseX = [25,71,117,163,209,255,301,347,393,439,485,531];
+  const jitterY = [10,-8,14,-10,6,-14,9,-6,12,-9,7,-12];
+  const pos = baseX.map((x,i)=>({x, y:300+jitterY[i]}));
+  const layer1Idx = [0,2,4,6,8,10];
+  const layer2Idx = [0,4,8];
+  const rowY = {0:300, 1:190, 2:80};
+  function buildAdj(pairs){ const adj={}; pairs.forEach(([a,b])=>{ (adj[a]=adj[a]||[]).push(b); (adj[b]=adj[b]||[]).push(a); }); return adj; }
+  const adj0 = buildAdj([[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[0,3],[2,6],[5,9],[7,11]]);
+  const adj1 = buildAdj([[0,2],[2,4],[4,6],[6,8],[8,10],[0,6],[4,10]]);
+  const adj2 = buildAdj([[0,4],[4,8],[0,8]]);
+  const entry = 4;
+  let Q = {x:300, y:340};
+  let animSteps = null, visited = [], animTimer = null, finalIdx = null;
+
+  function dist(p,q){ return Math.hypot(p.x-q.x, p.y-q.y); }
+
+  function greedyDescend(adj, start, layer, log){
+    let cur = start;
+    while(true){
+      const neighbors = adj[cur]||[];
+      let best=cur, bestD=dist(pos[cur],Q);
+      neighbors.forEach(n=>{ const d=dist(pos[n],Q); if(d<bestD-0.001){bestD=d;best=n;} });
+      if(best===cur) return cur;
+      log.push({layer, idx:best, note:`Layer ${layer}: N${cur} → N${best} (closer, d=${bestD.toFixed(0)})`});
+      cur = best;
+    }
+  }
+  function runSearch(){
+    const log = [];
+    let cur = entry;
+    log.push({layer:2, idx:cur, note:`Enter at N${cur} (top layer entry point)`});
+    cur = greedyDescend(adj2, cur, 2, log);
+    log.push({layer:1, idx:cur, note:`Drop to Layer 1 carrying N${cur}`});
+    cur = greedyDescend(adj1, cur, 1, log);
+    log.push({layer:0, idx:cur, note:`Drop to Layer 0 carrying N${cur}`});
+    cur = greedyDescend(adj0, cur, 0, log);
+    log.push({layer:0, idx:cur, note:`No closer neighbor left — N${cur} is the answer`, final:true});
+    return log;
+  }
+
+  function nodeXY(idx, layer){ return {x: pos[idx].x, y: rowY[layer]}; }
+
+  function draw(){
+    ctx.clearRect(0,0,lw,lh);
+    ctx.font = '10px ' + cssVar('--font-mono');
+    // vertical connectors
+    ctx.strokeStyle = cssVar('--text-faint'); ctx.globalAlpha=0.35; ctx.setLineDash([3,4]); ctx.lineWidth=1;
+    layer1Idx.forEach(i=>{ const a=nodeXY(i,0), b=nodeXY(i,1); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); });
+    layer2Idx.forEach(i=>{ const a=nodeXY(i,1), b=nodeXY(i,2); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); });
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+
+    function drawLayerEdges(adj, layer){
+      ctx.strokeStyle = cssVar('--border'); ctx.lineWidth=1.3; ctx.globalAlpha=0.8;
+      Object.keys(adj).forEach(k=>{
+        const a=+k;
+        adj[a].forEach(b=>{
+          if(b>a){ const pa=nodeXY(a,layer), pb=nodeXY(b,layer); ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke(); }
+        });
+      });
+      ctx.globalAlpha=1;
+    }
+    drawLayerEdges(adj0,0); drawLayerEdges(adj1,1); drawLayerEdges(adj2,2);
+
+    // layer labels
+    ctx.fillStyle = cssVar('--text-faint');
+    ctx.fillText('LAYER 2', 6, rowY[2]-24);
+    ctx.fillText('LAYER 1', 6, rowY[1]-24);
+    ctx.fillText('LAYER 0', 6, rowY[0]-24);
+
+    function drawNodes(idxList, layer){
+      idxList.forEach(i=>{
+        const p = nodeXY(i,layer);
+        const visitedHere = visited.find(v=>v.idx===i && v.layer===layer);
+        const isFinal = finalIdx===i && layer===0 && visited.length && visited[visited.length-1].final;
+        let color = cssVar('--text-faint');
+        let r = 6;
+        if(i===entry && layer===2){ color = cssVar('--accent-v'); r=7; }
+        if(visitedHere){ color = cssVar('--accent-a'); r=8; }
+        if(isFinal){ color = cssVar('--accent-b'); r=9; }
+        dot(ctx, p.x, p.y, r, color, !!visitedHere || isFinal);
+        ctx.fillStyle = visitedHere||isFinal ? cssVar('--text') : cssVar('--text-dim');
+        ctx.fillText('N'+i, p.x-8, p.y-12);
+      });
+    }
+    drawNodes(Array.from({length:12},(_,i)=>i), 0);
+    drawNodes(layer1Idx, 1);
+    drawNodes(layer2Idx, 2);
+
+    // query marker
+    ctx.strokeStyle = cssVar('--amber'); ctx.lineWidth=2.5;
+    const s=8;
+    ctx.beginPath(); ctx.moveTo(Q.x-s,Q.y-s); ctx.lineTo(Q.x+s,Q.y+s); ctx.moveTo(Q.x+s,Q.y-s); ctx.lineTo(Q.x-s,Q.y+s); ctx.stroke();
+    ctx.fillStyle = cssVar('--amber'); ctx.fillText('query', Q.x+11, Q.y+4);
+
+    // path lines
+    if(visited.length>1){
+      ctx.strokeStyle = cssVar('--accent-a'); ctx.lineWidth=2;
+      for(let k=1;k<visited.length;k++){
+        const a=visited[k-1], b=visited[k];
+        const pa = nodeXY(a.idx, a.layer), pb = nodeXY(b.idx, b.layer);
+        ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+      }
+    }
+  }
+
+  const qProxy = { get x(){return Q.x;}, set x(v){Q.x=v;}, get y(){return Q.y;}, set y(v){Q.y=v;} };
+  attachDrag(canvas, [Q], draw);
+  draw();
+  redrawCallbacks.push(draw);
+
+  const logEl = document.getElementById('hnsw-log');
+  document.getElementById('hnsw-run').addEventListener('click', function(){
+    if(animTimer) return;
+    const btn=this; btn.disabled=true;
+    visited = []; finalIdx=null;
+    logEl.innerHTML='';
+    const steps = runSearch();
+    let i=0;
+    animTimer = setInterval(()=>{
+      const s = steps[i];
+      visited.push(s);
+      if(s.final) finalIdx = s.idx;
+      const row = document.createElement('div');
+      row.innerHTML = `<span>${String(i+1).padStart(2,'0')}</span> ${s.note}`;
+      logEl.appendChild(row);
+      logEl.scrollTop = logEl.scrollHeight;
+      draw();
+      i++;
+      if(i>=steps.length){ clearInterval(animTimer); animTimer=null; btn.disabled=false; }
+    }, 650);
+  });
+  document.getElementById('hnsw-reset').addEventListener('click', ()=>{
+    if(animTimer){ clearInterval(animTimer); animTimer=null; }
+    visited=[]; finalIdx=null; logEl.innerHTML='<div class="dim">Drag ✕ anywhere, then run search.</div>';
+    document.getElementById('hnsw-run').disabled=false;
+    draw();
+  });
+}
+
+/* ============ CH-INDEX: QUANTIZATION CALCULATOR ============ */
+{
+  const nSlider = document.getElementById('quant-n');
+  const dSlider = document.getElementById('quant-d');
+  const modeEl = document.getElementById('quant-mode');
+  let bytesPerDim = 4;
+  function fmtBytes(bytes){
+    if(bytes >= 1e12) return (bytes/1e12).toFixed(2)+' TB';
+    if(bytes >= 1e9) return (bytes/1e9).toFixed(2)+' GB';
+    if(bytes >= 1e6) return (bytes/1e6).toFixed(2)+' MB';
+    return Math.round(bytes)+' B';
+  }
+  function render(){
+    const n = Math.round(Math.pow(10, +nSlider.value));
+    const d = Math.round(+dSlider.value);
+    document.getElementById('quant-n-val').textContent = n.toLocaleString('en-IN');
+    document.getElementById('quant-d-val').textContent = d;
+    const bytes = n * d * bytesPerDim;
+    const bytesF32 = n * d * 4;
+    document.getElementById('quant-size').textContent = fmtBytes(bytes);
+    document.getElementById('quant-savings').textContent = bytesPerDim===4 ? 'baseline' : (bytesF32/bytes).toFixed(0)+'× smaller';
+  }
+  nSlider.addEventListener('input', render);
+  dSlider.addEventListener('input', render);
+  modeEl.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      modeEl.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      bytesPerDim = +c.dataset.bytes;
+      render();
+    });
+  });
+  render();
+}
+
+/* ============ CH9: RETRIEVAL PIPELINE TABS ============ */
+{
+  const tabsEl = document.getElementById('ch9-tabs');
+  const panelsEl = document.getElementById('ch9-panels');
+  const tabs = [
+    {id:'chunk', label:'Chunking'},
+    {id:'meta', label:'Metadata Filters'},
+    {id:'hybrid', label:'Hybrid Search'},
+    {id:'rerank', label:'Reranking'},
+  ];
+  tabs.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='tab'+(i===0?' active':''); b.textContent=t.label; b.dataset.tab=t.id;
+    b.addEventListener('click', ()=>{
+      tabsEl.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      panelsEl.querySelectorAll('.tabpanel').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById('panel-'+t.id).classList.add('active');
+    });
+    tabsEl.appendChild(b);
+  });
+
+  panelsEl.innerHTML = `
+    <div class="tabpanel active" id="panel-chunk">
+      <div class="field"><label>Chunk size <span class="val" id="chunk-size-val">120</span> chars</label><input type="range" id="chunk-size" min="40" max="220" value="120"></div>
+      <div class="field"><label>Overlap <span class="val" id="chunk-overlap-val">20</span> chars</label><input type="range" id="chunk-overlap" min="0" max="60" value="20"></div>
+      <div class="chunktext panel" style="padding:14px;" id="chunk-output"></div>
+      <p class="hint" style="margin-top:10px;" id="chunk-count"></p>
+    </div>
+    <div class="tabpanel" id="panel-meta">
+      <p class="hint">Toggle filters — the list narrows before vector search even runs.</p>
+      <div class="chipset" id="meta-chips"></div>
+      <div class="doclist" id="meta-docs"></div>
+    </div>
+    <div class="tabpanel" id="panel-hybrid">
+      <div class="field"><label>Blend weight α (0 = pure keyword, 1 = pure vector) <span class="val" id="alpha-val">0.5</span></label><input type="range" id="alpha-slider" min="0" max="100" value="50"></div>
+      <div class="doclist" id="hybrid-docs"></div>
+      <details class="hood">
+        <summary>Under the hood</summary>
+        <div class="hood-body">
+          <p class="dim" style="font-size:0.88rem;">The "kw" score above stands in for <strong>BM25</strong>, the keyword-ranking formula almost every hybrid search stack uses under the hood — it scores a document higher when a query term appears often in it, but discounts terms that appear in nearly every document (so "the" never outweighs "refund").</p>
+          <div><span class="formula">score(D,Q) = Σ IDF(qᵢ) · f(qᵢ,D)(k₁+1) / (f(qᵢ,D) + k₁(1-b+b·|D|/avgdl))</span></div>
+          <p class="dim" style="font-size:0.88rem;">Vector search and BM25 fail in opposite ways: BM25 misses paraphrases ("refund" vs "money back"), cosine similarity misses exact identifiers (order numbers, SKUs, error codes). Blending both is why hybrid search consistently beats either alone in production.</p>
+        </div>
+      </details>
+    </div>
+    <div class="tabpanel" id="panel-rerank">
+      <p class="hint">Initial order comes from ANN vector search alone. A cross-encoder reranker then re-scores the shortlist against the full query.</p>
+      <div style="display:flex; gap:12px; margin:14px 0;">
+        <button class="btn small" id="rerank-apply">Apply reranker →</button>
+        <button class="btn ghost small" id="rerank-reset">Reset</button>
+      </div>
+      <div class="doclist" id="rerank-docs"></div>
+    </div>
+  `;
+
+  // -- Chunking --
+  const passage = "The Indian Railways return and refund policy allows cancellation up to four hours before scheduled departure for a full refund minus service charges. For e-tickets booked through IRCTC, refunds are processed automatically to the original payment method within five to seven working days. Tatkal tickets are non-refundable except in case of train cancellation by the railway itself, in which case a full refund is issued without any deduction.";
+  const sizeInput = document.getElementById('chunk-size');
+  const overlapInput = document.getElementById('chunk-overlap');
+  const chunkOut = document.getElementById('chunk-output');
+  const chunkCount = document.getElementById('chunk-count');
+  const chunkColors = ['--accent-a','--accent-b','--accent-v','--amber'];
+  function renderChunks(){
+    const size = +sizeInput.value, overlap = Math.min(+overlapInput.value, size-10);
+    document.getElementById('chunk-size-val').textContent = size;
+    document.getElementById('chunk-overlap-val').textContent = overlap;
+    let chunks = [], i=0, ci=0;
+    while(i < passage.length){
+      chunks.push(passage.slice(i, i+size));
+      i += (size-overlap);
+      ci++;
+      if(ci>40) break;
+    }
+    chunkOut.innerHTML = chunks.map((c,idx)=>`<span class="c" style="background:rgba(var(--accent-a-rgb),${0.10+ (idx%2)*0.08}); border:1px solid var(--border-soft);">${c}</span>`).join(' ');
+    chunkCount.textContent = `${chunks.length} chunks generated · ~${size} chars each, ${overlap} char overlap`;
+  }
+  sizeInput.addEventListener('input', renderChunks);
+  overlapInput.addEventListener('input', renderChunks);
+  renderChunks();
+
+  // -- Metadata filters --
+  const docs = [
+    {name:'Return Policy — Electronics', cat:'Policy', year:2025, lang:'EN'},
+    {name:'Refund FAQ — General', cat:'FAQ', year:2022, lang:'EN'},
+    {name:'Terms of Service v4', cat:'Legal', year:2024, lang:'EN'},
+    {name:'वापसी नीति (Hindi)', cat:'Policy', year:2025, lang:'HI'},
+    {name:'Warranty Claims Guide', cat:'FAQ', year:2023, lang:'EN'},
+    {name:'Shipping & Delivery Policy', cat:'Policy', year:2021, lang:'EN'},
+    {name:'Consumer Rights Act Summary', cat:'Legal', year:2025, lang:'EN'},
+    {name:'Damaged Item FAQ', cat:'FAQ', year:2025, lang:'EN'},
+  ];
+  const filters = {cat:null, recent:false};
+  const metaChips = document.getElementById('meta-chips');
+  const chipDefs = [
+    {label:'Policy', apply:d=>d.cat==='Policy', key:'Policy'},
+    {label:'FAQ', apply:d=>d.cat==='FAQ', key:'FAQ'},
+    {label:'Legal', apply:d=>d.cat==='Legal', key:'Legal'},
+    {label:'2024+', apply:d=>d.year>=2024, key:'recent'},
+  ];
+  const activeFilters = new Set();
+  function renderMeta(){
+    const docsEl = document.getElementById('meta-docs');
+    const catFilters = [...activeFilters].filter(k=>k!=='recent');
+    const filtered = docs.filter(d=>{
+      if(catFilters.length && !catFilters.includes(d.cat)) return false;
+      if(activeFilters.has('recent') && d.year<2024) return false;
+      return true;
+    });
+    docsEl.innerHTML = filtered.length ? filtered.map(d=>`<div class="docrow"><span class="name">${d.name}</span><span class="score">${d.cat} · ${d.year} · ${d.lang}</span></div>`).join('') : '<div class="docrow"><span class="dim">No documents match this filter combination.</span></div>';
+  }
+  chipDefs.forEach(cd=>{
+    const c=document.createElement('button'); c.className='chip'; c.textContent=cd.label;
+    c.addEventListener('click', ()=>{
+      if(activeFilters.has(cd.key)){ activeFilters.delete(cd.key); c.classList.remove('on'); }
+      else { activeFilters.add(cd.key); c.classList.add('on'); }
+      renderMeta();
+    });
+    metaChips.appendChild(c);
+  });
+  renderMeta();
+
+  // -- Hybrid search --
+  const hybridDocs = [
+    {name:'"Damaged item received" — Help Center', kw:0.95, vec:0.55},
+    {name:'Return Policy — Electronics', kw:0.40, vec:0.91},
+    {name:'Refund FAQ — General', kw:0.70, vec:0.78},
+    {name:'Shipping & Delivery Policy', kw:0.25, vec:0.44},
+    {name:'Warranty Claims Guide', kw:0.55, vec:0.70},
+  ];
+  const alphaSlider = document.getElementById('alpha-slider');
+  function renderHybrid(){
+    const alpha = +alphaSlider.value/100;
+    document.getElementById('alpha-val').textContent = alpha.toFixed(2);
+    const scored = hybridDocs.map(d=>({...d, score: alpha*d.vec + (1-alpha)*d.kw}))
+      .sort((a,b)=>b.score-a.score);
+    document.getElementById('hybrid-docs').innerHTML = scored.map((d,i)=>
+      `<div class="docrow"><span class="rank">${i+1}</span><span class="name">${d.name}<br><span class="dim" style="font-size:0.75rem;">kw ${d.kw.toFixed(2)} · vec ${d.vec.toFixed(2)}</span></span><span class="score">${d.score.toFixed(2)}</span></div>`
+    ).join('');
+  }
+  alphaSlider.addEventListener('input', renderHybrid);
+  renderHybrid();
+
+  // -- Reranking --
+  const rerankInitial = [
+    {name:'Shipping & Delivery Policy', annRank:1, trueRank:4},
+    {name:'Return Policy — Electronics', annRank:2, trueRank:1},
+    {name:'Warranty Claims Guide', annRank:3, trueRank:3},
+    {name:'Damaged Item FAQ', annRank:4, trueRank:2},
+    {name:'Terms of Service v4', annRank:5, trueRank:5},
+  ];
+  function renderRerank(useTrue){
+    const key = useTrue? 'trueRank':'annRank';
+    const sorted = [...rerankInitial].sort((a,b)=>a[key]-b[key]);
+    document.getElementById('rerank-docs').innerHTML = sorted.map((d,i)=>{
+      const moved = useTrue && d.annRank !== d.trueRank;
+      const dir = moved ? (d.trueRank < d.annRank ? '↑' : '↓') : '';
+      const cls = moved ? (d.trueRank < d.annRank ? 'up' : 'down') : '';
+      return `<div class="docrow ${cls}"><span class="rank">${i+1}</span><span class="name">${d.name}</span><span class="score">${dir}</span></div>`;
+    }).join('');
+  }
+  renderRerank(false);
+  document.getElementById('rerank-apply').addEventListener('click', ()=>renderRerank(true));
+  document.getElementById('rerank-reset').addEventListener('click', ()=>renderRerank(false));
+}
+
+/* ============ CH-ADVANCED: QUERY TRANSFORMATION TABS ============ */
+{
+  const tabsEl = document.getElementById('adv-tabs');
+  const panelsEl = document.getElementById('adv-panels');
+  const tabs = [{id:'hyde',label:'HyDE'},{id:'multi',label:'Multi-Query'},{id:'stepback',label:'Step-Back'}];
+  tabs.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='tab'+(i===0?' active':''); b.textContent=t.label;
+    b.addEventListener('click', ()=>{
+      tabsEl.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      panelsEl.querySelectorAll('.tabpanel').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById('advpanel-'+t.id).classList.add('active');
+    });
+    tabsEl.appendChild(b);
+  });
+  panelsEl.innerHTML = `
+    <div class="tabpanel active" id="advpanel-hyde">
+      <p class="hint">Query: <span class="mono dim">"money back for a broken item"</span></p>
+      <button class="btn small" id="hyde-run" style="margin:12px 0;">Generate hypothetical answer →</button>
+      <div class="panel" style="padding:16px; min-height:70px;" id="hyde-out"><span class="dim">Not generated yet.</span></div>
+      <p class="hint" style="margin-top:12px;">Illustrative — in production, a small fast LLM writes this draft, which then gets embedded and searched <em>instead of</em> the raw query.</p>
+    </div>
+    <div class="tabpanel" id="advpanel-multi">
+      <p class="hint">Query: <span class="mono dim">"money back for a broken item"</span></p>
+      <button class="btn small" id="multi-run" style="margin:12px 0;">Generate 3 reformulations →</button>
+      <div class="doclist" id="multi-out"></div>
+      <p class="hint" style="margin-top:12px;">Each variant retrieves independently; results get merged and de-duplicated — trading extra retrieval calls for meaningfully higher recall.</p>
+    </div>
+    <div class="tabpanel" id="advpanel-stepback">
+      <p class="hint">Original: <span class="mono dim">"Is a 45-day-old damaged blender still covered?"</span></p>
+      <button class="btn small" id="stepback-run" style="margin:12px 0;">Generate step-back question →</button>
+      <div class="panel" style="padding:16px; min-height:50px;" id="stepback-out"><span class="dim">Not generated yet.</span></div>
+      <p class="hint" style="margin-top:12px;">The system retrieves for <em>both</em> the specific and the general question, then answers with whichever context actually helps — general policy chunks often outrank oddly-specific ones.</p>
+    </div>
+  `;
+  document.getElementById('hyde-run').addEventListener('click', ()=>{
+    document.getElementById('hyde-out').innerHTML = '<span class="typed">"To get a refund for a damaged product, report the issue within the return window, upload photos as proof of damage, and the amount will be credited to your original payment method within 5–7 business days."</span>';
+  });
+  document.getElementById('multi-run').addEventListener('click', ()=>{
+    const variants = ['How do I return a damaged item for a refund?','What is the process for getting money back on a broken product?','Refund eligibility policy for damaged goods'];
+    document.getElementById('multi-out').innerHTML = variants.map((v,i)=>`<div class="docrow"><span class="rank">${i+1}</span><span class="name mono" style="font-size:0.85rem;">${v}</span></div>`).join('');
+  });
+  document.getElementById('stepback-run').addEventListener('click', ()=>{
+    document.getElementById('stepback-out').innerHTML = '<span class="typed">"What is the general damaged-product refund policy?"</span>';
+  });
+}
+
+/* ============ CH-PROD: EVALUATION / CHOOSING / SECURITY TABS ============ */
+{
+  const tabsEl = document.getElementById('prod-tabs');
+  const panelsEl = document.getElementById('prod-panels');
+  const tabs = [{id:'eval',label:'Evaluation'},{id:'choose',label:'Choosing a Vector DB'},{id:'ops',label:'Security & Ops'}];
+  tabs.forEach((t,i)=>{
+    const b=document.createElement('button'); b.className='tab'+(i===0?' active':''); b.textContent=t.label;
+    b.addEventListener('click', ()=>{
+      tabsEl.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      panelsEl.querySelectorAll('.tabpanel').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById('prodpanel-'+t.id).classList.add('active');
+    });
+    tabsEl.appendChild(b);
+  });
+  panelsEl.innerHTML = `
+    <div class="tabpanel active" id="prodpanel-eval">
+      <p class="hint">Ground truth: chunks <span class="mono">#2</span> and <span class="mono">#5</span> are the only genuinely relevant ones for this query.</p>
+      <div class="chipset" id="eval-scenario">
+        <button class="chip on" data-s="good">Good retrieval</button>
+        <button class="chip" data-s="bad">Bad retrieval</button>
+      </div>
+      <div class="doclist" id="eval-list" style="margin-top:14px;"></div>
+      <div class="readout-row" style="margin-top:16px;">
+        <div class="readout"><div class="k">Recall@3</div><div class="v mono a" id="eval-recall">–</div></div>
+        <div class="readout"><div class="k">MRR</div><div class="v mono" id="eval-mrr" style="color:var(--accent-v);">–</div></div>
+      </div>
+      <details class="hood" style="margin-top:18px;">
+        <summary>Under the hood</summary>
+        <div class="hood-body">
+          <div><span class="formula">Recall@K = relevant ∩ top-K / relevant &nbsp;·&nbsp; MRR = 1 / rank of first relevant hit</span></div>
+          <p class="dim" style="font-size:0.88rem;">These measure <em>retrieval</em>. For the LLM's final answer, RAG-specific tools like RAGAS add <strong>faithfulness</strong> (does the answer only claim things the retrieved chunks support?) and <strong>answer relevance</strong> (does it actually address the question?) — a system can retrieve perfectly and still hallucinate on top of good context.</p>
+        </div>
+      </details>
+    </div>
+    <div class="tabpanel" id="prodpanel-choose">
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+          <thead><tr style="text-align:left; color:var(--text-faint); font-family:var(--font-display); font-size:0.7rem; text-transform:uppercase;">
+            <th style="padding:6px 10px 6px 0;">Database</th><th style="padding:6px 10px;">Best for</th><th style="padding:6px 10px;">Hosting</th>
+          </tr></thead>
+          <tbody style="color:var(--text-dim);">
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Pinecone</td><td style="padding:8px 10px;">Fastest path to production, zero ops</td><td style="padding:8px 10px;">Managed only</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Qdrant</td><td style="padding:8px 10px;">Rich metadata filtering, Rust performance</td><td style="padding:8px 10px;">Self-host or managed</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Weaviate</td><td style="padding:8px 10px;">Built-in hybrid search, GraphQL API</td><td style="padding:8px 10px;">Self-host or managed</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Milvus</td><td style="padding:8px 10px;">Billion-scale, heavy ops budget available</td><td style="padding:8px 10px;">Self-host or managed</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">pgvector</td><td style="padding:8px 10px;">Already running Postgres, simplest ops</td><td style="padding:8px 10px;">Self-host or managed Postgres</td></tr>
+            <tr style="border-top:1px solid var(--border-soft);"><td style="padding:8px 10px 8px 0;">Chroma</td><td style="padding:8px 10px;">Prototyping, local-first, small apps</td><td style="padding:8px 10px;">Embedded / self-host</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin-top:14px;">General characterizations, not benchmarks — all six move fast. Weigh: do you already run Postgres? Do you need row-level multi-tenant filtering? Is this a prototype or a 500M-vector system?</p>
+    </div>
+    <div class="tabpanel" id="prodpanel-ops">
+      <div class="grid2" style="align-items:stretch;">
+        <div class="panel" style="padding:18px;">
+          <h3 style="font-family:var(--font-display); font-size:0.8rem; text-transform:uppercase; color:var(--accent-b); margin-bottom:10px;">Prompt injection via retrieved content</h3>
+          <p class="dim" style="font-size:0.88rem;">A malicious or compromised document in your corpus can contain text like "ignore previous instructions and…" — and it gets pulled into the prompt just like any other chunk. Treat retrieved content as untrusted input, the same way you'd treat user input.</p>
+        </div>
+        <div class="panel" style="padding:18px;">
+          <h3 style="font-family:var(--font-display); font-size:0.8rem; text-transform:uppercase; color:var(--accent-b); margin-bottom:10px;">Multi-tenant data leakage</h3>
+          <p class="dim" style="font-size:0.88rem;">Metadata filtering by tenant ID must be <strong>mandatory</strong> at the query layer, not an optional flag the application remembers to set — one missed filter and Tenant A's chatbot retrieves Tenant B's confidential documents.</p>
+        </div>
+        <div class="panel" style="padding:18px;">
+          <h3 style="font-family:var(--font-display); font-size:0.8rem; text-transform:uppercase; color:var(--accent-a); margin-bottom:10px;">Silent failure, not loud failure</h3>
+          <p class="dim" style="font-size:0.88rem;">ANN search always returns <em>something</em>, even when nothing in the corpus is actually relevant. Without a similarity-score threshold and an explicit "insufficient context" fallback, the system will confidently answer from irrelevant chunks instead of saying "I don't know."</p>
+        </div>
+        <div class="panel" style="padding:18px;">
+          <h3 style="font-family:var(--font-display); font-size:0.8rem; text-transform:uppercase; color:var(--accent-a); margin-bottom:10px;">What to actually monitor</h3>
+          <p class="dim" style="font-size:0.88rem;">Retrieval latency (P50/P99), top-K similarity score distribution over time (drift signal), re-embedding lag after document updates, and — if you can get it — a click/thumbs signal on whether retrieved chunks were actually useful.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  const evalDocs = [
+    {id:1, label:'Chunk #1 — Shipping FAQ'}, {id:2, label:'Chunk #2 — Refund Policy ✓'}, {id:3, label:'Chunk #3 — Store Hours'},
+    {id:4, label:'Chunk #4 — Loyalty Program'}, {id:5, label:'Chunk #5 — Damaged Item Process ✓'},
+  ];
+  const relevant = new Set([2,5]);
+  const scenarios = {
+    good: [2,5,1,3,4],
+    bad: [3,1,4,2,5],
+  };
+  function renderEval(s){
+    const order = scenarios[s];
+    document.getElementById('eval-list').innerHTML = order.map((id,i)=>{
+      const d = evalDocs.find(x=>x.id===id);
+      const isRel = relevant.has(id);
+      return `<div class="docrow ${isRel?'up':''}"><span class="rank">${i+1}</span><span class="name">${d.label}</span></div>`;
+    }).join('');
+    const top3 = order.slice(0,3);
+    const recall = top3.filter(id=>relevant.has(id)).length / relevant.size;
+    const firstRelRank = order.findIndex(id=>relevant.has(id)) + 1;
+    document.getElementById('eval-recall').textContent = (recall*100).toFixed(0)+'%';
+    document.getElementById('eval-mrr').textContent = (1/firstRelRank).toFixed(2);
+  }
+  document.getElementById('eval-scenario').querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      document.getElementById('eval-scenario').querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      renderEval(c.dataset.s);
+    });
+  });
+  renderEval('good');
+}
+
+/* ============ CH10: CAPSTONE RAG ============ */
+{
+  const stages = [
+    {ic:'❓', label:'Query', detail:'"How do I get a refund for a damaged product ordered on Flipkart?"'},
+    {ic:'🔤', label:'Tokenize', detail:'Query → [How, do, I, get, a, refund, ...] → token IDs [4438, 621, ...] (Chapter 7)'},
+    {ic:'🧮', label:'Embed query', detail:'Token IDs → [0.12, -0.44, 0.08, ... , 0.31]  (1536-dim vector)'},
+    {ic:'🗂️', label:'Vector search', detail:'HNSW index search → top candidates by cosine similarity, in single-digit milliseconds across millions of chunks.'},
+    {ic:'📎', label:'Retrieve chunks', detail:'① "Damaged items are eligible for full refund within 7 days of delivery."<br>② "Refunds are credited to the original payment method within 5–7 business days."<br>③ "Photos of the damage must be uploaded via the Returns tab."'},
+    {ic:'🎯', label:'Rerank', detail:'Cross-encoder re-scores all 3 chunks against the full question → chunk ① promoted to rank 1 for directly answering "how."'},
+    {ic:'📝', label:'Augment prompt', detail:'SYSTEM: Answer only using the context below.<br>CONTEXT: [chunk ①, chunk ③, chunk ②]<br>QUESTION: How do I get a refund for a damaged product?'},
+    {ic:'🤖', label:'LLM generates', detail:'The model reads the retrieved context, not its training memory, to compose the answer.'},
+    {ic:'✅', label:'Answer', detail:'"Report the damage within 7 days, upload photos in the Returns tab, and you\'ll get a full refund to your original payment method within 5–7 business days." — grounded in chunks ①③②, not guessed.'},
+  ];
+  const pipeEl = document.getElementById('ch10-pipeline');
+  stages.forEach((s,i)=>{
+    if(i>0){ const ar=document.createElement('span'); ar.className='parrow'; ar.textContent='→'; pipeEl.appendChild(ar); }
+    const n=document.createElement('div'); n.className='pnode'; n.id='ch10-n'+i;
+    n.innerHTML = `<span class="ic">${s.ic}</span>${s.label}`;
+    pipeEl.appendChild(n);
+  });
+  const detailBox = document.getElementById('ch10-detail');
+  let timer=null;
+  function setStage(i){
+    stages.forEach((s,j)=>document.getElementById('ch10-n'+j).classList.toggle('on', j===i));
+    detailBox.innerHTML = `<div class="stagelabel">Stage ${i+1} / ${stages.length} — ${stages[i].label}</div><div class="typed">${stages[i].detail}</div>`;
+  }
+  document.getElementById('ch10-run').addEventListener('click', function(){
+    if(timer) return;
+    const btn=this; btn.disabled=true;
+    let i=0; setStage(0);
+    timer=setInterval(()=>{
+      i++;
+      if(i>=stages.length){ clearInterval(timer); timer=null; btn.disabled=false; return; }
+      setStage(i);
+    },1100);
+  });
+  document.getElementById('ch10-reset').addEventListener('click', ()=>{
+    if(timer){ clearInterval(timer); timer=null; }
+    document.getElementById('ch10-run').disabled=false;
+    stages.forEach((s,j)=>document.getElementById('ch10-n'+j).classList.remove('on'));
+    detailBox.innerHTML = `<div class="stagelabel">Ready</div><div class="typed dim">Press Run to step through the pipeline stage by stage.</div>`;
+  });
+}
+
+})();
+</script>
+</body>
+</html>

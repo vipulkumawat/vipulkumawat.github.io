@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI System Design — 5-Day Revision Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B1024; --panel:#151C41; --panel2:#1B2452; --line:#2B3670;
+  --txt:#EAEEFB; --mut:#98A4CD; --good:#5EE6A8; --bad:#FF7A85;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:"Inter",system-ui,sans-serif;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vh 6vw 9vh;opacity:0;transform:translateX(4vw);transition:opacity .45s ease,transform .45s ease;pointer-events:none;overflow:hidden}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60vw 60vh at 85% -10%, color-mix(in srgb, var(--acc) 14%, transparent), transparent 60%),
+  radial-gradient(50vw 50vh at -10% 110%, color-mix(in srgb, var(--acc) 8%, transparent), transparent 60%);
+  pointer-events:none}
+.slide>*{position:relative;z-index:1}
+[data-day="0"]{--acc:#7EE8FA}
+[data-day="1"]{--acc:#53C8F5}
+[data-day="2"]{--acc:#B79CFF}
+[data-day="3"]{--acc:#FFC46B}
+[data-day="4"]{--acc:#FF8A93}
+[data-day="5"]{--acc:#5EE6A8}
+.kick{color:var(--acc);font:600 clamp(.7rem,1vw,.9rem)/1 "Space Grotesk";letter-spacing:.22em;text-transform:uppercase;margin-bottom:1.4vh}
+h1{font-family:"Space Grotesk";font-weight:700;font-size:clamp(2.6rem,6vw,5rem);line-height:1.05;margin:0}
+h2{font-family:"Space Grotesk";font-weight:700;font-size:clamp(1.7rem,3.4vw,2.9rem);line-height:1.12;margin:0 0 .4vh}
+h3{font-family:"Space Grotesk";font-weight:600;font-size:clamp(1rem,1.5vw,1.3rem);margin:0 0 1vh;color:var(--acc)}
+.sub{color:var(--mut);font-size:clamp(.92rem,1.35vw,1.15rem);margin:0 0 3.5vh;max-width:70vw}
+p,li{font-size:clamp(.85rem,1.2vw,1.05rem);line-height:1.55}
+ul{margin:.4vh 0 0;padding-left:1.2em}
+li{margin-bottom:.9vh}
+li::marker{color:var(--acc)}
+.mut{color:var(--mut)} .acc{color:var(--acc)} .goodc{color:var(--good)} .badc{color:var(--bad)}
+b{color:#fff;font-weight:600}
+code{font-family:"JetBrains Mono",monospace;font-size:.92em;background:rgba(255,255,255,.07);padding:.1em .4em;border-radius:6px;color:var(--acc)}
+.grid{display:grid;gap:1.3vw;margin-top:1vh}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:2.4vh 1.5vw}
+.card.good{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,rgba(94,230,168,.10),var(--panel))}
+.card.good h3{color:var(--good)}
+.card.bad{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));background:linear-gradient(180deg,rgba(255,122,133,.10),var(--panel))}
+.card.bad h3{color:var(--bad)}
+.card.hero{border-color:color-mix(in srgb,var(--acc) 50%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 12%,var(--panel)),var(--panel))}
+.pills{display:flex;flex-wrap:wrap;gap:.7vw;margin-top:2vh}
+.pill{border:1px solid color-mix(in srgb,var(--acc) 55%,var(--line));color:var(--acc);border-radius:999px;padding:.9vh 1.3vw;font:500 clamp(.8rem,1.05vw,1rem) "Space Grotesk"}
+.pill.solid{background:var(--acc);color:#0B1024;border-color:var(--acc)}
+.stat .v{font-family:"Space Grotesk";font-weight:700;font-size:clamp(2.2rem,4.6vw,4rem);color:var(--acc);line-height:1}
+.stat .l{margin-top:1.2vh;font-weight:600}
+.stat .d{color:var(--mut);font-size:clamp(.78rem,1vw,.95rem);margin-top:.6vh}
+.flow{display:flex;align-items:stretch;gap:0;margin-top:2vh;flex-wrap:wrap}
+.fbox{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:1.6vh 1.1vw;flex:1;min-width:8vw;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.fbox b{display:block;font-family:"Space Grotesk";font-size:clamp(.85rem,1.15vw,1.1rem)}
+.fbox span{color:var(--mut);font-size:clamp(.72rem,.95vw,.9rem);margin-top:.4vh}
+.fbox.hot{background:color-mix(in srgb,var(--acc) 18%,var(--panel2));border-color:var(--acc)}
+.farr{align-self:center;color:var(--acc);font-size:clamp(1.1rem,1.8vw,1.7rem);padding:0 .55vw;font-weight:700}
+.num{display:inline-flex;align-items:center;justify-content:center;width:2.1em;height:2.1em;border-radius:50%;background:var(--acc);color:#0B1024;font:700 clamp(.8rem,1.05vw,1rem) "Space Grotesk";flex:none}
+.steprow{display:flex;gap:1vw;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6vh 1.2vw;margin-bottom:1.3vh}
+.steprow p{margin:0}
+.band{margin-top:2.6vh;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 22%,var(--panel)),var(--panel));border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));border-radius:16px;padding:2vh 1.6vw;font-size:clamp(.9rem,1.25vw,1.1rem)}
+.divider{justify-content:center}
+.divider .dnum{font-family:"Space Grotesk";font-weight:700;font-size:clamp(6rem,16vw,13rem);line-height:.9;color:transparent;-webkit-text-stroke:2px var(--acc);opacity:.9}
+table{border-collapse:collapse;width:100%;margin-top:2vh;font-size:clamp(.8rem,1.05vw,1rem)}
+th{font-family:"Space Grotesk";color:var(--acc);text-align:left;padding:1.2vh 1vw;border-bottom:2px solid var(--acc)}
+td{padding:1.2vh 1vw;border-bottom:1px solid var(--line);vertical-align:top}
+tr td:first-child{font-weight:600;color:#fff}
+.hud{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:1.6vh 2vw;z-index:50;font:500 .85rem "Space Grotesk";color:var(--mut);pointer-events:none}
+.hud .btns{pointer-events:auto;display:flex;gap:.5rem}
+.hud button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.55rem .95rem;cursor:pointer;font:600 .9rem "Space Grotesk"}
+.hud button:hover{border-color:#7EE8FA;color:#7EE8FA}
+#bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#53C8F5,#B79CFF,#FFC46B,#FF8A93,#5EE6A8);width:0;z-index:60;transition:width .3s}
+#toc{position:fixed;inset:0;background:rgba(7,10,25,.96);z-index:100;display:none;overflow:auto;padding:6vh 6vw}
+#toc.open{display:block}
+#toc h2{margin-bottom:3vh}
+#toc .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem}
+#toc a{display:block;color:var(--mut);text-decoration:none;padding:.5rem .8rem;border-radius:10px;border:1px solid transparent;font-size:.9rem}
+#toc a:hover{color:#fff;border-color:var(--line);background:var(--panel)}
+#toc a b{color:#7EE8FA;font-family:"Space Grotesk";margin-right:.5em}
+.svgwrap{margin-top:2vh}
+svg text{font-family:"Inter",sans-serif}
+@media (max-width:820px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .slide{padding:5vh 6vw 11vh;justify-content:flex-start;overflow-y:auto}
+  .flow{flex-direction:column}
+  .farr{transform:rotate(90deg);padding:.5vh 0}
+  .sub{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="deck">
+
+<!-- ============ INTRO ============ -->
+<section class="slide" data-day="0" data-t="Title">
+  <div class="kick">5-day revision · web deck</div>
+  <h1>Agentic AI<br>system design</h1>
+  <p class="sub" style="margin-top:2vh">Agents · RAG · AST · BM25 · Graph RAG · Evaluation · RAGAS · RRF · HyDE · RAPTOR · Context engineering</p>
+  <div class="pills">
+    <span class="pill solid">Day 1 · Agents & RAG</span><span class="pill">Day 2 · AST · Lexical · Hybrid</span><span class="pill">Day 3 · RAG types · Eval metrics</span><span class="pill">Day 4 · RAGAS · Comparison</span><span class="pill">Day 5 · RRF · HyDE · Context</span>
+  </div>
+  <p class="mut" style="margin-top:5vh">Use ← → arrow keys, click the buttons, or press <code>M</code> for the table of contents.</p>
+</section>
+
+<section class="slide" data-day="0" data-t="Course map">
+  <div class="kick">Orientation</div>
+  <h2>The journey in one map</h2>
+  <p class="sub">Every day builds directly on the failures discovered the day before.</p>
+  <div class="flow">
+    <div class="fbox"><b>Day 1</b><span>Agents, basic RAG — and where naive chunking breaks</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Day 2</b><span>AST chunking, BM25, hybrid & agentic retrieval</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Day 3</b><span>The RAG taxonomy + how to measure anything</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Day 4</b><span>RAGAS evals: proving which RAG is best</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>Day 5</b><span>RRF, HyDE, RAPTOR, PageIndex → context engineering</span></div>
+  </div>
+  <div class="band">The course mantra: <b>there is no single correct solution — understand the trade-offs at every step.</b> Latency, cost, tokens, accuracy: every choice moves all four.</div>
+</section>
+
+<!-- ============ DAY 1 ============ -->
+<section class="slide divider" data-day="1" data-t="DAY 1">
+  <div class="dnum">01</div>
+  <h2>Intro to agents & RAG</h2>
+  <p class="sub">What an agent is, why LLMs need tools, and building your first semantic RAG — until it breaks.</p>
+</section>
+
+<section class="slide" data-day="1" data-t="What is an agent">
+  <div class="kick">Day 1 · Foundations</div>
+  <h2>What is an agent? Three evolving definitions</h2>
+  <p class="sub">Each definition layers on the previous one.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Classic</h3><p style="font-family:'Space Grotesk';font-weight:600;font-size:1.2em">LLM + tool</p><p class="mut">The LLM reasons in language; the tool performs the action.</p></div>
+    <div class="card"><h3>Newer</h3><p style="font-family:'Space Grotesk';font-weight:600;font-size:1.2em">LLM + context</p><p class="mut">Behavior is driven by what you feed the model — context engineering.</p></div>
+    <div class="card hero"><h3>Current</h3><p style="font-family:'Space Grotesk';font-weight:600;font-size:1.2em">LLM + harness</p><p class="mut">The orchestration scaffolding: retries, tool routing, middleware.</p></div>
+  </div>
+  <div class="band">Keep the terms straight: <b>OpenAI</b> = model provider · <b>GPT / Gemini / DeepSeek / Kimi K2</b> = LLMs · <b>ChatGPT</b> = an application built on GPT.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="LLM + tool split">
+  <div class="kick">Day 1 · Foundations</div>
+  <h2>The core split</h2>
+  <p class="sub">Each half supplies exactly what the other lacks.</p>
+  <div class="grid g2">
+    <div class="card"><h3>LLM</h3><ul><li>Understands natural language</li><li>Reasons about what <b>should</b> happen</li><li class="badc">Cannot perform any action — no search, no DB call, no file write</li></ul></div>
+    <div class="card"><h3>Tool</h3><ul><li>Just code — a function, method, or API call</li><li>Performs <b>real</b> actions</li><li class="badc">Cannot understand natural language</li></ul></div>
+  </div>
+  <div class="band"><b>Agent = the two combined.</b> The LLM decides; the application-side tool executes.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="LLM shortcomings">
+  <div class="kick">Day 1 · Foundations</div>
+  <h2>Six shortcomings of raw LLMs</h2>
+  <p class="sub">The reasons agents and tools exist at all.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Hallucination</h3><p class="mut">Plausible-sounding but wrong output.</p></div>
+    <div class="card"><h3>Knowledge cutoff</h3><p class="mut">No awareness after the training date — can’t answer “who won IPL 2026.”</p></div>
+    <div class="card"><h3>Stateless</h3><p class="mut">Every request is fresh. “Memory” is the app resending prior context.</p></div>
+    <div class="card"><h3>Fixed context window</h3><p class="mut">Input is limited — and every token costs money.</p></div>
+    <div class="card"><h3>Non-deterministic</h3><p class="mut">The same prompt phrases its answer differently every time — a reliability concern.</p></div>
+    <div class="card"><h3>No actions</h3><p class="mut">It only generates text. It can’t search, query, or write anything.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="Tools: retrieval vs action">
+  <div class="kick">Day 1 · Foundations</div>
+  <h2>Two families of tools</h2>
+  <div class="grid g2">
+    <div class="card hero"><h3>Retrieval tools — fetch information</h3><ul><li>Web search</li><li>Database query</li><li>Code base search</li></ul></div>
+    <div class="card"><h3>Action tools — change the world</h3><ul><li>Send email · calendar ops</li><li>Create / write files (CRUD) · DB writes</li><li>GitHub actions</li></ul></div>
+  </div>
+  <div class="band">If an agent’s tool <b>retrieves information</b>, that agent is a <b>RAG agent</b>.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="RAG = R+A+G">
+  <div class="kick">Day 1 · RAG</div>
+  <h2>RAG — a pattern, not a technology</h2>
+  <div class="grid g3">
+    <div class="card stat"><div class="v">R</div><div class="l">Retrieval</div><div class="d">Fetch relevant info via a retriever tool — vector DB, web, anything.</div></div>
+    <div class="card stat"><div class="v">A</div><div class="l">Augmented</div><div class="d">“Augment” just means add — retrieved info is added to the user’s query.</div></div>
+    <div class="card stat"><div class="v">G</div><div class="l">Generation</div><div class="d">The LLM generates the final answer from query + retrieved context.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="RAG request flow">
+  <div class="kick">Day 1 · RAG</div>
+  <h2>How a RAG request actually flows</h2>
+  <p class="sub">Example: “Who won IPL 2026?” — outside the model’s training data.</p>
+  <div class="flow">
+    <div class="fbox"><b>1 · User</b><span>query → application</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>2 · App → LLM</b><span>query + tool list</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>3 · LLM decides</b><span>which tool to call</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>4 · App executes</b><span>the tool call</span></div>
+  </div>
+  <div class="flow">
+    <div class="fbox"><b>5 · Tool returns</b><span>raw JSON / chunks</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>6 · Back to LLM</b><span>never straight to user</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>7 · Final answer</b><span>natural language</span></div>
+  </div>
+  <div class="band">The LLM never knows tools exist unless the app <b>declares them — on every request</b>. And raw tool output (JSON, status codes) is never a user answer — only the LLM can phrase it.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="Failure modes">
+  <div class="kick">Day 1 · RAG</div>
+  <h2>What can still go wrong</h2>
+  <p class="sub">These four problems motivate every RAG variant in the rest of the course.</p>
+  <div class="grid g2">
+    <div class="card bad"><h3>Wrong tool choice</h3><p class="mut">The LLM picks a tool that can’t answer the query.</p></div>
+    <div class="card bad"><h3>Too many tools</h3><p class="mut">Every declared tool consumes context on every call.</p></div>
+    <div class="card bad"><h3>Oversized responses</h3><p class="mut">Tool output too large for the context window.</p></div>
+    <div class="card bad"><h3>Bad queries</h3><p class="mut">Ambiguous, abstract, or typo’d user input retrieves poorly.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="Embeddings & vector DBs">
+  <div class="kick">Day 1 · RAG</div>
+  <h2>Embeddings: match meaning, not words</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Same meaning, different words</h3>
+      <p>“I’m excited” <span class="acc">≈</span> “I’m happy”</p>
+      <p>“Why are payments failing?” <span class="acc">≈</span> <code>CheckoutException</code></p>
+      <p class="mut">Text becomes a vector — an array of numbers — so similarity is pure math (cosine similarity / dot product).</p></div>
+    <div class="card"><h3>Where vectors live</h3>
+      <div class="pills" style="margin-top:.5vh"><span class="pill solid">Chroma</span><span class="pill solid">Milvus</span><span class="pill solid">FAISS</span><span class="pill solid">Pinecone</span></div>
+      <p class="mut" style="margin-top:1.5vh">General DBs adding vector support:</p>
+      <div class="pills" style="margin-top:.2vh"><span class="pill">MongoDB</span><span class="pill">Postgres</span><span class="pill">Redis</span></div></div>
+  </div>
+  <div class="band">A vector DB record stores <b>three things</b>: the embedding, the original chunk, and metadata. Trade-off: bigger embedding dimension = more nuance, but more storage, compute, and latency.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="Why chunking">
+  <div class="kick">Day 1 · Chunking</div>
+  <h2>Why chunking is non-negotiable</h2>
+  <p class="sub">You cannot send a 1,000-file code base to an LLM.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Token limits</h3><p class="mut">The context window is fixed — the whole corpus simply doesn’t fit.</p></div>
+    <div class="card"><h3>Cost</h3><p class="mut">Every token costs money. Irrelevant code is paid-for noise.</p></div>
+    <div class="card"><h3>Relevance</h3><p class="mut">Even if it fit, the model would lose focus on the actual query.</p></div>
+  </div>
+  <div class="flow">
+    <div class="fbox"><b>Chunk</b></div><div class="farr">→</div>
+    <div class="fbox"><b>Embed</b></div><div class="farr">→</div>
+    <div class="fbox"><b>Store</b></div><div class="farr">→</div>
+    <div class="fbox hot"><b>Retrieve only what the query needs</b></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="Chunking code breaks">
+  <div class="kick">Day 1 · Chunking</div>
+  <h2>Chunking code is harder than chunking prose</h2>
+  <div class="grid g2">
+    <div class="card bad"><h3>Naive chunking breaks code</h3><ul>
+      <li>A boundary can fall mid-class, mid-function, mid-argument-list</li>
+      <li>You lose which function belongs to which class</li>
+      <li>Same function names repeat across classes → wrong answers</li></ul></div>
+    <div class="card"><h3>LangChain recursive splitter</h3><ul>
+      <li>Told the language + a <code>chunk_size</code></li>
+      <li>Splits by class → still too big? by function → then raw text</li>
+      <li class="badc">Still keyword pattern-matching on <code>class</code> / <code>def</code> — no real structural understanding</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="Chunk size numbers">
+  <div class="kick">Day 1 · Chunking</div>
+  <h2>Chunk size, in real numbers</h2>
+  <p class="sub">Same 13-file sample project, different settings.</p>
+  <div class="grid g4">
+    <div class="card stat"><div class="v">256</div><div class="l">→ 173 chunks</div><div class="d">Cheap — but answers broke</div></div>
+    <div class="card stat"><div class="v">1,500</div><div class="l">→ 34 chunks</div><div class="d">Better — still missed functions</div></div>
+    <div class="card stat"><div class="v">2,500</div><div class="l">all 5 functions found</div><div class="d">Complete — more tokens per call</div></div>
+    <div class="card stat"><div class="v">k = 4</div><div class="l">chunks per query</div><div class="d">Top-k caps what the LLM ever sees</div></div>
+  </div>
+  <div class="band"><b>The trade-off:</b> smaller = cheaper but risks missing content · larger = complete but costlier — and still fails when boundaries ignore code structure.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="Demo: worked vs failed">
+  <div class="kick">Day 1 · Demo</div>
+  <h2>The demo that set up the whole week</h2>
+  <div class="grid g2">
+    <div class="card good"><h3>Worked</h3><ul>
+      <li>“What does auth service do?” → correct</li>
+      <li>“What does PermissionPolicy do?” → correct</li></ul></div>
+    <div class="card bad"><h3>Failed</h3><ul>
+      <li>“What are the functions inside auth service?”</li>
+      <li>Actual: <code>__init__, register, login, get_current_user, logout</code> — agent found none, or a partial list</li></ul></div>
+  </div>
+  <div class="band"><b>Why:</b> with chunk_size 256 + k = 4, the top-4 chunks ran out before covering the file — the first chunk was mostly imports, and retrieval stalled at <code>login</code>. Two compounding causes: chunks too small for the file, and fixed top-k never guaranteed to cover a whole logical unit.</div>
+</section>
+
+<section class="slide" data-day="1" data-t="LangSmith">
+  <div class="kick">Day 1 · Observability</div>
+  <h2>LangSmith: watch what your agent really did</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Setup — two lines in .env</h3>
+      <p><code>LANGSMITH_TRACING=true</code><br><code>LANGSMITH_API_KEY=&lt;key&gt;</code></p>
+      <p class="mut">Free tier: 5,000 traces. Every framework has an equivalent (Google ADK has its own tracing).</p>
+      <div class="card bad" style="margin-top:2vh"><h3>6 tool calls, one failing query</h3><p class="mut">The LLM kept judging chunks insufficient and retried before giving up. The <b>LLM decides</b> whether to retry; middleware just caps it.</p></div></div>
+    <div class="card"><h3>What a trace shows</h3><ul>
+      <li>System prompt + user query sent to the model</li>
+      <li>Tool-call decision and arguments</li>
+      <li>Raw tool response (retrieved chunks)</li>
+      <li>The final generated answer</li>
+      <li><b>Token usage and dollar cost</b> — per sub-call and per request</li>
+      <li>Loops and repeated tool calls, made visible</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-day="1" data-t="Frameworks & terms">
+  <div class="kick">Day 1 · Wrap</div>
+  <h2>Frameworks & terminology</h2>
+  <div class="pills"><span class="pill solid">LangChain</span><span class="pill solid">LangGraph</span><span class="pill solid">Google ADK</span><span class="pill solid">OpenAI SDK</span><span class="pill solid">Microsoft</span></div>
+  <div class="grid g2" style="margin-top:2.5vh">
+    <div class="card"><h3>Concepts transfer</h3><p class="mut">Agent = model + tools + prompt everywhere. Learn trade-offs, not one framework’s syntax.</p></div>
+    <div class="card"><h3>Tokenization ≠ chunking</h3><p class="mut">Tokens: tiny units for training. Chunks: larger pieces for retrieval. Tokens ≪ chunks.</p></div>
+  </div>
+  <div class="band">The agent recipe used all week: <b>model + tools + system prompt</b> — with a retriever tool (e.g. <code>search_code_base</code>) explicitly declared to the LLM.</div>
+</section>
+
+<!-- ============ DAY 2 ============ -->
+<section class="slide divider" data-day="2" data-t="DAY 2">
+  <div class="dnum">02</div>
+  <h2>AST · lexical · hybrid · agentic</h2>
+  <p class="sub">Structural chunking for code, exact-match search with BM25, and the first ways of combining retrievers.</p>
+</section>
+
+<section class="slide" data-day="2" data-t="RAG quality levers">
+  <div class="kick">Day 2 · Recap</div>
+  <h2>What actually drives RAG quality</h2>
+  <p class="sub">Never one lever — it’s the combination.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Data side</h3><ul><li>Chunking strategy & chunk size</li><li>Docstrings — the LLM reads language, not code structure</li></ul></div>
+    <div class="card"><h3>Index side</h3><ul><li>Embedding model & dimension</li><li>Vector DB choice & settings</li></ul></div>
+    <div class="card"><h3>Query side</h3><ul><li>Model settings</li><li>Query quality & k</li></ul></div>
+  </div>
+  <div class="band">Day-1 proof: raising chunk_size 256 → 2500 <b>and</b> adding clearer docstrings both fixed the failing “functions inside auth service” query.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Chunk overlap">
+  <div class="kick">Day 2 · Chunking</div>
+  <h2>Chunk overlap: don’t split the meaning</h2>
+  <div class="grid g2" style="align-items:center">
+    <div>
+      <div class="flow" style="margin-top:0">
+        <div class="fbox"><b>Chunk A</b><span>“…this is a <b class="badc">5</b>”</span></div>
+        <div class="farr">✂</div>
+        <div class="fbox"><b>Chunk B</b><span>“<b class="badc">week</b> course…”</span></div>
+      </div>
+      <p class="mut" style="margin-top:2vh">Neither chunk contains “5 week course” — the phrase is destroyed at the boundary.</p>
+    </div>
+    <div class="card"><h3>The fix</h3><p>Let adjacent chunks <b>share trailing/leading text</b>, so any split phrase survives intact in at least one chunk.</p><p class="mut">No universal value: short-sentence data needs little overlap; long sentences need more.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="2" data-t="AST intro">
+  <div class="kick">Day 2 · AST</div>
+  <h2>AST — how machines actually read code</h2>
+  <p class="sub">Compilers, linters, and IDE autocomplete never read code as plain text.</p>
+  <div class="grid g2" style="align-items:center">
+    <div class="svgwrap">
+    <svg viewBox="0 0 340 210" width="100%">
+      <g font-size="13" text-anchor="middle">
+        <rect x="120" y="8" width="100" height="32" rx="8" fill="#1B2452" stroke="#B79CFF"/><text x="170" y="29" fill="#EAEEFB">x = 1 + 2</text>
+        <line x1="170" y1="40" x2="90" y2="80" stroke="#2B3670"/><line x1="170" y1="40" x2="250" y2="80" stroke="#2B3670"/>
+        <rect x="45" y="80" width="90" height="30" rx="8" fill="#151C41" stroke="#2B3670"/><text x="90" y="100" fill="#EAEEFB">target: x</text>
+        <rect x="205" y="80" width="90" height="30" rx="8" fill="#151C41" stroke="#2B3670"/><text x="250" y="100" fill="#EAEEFB">op: add</text>
+        <line x1="250" y1="110" x2="210" y2="150" stroke="#2B3670"/><line x1="250" y1="110" x2="290" y2="150" stroke="#2B3670"/>
+        <rect x="180" y="150" width="60" height="30" rx="8" fill="#151C41" stroke="#2B3670"/><text x="210" y="170" fill="#EAEEFB">1</text>
+        <rect x="260" y="150" width="60" height="30" rx="8" fill="#151C41" stroke="#2B3670"/><text x="290" y="170" fill="#EAEEFB">2</text>
+      </g>
+    </svg></div>
+    <div>
+      <ul>
+        <li>A <b>tree of the code’s real structure</b> — a function is a node with name, args, body; a class contains its functions as children</li>
+        <li>Python stdlib: <code>ast.parse()</code> builds it · <code>ast.dump()</code> prints it · <code>ast.walk()</code> traverses · nodes map back to exact source</li>
+        <li>Production choice: <b>tree-sitter</b> with per-language grammars (<code>tree-sitter-python</code>)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-day="2" data-t="AST vs splitter">
+  <div class="kick">Day 2 · AST</div>
+  <h2>AST chunking vs recursive splitter</h2>
+  <p class="sub">Only the chunking step changes — embedding, storage, retrieval stay identical.</p>
+  <div class="grid g2">
+    <div class="card"><h3 class="mut">Recursive splitter</h3><ul>
+      <li>Pattern-matches on <code>class</code> / <code>def</code> tokens</li>
+      <li>Falls back to newline / character splits</li>
+      <li>No understanding of symbol relationships</li></ul></div>
+    <div class="card hero"><h3>AST chunking</h3><ul>
+      <li>Parses the whole file into a tree <b>first</b></li>
+      <li>One chunk per function / class / method — real units</li>
+      <li>Full control over boundaries while walking the tree</li></ul></div>
+  </div>
+  <div class="band"><b>Trade-off:</b> the tree costs memory. Keep the AST only transiently to extract chunks, then discard — persist just chunks + embeddings.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="AST wins & limits">
+  <div class="kick">Day 2 · AST</div>
+  <h2>AST in practice: wins and limits</h2>
+  <div class="grid g2">
+    <div class="card good"><h3>The Day-1 failure, fixed</h3><p>With AST chunks + k = 4, “what are the functions inside auth service” returns a clean, complete answer.</p></div>
+    <div class="card bad"><h3>Not a universal fix</h3><ul>
+      <li>k = 1 (large-codebase simulation) still failed: ~22 s, ~2.8k tokens on retries</li>
+      <li>Cross-file queries (“every place billing error is raised”) — one chunk = one function, never a codebase view</li>
+      <li>Built per file · code-only · still needs docstrings</li></ul></div>
+  </div>
+  <div class="band">Cross-file relationships need a <b>graph representation</b> → Graph RAG (Day 3).</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Loop control">
+  <div class="kick">Day 2 · Control</div>
+  <h2>Controlling agent loops</h2>
+  <p class="sub">Blind retries burn money and time without improving answers.</p>
+  <div class="grid g3">
+    <div class="card bad stat"><div class="v">~12 s</div><div class="l">Before</div><div class="d">5 model calls + 5 tool calls, ~1.8k tokens — same wrong answer</div></div>
+    <div class="card good stat"><div class="v">~3.4 s</div><div class="l">After limits</div><div class="d">Framework enforces a hard ceiling on calls</div></div>
+    <div class="card"><h3>Who decides?</h3><p class="mut">The LLM still decides <b>whether</b> to retry within the ceiling — only it can judge if a tool response answers the query.</p></div>
+  </div>
+  <div class="band"><b>LangChain middleware:</b> model-call limit (+ thread-level count) · tool-call limit — enforced <b>per tool name</b>, a mismatched name silently never applies · exit behavior: end, continue, or throw.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Lexical motivation">
+  <div class="kick">Day 2 · Lexical</div>
+  <h2>When “similar” is wrong and “identical” is right</h2>
+  <div class="grid g2">
+    <div class="card bad"><h3>Semantic search wastes exact-match queries</h3><p>Searching <code>order_handler</code> semantically also returns <code>order_processor</code> and <code>order_manager</code> — noise you pay for.</p></div>
+    <div class="card"><h3>And grep doesn’t scale</h3><p>Raw text scanning across thousands of files is too slow. Elasticsearch-style engines solve this with an <b>inverted index</b>.</p><p class="mut">(Though Claude Code deliberately greps live — Day 4 tells that story.)</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="2" data-t="Inverted index">
+  <div class="kick">Day 2 · Lexical</div>
+  <h2>The inverted index</h2>
+  <div class="grid g2">
+    <div class="card"><h3 class="mut">Forward index</h3><p><code>document → its content</code></p><p class="mut">How you normally read.</p>
+      <h3 style="margin-top:2.5vh">Inverted index</h3><p><code>word → [docs containing it] + freq</code></p><p class="mut">Hash-map-like, near O(1) lookup per term.</p></div>
+    <div class="card"><h3>Build steps</h3><ul>
+      <li>Tokenize the documents</li>
+      <li>Drop stop words (a, the, in, on, for…) — zero retrieval value</li>
+      <li>Map each word → documents + frequency</li></ul>
+      <p class="mut"><b>Trade-off:</b> storage-heavy, but buys much lower query-time latency — classic space-vs-speed.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="2" data-t="BM25">
+  <div class="kick">Day 2 · Lexical</div>
+  <h2>BM25 — best matching 25</h2>
+  <p class="sub">Inverted index + relevance scoring. The default inside Elasticsearch. Three factors:</p>
+  <div class="grid g3">
+    <div class="card"><h3>1 · Term frequency</h3><p class="mut">More occurrences = more relevant — with <b>diminishing returns</b>: 200 hits isn’t twice as relevant as 100.</p></div>
+    <div class="card"><h3>2 · Word rarity (IDF)</h3><p class="mut">“agent” in an AI corpus discriminates nothing; rare words like “RAG” weigh far more.</p></div>
+    <div class="card"><h3>3 · Length penalty</h3><p class="mut">A term counts for more in a 10-word doc than a 1,000-word one — long docs accumulate hits cheaply.</p></div>
+  </div>
+  <div class="band"><b class="badc">Core weakness — purely lexical:</b> querying “generate bill” scores <b>zero</b> against a genuinely relevant “create invoice” document. No shared words → no match. No synonyms, no paraphrase.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Semantic vs lexical">
+  <div class="kick">Day 2 · Lexical</div>
+  <h2>Semantic vs lexical — when each wins</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Semantic wins</h3><ul>
+      <li>Natural-language questions</li>
+      <li>Paraphrased / conceptual queries</li>
+      <li>“Explain why my payments are failing”</li></ul></div>
+    <div class="card"><h3>Lexical / BM25 wins</h3><ul>
+      <li>Exact exception or error-code lookups</li>
+      <li>Exact class / function / variable names</li>
+      <li>Anything where identical beats similar</li></ul></div>
+  </div>
+  <div class="band"><b>Context rot:</b> BM25’s length-penalty intuition applies to LLMs too — a short, focused context gets proportionally more attention; a huge one dilutes it and the model loses the query. Relevance degrades as context grows. Don’t stuff context just because it fits.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Hybrid RAG">
+  <div class="kick">Day 2 · Combining</div>
+  <h2>Hybrid RAG</h2>
+  <p class="sub">Multiple retrievers, one merged answer.</p>
+  <div class="flow">
+    <div class="fbox"><b>Query</b></div><div class="farr">→</div>
+    <div class="fbox"><b>Vector DB</b><span>semantic</span></div>
+    <div class="fbox" style="margin-left:.6vw"><b>BM25</b><span>lexical</span></div>
+    <div class="fbox" style="margin-left:.6vw"><b>Graph / SQL / …</b><span>any retriever</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>Merge + re-rank</b><span>weights, e.g. 0.5 / 0.5</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>LLM</b></div>
+  </div>
+  <div class="band">Misconception to drop: hybrid ≠ only “vector + lexical.” It’s a general <b>multi-retriever architecture</b> — and the production standard.</div>
+</section>
+
+<section class="slide" data-day="2" data-t="Agentic RAG intro">
+  <div class="kick">Day 2 · Combining</div>
+  <h2>Agentic RAG — first look</h2>
+  <p class="sub">An extra LLM call, purely for decision-making.</p>
+  <div class="grid g2">
+    <div class="card"><h3 class="mut">Hybrid</h3><p>Always calls a <b>fixed set</b> of retrievers → merge → re-rank. Deterministic, engineered ahead of time.</p></div>
+    <div class="card hero"><h3>Agentic</h3><p>An <b>LLM classifies the query</b> and picks retriever(s) per request — possibly just one, saving retrievals.</p></div>
+  </div>
+  <div class="band"><b>Cost trade-off:</b> the decision call adds latency and money. If both retrievers should always run, hard-code the hybrid call — agentic RAG earns its cost only when strategy must vary per query.</div>
+</section>
+
+<!-- ============ DAY 3 ============ -->
+<section class="slide divider" data-day="3" data-t="DAY 3">
+  <div class="dnum">03</div>
+  <h2>Types of RAG & evaluation metrics</h2>
+  <p class="sub">Debunking the “20 types of RAG” hype — then learning to measure everything with numbers.</p>
+</section>
+
+<section class="slide" data-day="3" data-t="RAG types debunked">
+  <div class="kick">Day 3 · Taxonomy</div>
+  <h2>“20 types of RAG you must know” — mostly hype</h2>
+  <p class="sub">If you understand the core flow, every “type” is just an extra step or a different choice somewhere in the pipeline.</p>
+  <div class="flow">
+    <div class="fbox"><b>Ingestion / chunking</b><span>RAPTOR & friends</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Query</b><span>HyDE, rewriting</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Retrieval</b><span>vector · lexical · graph · SQL · web · hybrid</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Generation</b></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Validation</b><span>self / corrective RAG</span></div>
+  </div>
+  <div class="band">Optimization is possible at <b>every stage</b> — add a step anywhere and someone has given it a RAG name. Every variant trades <b>latency, cost, and tokens</b>.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="Self vs Corrective RAG">
+  <div class="kick">Day 3 · Validation RAGs</div>
+  <h2>Validating the output: self vs corrective</h2>
+  <p class="sub">Pass retrieved context + query + generated answer to a model and ask: “is this good?”</p>
+  <div class="grid g2">
+    <div class="card"><h3>Self-RAG</h3><p>Another call to the <b>same LLM / session</b>, asking it to verify its own response.</p></div>
+    <div class="card"><h3>Corrective RAG (CRAG)</h3><p>Validation by a <b>different model</b> — or the same LLM in a <b>fresh session</b> with no shared context.</p></div>
+  </div>
+  <div class="grid g2">
+    <div class="card bad"><h3>Honest caveats</h3><p class="mut">An extra check ≠ a guarantee of correctness. And every validation call adds <b>latency + cost</b>.</p></div>
+    <div class="card"><h3>Aliases</h3><p class="mut">Reflection RAG, fact-verification RAG — all the same idea: one extra validation layer.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="Retrieval-source types">
+  <div class="kick">Day 3 · Taxonomy</div>
+  <h2>RAG is not just vector DBs</h2>
+  <p class="sub">The retriever can pull from any store — and every database is optimized for a different kind of query.</p>
+  <div class="grid g4">
+    <div class="card"><h3>SQL RAG</h3><p class="mut">LLM writes the SQL against your existing DB — no migration needed.</p></div>
+    <div class="card"><h3>Web RAG</h3><p class="mut">Live web search as the retriever.</p></div>
+    <div class="card"><h3>Graph RAG</h3><p class="mut">Relationships: who calls what, what depends on what.</p></div>
+    <div class="card"><h3>Files / PDFs</h3><p class="mut">Plain documents, HTML, anything readable.</p></div>
+  </div>
+  <div class="band"><b>Tool descriptions must carry the schema</b> — put your data structure in the tool’s docstring so the LLM can generate valid queries against it.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="Graph RAG: why">
+  <div class="kick">Day 3 · Graph RAG</div>
+  <h2>Code is inherently a graph</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Killer queries</h3><ul>
+      <li>“Who calls this function?”</li>
+      <li>“Trace the complete call chain”</li>
+      <li>“If I change this, what breaks?” — multi-hop impact analysis</li></ul></div>
+    <div class="card bad"><h3>The cost anecdote</h3><p>The instructor’s live “trace the complete call chain” query — run via hybrid RAG with <b>no call limit</b> — burned an enormous number of tokens in one call.</p><p class="goodc">A graph DB answers it trivially and cheaply.</p></div>
+  </div>
+  <div class="band">AST is per-file, local chunking. The <b>graph captures cross-module relationships</b> — classes, inheritance, calls: basically UML, and UML is a graph.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="Graph RAG: how">
+  <div class="kick">Day 3 · Graph RAG</div>
+  <h2>How Graph RAG works</h2>
+  <div class="grid g2">
+    <div class="card"><h3>The store</h3><ul>
+      <li><b>Neo4j</b> — used in the final project (in-memory graphs are demo-only)</li>
+      <li>Nodes: classes, functions, modules · Edges: calls, imports, has-method</li>
+      <li>Demo graph: <code>AuthService</code>, <code>User</code>, <code>TaskService</code>… with typed relationships + properties</li></ul></div>
+    <div class="card hero"><h3>Who writes the graph query?</h3><p><b>Not you — the LLM writes the Cypher.</b> You send it the tools plus a description of your graph structure (nodes, relationships); it returns the query; your app executes it.</p><p class="mut">Same pattern as every other retriever.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="3-store architecture">
+  <div class="kick">Day 3 · Architecture</div>
+  <h2>The final-project storage design</h2>
+  <p class="sub">One codebase, indexed three ways — each store answers what it’s best at.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Vector DB</h3><p class="mut">Chroma-like · semantic meaning: “how does auth work?”</p></div>
+    <div class="card"><h3>BM25 / Elasticsearch</h3><p class="mut">Inverted index · exact matches: error codes, function & class names</p></div>
+    <div class="card"><h3>Neo4j</h3><p class="mut">Graph · relationships: call chains, imports, impact analysis</p></div>
+  </div>
+  <div class="band">Storage duplication is real — the same corpus lives three times. That’s the <b>quality-vs-storage trade-off</b>, accepted deliberately. (And not the only valid design — you can skip the graph with metadata tricks.)</div>
+</section>
+
+<section class="slide" data-day="3" data-t="HyDE & RAPTOR teaser">
+  <div class="kick">Day 3 · Transformations</div>
+  <h2>Fixing bad queries and bloated chunks</h2>
+  <div class="grid g2">
+    <div class="card"><h3>HyDE — query transformation</h3><p>A big reason RAGs fail: <b>user queries are bad</b> — vague, under-specified. HyDE has the LLM first <b>generate a hypothetical answer</b>, then uses that richer text to drive retrieval.</p><p class="mut">Fun fact: even passing the same query twice can improve RAG performance.</p></div>
+    <div class="card"><h3>RAPTOR — chunk transformation</h3><p>Too many chunks, unsatisfying retrieval? <b>Summarize the chunks and run RAG over the summaries.</b></p><p class="mut">Both get full treatment on Day 5.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="RAG taxonomy">
+  <div class="kick">Day 3 · Taxonomy</div>
+  <h2>The unifying taxonomy</h2>
+  <table>
+    <tr><th>Design question</th><th>The “types” that answer it</th></tr>
+    <tr><td>Where is knowledge stored?</td><td>Vector (dense) · Lexical (sparse) · Graph · SQL · Web · Hybrid</td></tr>
+    <tr><td>How to ensure correctness?</td><td>Self-RAG · Corrective RAG · Reflection · Fact-verification</td></tr>
+    <tr><td>How to improve the query?</td><td>HyDE · query rewriting · decomposition</td></tr>
+    <tr><td>How to transform chunks?</td><td>RAPTOR (summarize-then-RAG) · hierarchical</td></tr>
+    <tr><td>How to orchestrate?</td><td>Agentic RAG — an LLM decides, per query</td></tr>
+  </table>
+  <div class="band">One system can be <b>hybrid + corrective + agentic simultaneously</b> — these are answers to different questions, not exclusive categories.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="Why evaluate (EDD)">
+  <div class="kick">Day 3 · Evaluation</div>
+  <h2>From “feels better” to a number</h2>
+  <p class="sub">You changed the chunking. Is the new RAG actually better? Prove it.</p>
+  <div class="grid g2">
+    <div class="card"><h3>Evaluate every layer</h3><div class="flow" style="margin-top:1vh">
+      <div class="fbox"><b>Chunking</b></div><div class="farr">→</div>
+      <div class="fbox"><b>Retrieval</b></div><div class="farr">→</div>
+      <div class="fbox"><b>Re-ranking</b></div><div class="farr">→</div>
+      <div class="fbox"><b>Generation</b></div></div>
+      <p class="mut" style="margin-top:1.5vh">Different metrics diagnose different layers — where did the failure happen?</p></div>
+    <div class="card hero"><h3>EDD — eval-driven development</h3><p>Traditional software has TDD. Agentic apps have <b>EDD</b>: every change to embeddings, chunking, re-ranking, prompts, or model → re-run all metrics → confirm improvement, catch regressions.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="Golden dataset">
+  <div class="kick">Day 3 · Evaluation</div>
+  <h2>The golden dataset — your source of truth</h2>
+  <p class="sub">Analogous to unit tests. Each entry: query → expected relevant docs → expected answer.</p>
+  <div class="grid g2">
+    <div class="card"><h3>Three ways to build it</h3><ul>
+      <li><b>Manual</b> — human-written cases</li>
+      <li><b>Production logs</b> — mine real user queries</li>
+      <li><b>Synthetic</b> — LLM-generated, then human-approved</li></ul></div>
+    <div class="card"><h3>Cover diverse query types</h3><ul>
+      <li>Summarization · comparison · procedural</li>
+      <li>Fact-based · deliberately <b>ambiguous</b></li></ul></div>
+  </div>
+  <div class="band"><b>Interview question:</b> “Evals are great but production is bad — what do you do?” → <b>Update the golden dataset</b>: mine failed production queries, human-review, add them, re-run evals. Every future version must pass.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="Precision & recall">
+  <div class="kick">Day 3 · Retrieval metrics</div>
+  <h2>Precision & recall</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Precision — correctness</h3>
+      <p style="font-family:'JetBrains Mono';font-size:.95em">relevant retrieved ÷ total retrieved</p>
+      <p class="mut">“Of everything you fetched, how much was relevant?” Low precision = noise sent to the LLM.</p>
+      <p>Retrieved 5, relevant 2 → <b>40%</b></p></div>
+    <div class="card"><h3>Recall — completeness</h3>
+      <p style="font-family:'JetBrains Mono';font-size:.95em">relevant retrieved ÷ total relevant in corpus</p>
+      <p class="mut">“Of all relevant info that exists, how much did you get?”</p>
+      <p>200 docs, 10 relevant; retrieved 5, of which 3 relevant → P = <b>60%</b>, R = <b>30%</b></p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="P/R trade-off">
+  <div class="kick">Day 3 · Retrieval metrics</div>
+  <h2>The precision–recall tug of war</h2>
+  <p class="sub">1,000 docs in the corpus, 100 of them relevant:</p>
+  <div class="grid g2">
+    <div class="card"><h3>Fetch all 1,000</h3><p>Recall = <b class="goodc">100%</b> · Precision = <b class="badc">10%</b></p><p class="mut">Perfect completeness, terrible noise: latency, cost, hallucination risk, the LLM drowns.</p></div>
+    <div class="card"><h3>Fetch exactly 1 relevant doc</h3><p>Precision = <b class="goodc">100%</b> · Recall = <b class="badc">1%</b></p><p class="mut">Perfectly clean, hopelessly incomplete — unacceptable in <b>medical or legal</b> domains, where recall wins.</p></div>
+  </div>
+  <div class="band">Both at 100% is mathematically possible (retrieve exactly the relevant set) — realistically, pushing one up pushes the other down.</div>
+</section>
+
+<section class="slide" data-day="3" data-t="@K, hit rate, MRR, NDCG">
+  <div class="kick">Day 3 · Retrieval metrics</div>
+  <h2>@K and the ranking metrics</h2>
+  <p class="sub">You only send top-K chunks to the LLM (typically 3, 5, or 10) — so measure at K.</p>
+  <div class="grid g4">
+    <div class="card"><h3>Precision@K</h3><p class="mut">relevant in top-K ÷ K</p></div>
+    <div class="card"><h3>Recall@K</h3><p class="mut">relevant in top-K ÷ all relevant</p></div>
+    <div class="card"><h3>Hit rate</h3><p class="mut">Binary: 1 if <b>any</b> relevant chunk retrieved, else 0.</p></div>
+    <div class="card"><h3>NDCG</h3><p class="mut">Graded relevance — not all relevant docs are <b>equally</b> relevant; weights by rank.</p></div>
+  </div>
+  <div class="card" style="margin-top:1.5vh"><h3>MRR — mean reciprocal rank</h3><p>Position of the <b>first</b> relevant doc → take 1/rank → average over queries. First-relevant at positions 4, 3, 1, 4 → MRR = mean(¼, ⅓, 1, ¼). <span class="mut">If MRR is already good, you may be able to skip re-ranking entirely.</span></p></div>
+</section>
+
+<section class="slide" data-day="3" data-t="Metrics demo">
+  <div class="kick">Day 3 · Demo</div>
+  <h2>Computing the metrics — what K reveals</h2>
+  <p class="sub">10-doc knowledge base, golden dataset of query → relevant doc IDs, run at K = 1, 3, 5.</p>
+  <div class="grid g3">
+    <div class="card stat"><div class="v">K=1</div><div class="l badc">Recall is low</div><div class="d">Too few docs fetched to cover all relevant ones</div></div>
+    <div class="card stat"><div class="v">K=3·5</div><div class="l badc">Precision is low</div><div class="d">Few docs are relevant → more retrieval = more noise</div></div>
+    <div class="card"><h3>Method notes</h3><ul>
+      <li>Average over all golden queries, compare to a threshold (e.g. 0.7)</li>
+      <li>Pick K from the <b>average number of relevant docs per query</b></li>
+      <li>Use multiple metrics — failure analysis reveals the true cause</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-day="3" data-t="Generation metrics">
+  <div class="kick">Day 3 · Generation metrics</div>
+  <h2>Faithfulness ≠ factual correctness</h2>
+  <table>
+    <tr><th>Metric</th><th>Measures</th><th>LLM judge?</th><th>Golden dataset?</th></tr>
+    <tr><td>Recall@K / Precision@K / MRR / hit rate / NDCG</td><td>Retrieval quality</td><td>No — pure math</td><td>Yes</td></tr>
+    <tr><td>Faithfulness</td><td>Answer grounded in the <b>retrieved context</b></td><td class="goodc">Yes</td><td>No</td></tr>
+    <tr><td>Factual correctness</td><td>Answer matches the <b>ground truth</b></td><td class="goodc">Yes</td><td class="goodc">Yes</td></tr>
+    <tr><td>Answer relevancy</td><td>Answer addresses the question</td><td class="goodc">Yes</td><td>No</td></tr>
+  </table>
+  <div class="band"><b>Interview classic:</b> retrieval says “7 weeks”, model answers “5 weeks” from its training prior → <b>unfaithful</b>, even if 5 happened to be true. Faithful = stuck to the retrieved context, true or not.</div>
+</section>
+
+<!-- ============ DAY 4 ============ -->
+<section class="slide divider" data-day="4" data-t="DAY 4">
+  <div class="dnum">04</div>
+  <h2>RAG evaluation comparison</h2>
+  <p class="sub">RAGAS, LLM-as-a-judge, GraphRAG implementation, three levels of ranking — and a definitive winner.</p>
+</section>
+
+<section class="slide" data-day="4" data-t="RAGAS">
+  <div class="kick">Day 4 · RAGAS</div>
+  <h2>RAGAS — RAG assessment, automated</h2>
+  <div class="grid g2">
+    <div class="card"><h3>LLM-as-a-judge</h3><p>Not every metric is computable with math — “is this answer relevant?” has no formula. RAGAS makes a <b>separate LLM call to judge</b>.</p><ul>
+      <li>Judge can be a small, cheap model</li>
+      <li class="badc">Same model judging its own output can be biased</li></ul></div>
+    <div class="card"><h3>Each eval sample needs 4 things</h3><ul>
+      <li><code>user_input</code> — the question</li>
+      <li><code>retrieved_contexts</code> — what the retriever returned</li>
+      <li><code>response</code> — the final agent answer</li>
+      <li><code>reference</code> — ground truth from the golden dataset</li></ul></div>
+  </div>
+  <div class="pills"><span class="pill">LLMContextPrecision</span><span class="pill">LLMContextRecall</span><span class="pill">Faithfulness</span><span class="pill">AnswerRelevancy</span><span class="pill">FactualCorrectness</span></div>
+</section>
+
+<section class="slide" data-day="4" data-t="Eval pipeline">
+  <div class="kick">Day 4 · Pipeline</div>
+  <h2>The evaluation pipeline</h2>
+  <p class="sub">Golden dataset of ~18–20 diverse test cases over the sample code project.</p>
+  <div class="flow">
+    <div class="fbox"><b>1 · Run agent</b><span>per test case</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>2 · Capture</b><span>extract ToolMessages = retrieved context</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>3 · Build samples</b><span>question · context · answer · reference</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>4 · ragas.evaluate()</b><span>judge LLM + embeddings</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>5 · Average</b><span>mean over test cases</span></div>
+  </div>
+  <div class="band">Evals run in <b>CI/CD, not on the live path</b> — the user never waits on them, so eval latency doesn’t matter. Metrics pass → ship the new RAG version. The eval scaffolding is <b>identical for every RAG type</b>; only the retriever differs.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Config effects">
+  <div class="kick">Day 4 · Results</div>
+  <h2>What the numbers proved</h2>
+  <div class="grid g2">
+    <div class="card good"><h3>chunk_size 256 → 1500</h3><p>Precision ↑ · Recall ↑ · Faithfulness ↑ · Relevancy ↑</p><p class="mut">Last week’s qualitative observation — now proven with numbers.</p></div>
+    <div class="card bad"><h3>k = 4 → k = 1</h3><p>Every metric ↓ — less retrieved context, as expected.</p><p class="mut">But no universal best: raising K raises latency, context size, and token cost.</p></div>
+  </div>
+  <div class="band">Changing embeddings (OpenAI ↔ HuggingFace) made only a <b>slight</b> difference. The vector DB choice matters little; <b>embedding model/dimension matters more</b> — and chunk size & K matter a lot.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Per-query results">
+  <div class="kick">Day 4 · Results</div>
+  <h2>No single RAG fits all queries</h2>
+  <table>
+    <tr><th>Query</th><th class="badc">Weak in</th><th class="goodc">Strong in</th></tr>
+    <tr><td>“Which file imports Task and Status?”</td><td>Semantic</td><td>Graph — near-perfect precision & recall</td></tr>
+    <tr><td>“billing error” (exact string)</td><td>—</td><td>Lexical / BM25</td></tr>
+    <tr><td>“user plans”, “permission denied”</td><td>Lexical</td><td>Semantic</td></tr>
+    <tr><td>“Trace the entire flow”</td><td>Semantic & lexical</td><td>Graph</td></tr>
+  </table>
+  <div class="band">This is <b>the</b> takeaway of the eval week: different query types are best served by different retrieval strategies — which is exactly why hybrid and agentic RAG exist.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Winner & loser">
+  <div class="kick">Day 4 · Results</div>
+  <h2>Across 9 variants, one winner</h2>
+  <p class="sub">Semantic (256 / 1500 / k=1), semantic+AST, lexical, graph, hybrid (HF / OpenAI, 256 / 1500) — averaged over the full golden dataset.</p>
+  <div class="grid g2">
+    <div class="card good stat"><div class="v">🏆 Hybrid</div><div class="l">chunk_size 1500</div><div class="d">Best numbers across the board — multiple retrievers + fusion wins on mixed query sets</div></div>
+    <div class="card bad stat"><div class="v">Lexical-only</div><div class="l">Worst overall</div><div class="d">Shines only on narrow exact-match queries; worst approach for faithfulness</div></div>
+  </div>
+  <div class="band">Left as an exercise: the hybrid runs used plain text splitting — <b>AST chunking would push the winner further</b>.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="GraphRAG implementation">
+  <div class="kick">Day 4 · GraphRAG</div>
+  <h2>GraphRAG, implemented</h2>
+  <div class="grid g2">
+    <div class="card"><h3>The graph</h3><ul>
+      <li><b>Nodes</b> = classes, functions, modules, files</li>
+      <li><b>Edges</b> = defines · imports · uses · calls · depends_on · inherits_from</li>
+      <li>Every relationship = <code>subject → predicate → object</code></li>
+      <li>In-memory via <b>NetworkX</b> now, Neo4j in the project</li></ul></div>
+    <div class="card"><h3>Three agents build & use it</h3><ul>
+      <li><b>Relationship extractor</b> — LLM reads each file, outputs typed relationships (structured <code>GraphDocument</code>)</li>
+      <li><b>Entity extractor</b> — pulls all entities</li>
+      <li><b>QA agent</b> — answers queries from graph context</li></ul>
+      <p class="mut">LLM-based extraction costs real tokens on big repos — hierarchical/incremental indexing mitigates.</p></div>
+  </div>
+  <div class="grid g3">
+    <div class="card stat"><div class="v">13</div><div class="l">files loaded</div></div>
+    <div class="card stat"><div class="v">202</div><div class="l">nodes</div></div>
+    <div class="card stat"><div class="v">260</div><div class="l">edges</div></div>
+  </div>
+</section>
+
+<section class="slide" data-day="4" data-t="3 levels of ranking">
+  <div class="kick">Day 4 · Ranking</div>
+  <h2>Three levels of ranking</h2>
+  <div class="grid g3">
+    <div class="card"><h3>1 · Retrieval ranking</h3><p class="mut"><b>Inside the store.</b> Vector DBs rank by cosine/dot product; lexical stores by BM25/TF-IDF. You never implement this.</p></div>
+    <div class="card"><h3>2 · Fusion</h3><p class="mut"><b>App side, no LLM.</b> Merge multiple ranked lists purely by rank arithmetic — standard algorithm: <b>RRF</b>. Never re-reads documents.</p></div>
+    <div class="card"><h3>3 · Re-ranking</h3><p class="mut"><b>App side, with a model.</b> Cross-encoders, ColBERT, LLM re-rankers <b>re-read</b> the candidates and re-order by true relevance.</p></div>
+  </div>
+  <div class="band">None of these stages is mandatory — skip fusion, skip re-ranking, use any subset. It’s a design decision measured by evals.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Production pipeline">
+  <div class="kick">Day 4 · Ranking</div>
+  <h2>The production retrieval pipeline</h2>
+  <div class="flow">
+    <div class="fbox"><b>Query</b></div><div class="farr">→</div>
+    <div class="fbox"><b>Parallel retrieval</b><span>vector + BM25 + graph</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>RRF fusion</b><span>~100 candidates</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Re-ranking</b><span>cross-encoder / LLM</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>Top 5–10</b><span>→ generation</span></div>
+  </div>
+  <div class="band">Worked example: 3 retrievers × 20 docs = 60 merged → ~20 to the re-ranker → top 5 for the answer. Why fuse at all? You never know in advance which retriever wins a given query — and you can’t send 100 docs to the LLM.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Ensemble retriever">
+  <div class="kick">Day 4 · Hybrid code</div>
+  <h2>Hybrid in code: EnsembleRetriever</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Setup</h3><ul>
+      <li>Dense retriever (HuggingFace or OpenAI embeddings, k = 2)</li>
+      <li><code>BM25Retriever</code> over the same chunks</li>
+      <li>LangChain <code>EnsembleRetriever(weights=[0.5, 0.5])</code> — <b>internally uses RRF</b></li></ul></div>
+    <div class="card"><h3>Tunable dimensions</h3><p class="mut">Which retrievers · chunk size & strategy · K per retriever · fusion weights · re-ranking on/off — every combination shifts the eval metrics, so measure.</p><p>Vary <b>one thing at a time</b>; keep everything else production-identical.</p></div>
+  </div>
+  <div class="band">Also: add the <b>middleware call limits in code</b>, not just on the LangSmith side — prevents runaway loops in every environment.</div>
+</section>
+
+<section class="slide" data-day="4" data-t="Claude Code vs Cursor">
+  <div class="kick">Day 4 · Q&A gems</div>
+  <h2>Two valid designs: Claude Code vs Cursor</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Claude Code</h3><p>Deliberately uses <b>no RAG index</b> — it greps/globs the repo live, every time.</p><p class="mut">Always fresh, zero index maintenance; pays with per-query scanning.</p></div>
+    <div class="card"><h3>Cursor</h3><p>Internally uses <b>these exact RAG techniques</b> — indexes the codebase.</p><p class="mut">Fast semantic lookup; pays with index freshness and storage.</p></div>
+  </div>
+  <div class="band">Both are production systems handling the same use case differently — the course’s founding point about trade-offs, made real. Also from Q&A: text-to-SQL is the pattern for dynamic DB queries — the LLM writes the query, don’t hard-code restrictive APIs.</div>
+</section>
+
+<!-- ============ DAY 5 ============ -->
+<section class="slide divider" data-day="5" data-t="DAY 5">
+  <div class="dnum">05</div>
+  <h2>RRF · HyDE · RAPTOR · context engineering</h2>
+  <p class="sub">The remaining RAG research directions — then the discipline that governs everything you send an LLM.</p>
+</section>
+
+<section class="slide" data-day="5" data-t="RRF internals">
+  <div class="kick">Day 5 · RRF</div>
+  <h2>RRF — reciprocal rank fusion, internals</h2>
+  <div class="grid g2">
+    <div class="card"><h3>The formula</h3>
+      <p style="font-family:'JetBrains Mono';font-size:1.05em;background:rgba(255,255,255,.06);padding:1.4vh 1vw;border-radius:12px">score(doc) = Σ 1 / (k + rank)</p>
+      <ul><li>Rank 1 matters more than 2 → use the <b>reciprocal</b></li>
+      <li>But 1/1 vs 1/2 is too steep — rank 2 isn’t “half as good”</li>
+      <li>Smoothing constant <b>k = 60</b> (convention): 1/61, 1/62, 1/70…</li></ul></div>
+    <div class="card"><h3>Why it’s loved</h3><ul>
+      <li>Considers rank <b>and cross-retriever agreement</b></li>
+      <li>No training, no LLM call — pure arithmetic</li>
+      <li>Works across dense, sparse, graph — anything that ranks</li></ul></div>
+  </div>
+  <div class="band"><b>Demo:</b> “How does the app enforce task limits per user?” — a chunk appearing in <b>both</b> lexical and semantic lists (<code>create task</code>) scored ≈ 0.03 vs ≈ 0.016 for single-list chunks. <b>Agreement boosts a chunk.</b></div>
+</section>
+
+<section class="slide" data-day="5" data-t="Agentic RAG full">
+  <div class="kick">Day 5 · Agentic RAG</div>
+  <h2>Agentic RAG — the full picture</h2>
+  <p class="sub">Any RAG pipeline where an extra LLM call makes a decision.</p>
+  <div class="grid g4">
+    <div class="card"><h3>Routing</h3><p class="mut">Which store — vector, Mongo, SQL, one of several vector DBs?</p></div>
+    <div class="card"><h3>Validation</h3><p class="mut">Post-retrieval “is this relevant?” loops — self/corrective RAG qualify as agentic.</p></div>
+    <div class="card"><h3>Decomposition</h3><p class="mut">Multi-step queries split into sub-queries by an extra call.</p></div>
+    <div class="card"><h3>Retrieve at all?</h3><p class="mut">The LLM may decide no retrieval is needed and answer directly.</p></div>
+  </div>
+  <div class="band"><b>Agentic vs hybrid (interview classic):</b> hybrid = all retrievers always fire, then fuse. Agentic = an LLM decides which fires. If the router picks multiple → it’s both. Production systems combine agentic + hybrid + corrective.</div>
+</section>
+
+<section class="slide" data-day="5" data-t="Router demo">
+  <div class="kick">Day 5 · Agentic RAG</div>
+  <h2>The router demo — agents inside tools</h2>
+  <div class="flow">
+    <div class="fbox"><b>Outer agent</b><span>“senior engineer — always retrieve before answering”</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>Retrieval tool</b><span>contains the router agent</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Router agent</b><span>“semantic for concepts, lexical for exact names”</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Chosen retriever</b><span>vector store or BM25</span></div>
+  </div>
+  <table>
+    <tr><th>Query</th><th>Router chose</th></tr>
+    <tr><td>“How does the app handle user authentication?”</td><td>Semantic — conceptual</td></tr>
+    <tr><td>“Where is billing error defined?”</td><td>Lexical — exact string</td></tr>
+    <tr><td>“Show me the PermissionPolicy class”</td><td>Lexical — exact class name</td></tr>
+  </table>
+  <div class="band">A tool is just a function — <b>it can contain another agent</b>. Decoupling responsibilities (outer answers, inner routes) is deliberate single-responsibility design; the supervisor + sub-agents pattern comes later in the course.</div>
+</section>
+
+<section class="slide" data-day="5" data-t="HyDE deep dive">
+  <div class="kick">Day 5 · HyDE</div>
+  <h2>HyDE — hypothetical document embeddings</h2>
+  <p class="sub">Paper: “Precise Zero-Shot Dense Retrieval without Relevance Labels.”</p>
+  <div class="flow">
+    <div class="fbox"><b>Vague query</b><span>“how does auth work?”</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>LLM writes a hypothetical answer</b><span>fake but plausible passage</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Embed the hypothetical</b><span>lands in a richer neighborhood</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Retrieve real docs</b><span>by similarity to it</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Answer from real docs</b><span>never from the fake one</span></div>
+  </div>
+  <div class="grid g2" style="margin-top:2vh">
+    <div class="card"><h3>Why it works</h3><p class="mut">Users write abstract, under-specified queries — you can’t force them to rephrase. The hypothetical document carries far more retrieval signal than the raw query.</p></div>
+    <div class="card bad"><h3>Trade-offs</h3><p class="mut">Can hallucinate, can occasionally hurt accuracy, adds token cost. Poor fit for code (too codebase-specific). Make it conditional — a decision call “is this query good enough?” → that combo is agentic RAG.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="5" data-t="RAPTOR">
+  <div class="kick">Day 5 · RAPTOR</div>
+  <h2>RAPTOR — tree-organized retrieval</h2>
+  <p class="sub">Recursive Abstractive Processing for Tree-Organized Retrieval. Problem: too many chunks → search is slow.</p>
+  <div class="grid g2" style="align-items:center">
+    <div class="svgwrap"><svg viewBox="0 0 360 200" width="100%">
+      <g font-size="11" text-anchor="middle">
+        <rect x="130" y="6" width="100" height="30" rx="8" fill="#1B2452" stroke="#5EE6A8"/><text x="180" y="25" fill="#EAEEFB">root summary</text>
+        <line x1="180" y1="36" x2="90" y2="70" stroke="#2B3670"/><line x1="180" y1="36" x2="270" y2="70" stroke="#2B3670"/>
+        <rect x="35" y="70" width="110" height="28" rx="8" fill="#151C41" stroke="#2B3670"/><text x="90" y="88" fill="#EAEEFB">customer-facing</text>
+        <rect x="215" y="70" width="110" height="28" rx="8" fill="#151C41" stroke="#2B3670"/><text x="270" y="88" fill="#EAEEFB">security / admin</text>
+        <line x1="90" y1="98" x2="50" y2="132" stroke="#2B3670"/><line x1="90" y1="98" x2="130" y2="132" stroke="#2B3670"/>
+        <line x1="270" y1="98" x2="230" y2="132" stroke="#2B3670"/><line x1="270" y1="98" x2="310" y2="132" stroke="#2B3670"/>
+        <rect x="15" y="132" width="70" height="26" rx="8" fill="#0F1430" stroke="#2B3670"/><text x="50" y="149" fill="#98A4CD">orders Σ</text>
+        <rect x="95" y="132" width="70" height="26" rx="8" fill="#0F1430" stroke="#2B3670"/><text x="130" y="149" fill="#98A4CD">products Σ</text>
+        <rect x="195" y="132" width="70" height="26" rx="8" fill="#0F1430" stroke="#2B3670"/><text x="230" y="149" fill="#98A4CD">auth Σ</text>
+        <rect x="275" y="132" width="70" height="26" rx="8" fill="#0F1430" stroke="#2B3670"/><text x="310" y="149" fill="#98A4CD">audit Σ</text>
+        <text x="180" y="185" fill="#5EE6A8">leaf chunks below each cluster</text>
+      </g></svg></div>
+    <div><ul>
+      <li><b>Build:</b> recursively cluster chunks by embedding; an LLM writes a summary per cluster; parents hold child summaries — repeat upward</li>
+      <li><b>Search:</b> semantic search against <b>summaries</b>, pick best cluster per level, drill down to leaf chunks</li>
+      <li><b>Store:</b> anything tree-friendly — SQLite works, graph DBs too</li>
+      <li><b>vs Graph RAG:</b> RAPTOR groups & summarizes (trees, no cycles); graphs model <b>relationships</b> (cycles allowed)</li></ul></div>
+  </div>
+</section>
+
+<section class="slide" data-day="5" data-t="PageIndex / vectorless">
+  <div class="kick">Day 5 · Vectorless</div>
+  <h2>PageIndex — vectorless, reasoning-based RAG</h2>
+  <p class="sub">The #1 trending GitHub repo that day. Core claim: “similarity does not mean relevance.”</p>
+  <div class="grid g2">
+    <div class="card"><h3>The mental model: a book’s table of contents</h3><p>Looking up SQL? You go to the <i>Databases</i> chapter — you <b>reason</b> from titles, you don’t compute similarity.</p><ul>
+      <li>Build: LLM summarizes each file/section → directory → file → chunk tree (demo: 34 chunks, <b>zero embeddings</b>)</li>
+      <li>Query: send TOC + query to the LLM → it reasons “probably section 3” → descend → leaf = the answer document</li></ul></div>
+    <div class="card"><h3>vs RAPTOR — know this cold</h3><p>Both build trees. RAPTOR traverses by <b>semantic search over summaries</b>; PageIndex uses <b>no embeddings at all</b> — pure LLM reasoning over the index, like a B+-tree traversal.</p>
+      <p class="mut"><b>Wins:</b> standard structured documents — legal docs full of cross-references. <b>Loses:</b> concepts scattered across distant sections, where semantic search shines. Build cost: LLM summarization of the corpus, once.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="5" data-t="Which technique when">
+  <div class="kick">Day 5 · Rapid-fire revision</div>
+  <h2>Which technique, when?</h2>
+  <table>
+    <tr><th>Situation</th><th>Reach for</th></tr>
+    <tr><td>Don’t know if queries need lexical, semantic, or graph</td><td>Agentic and/or hybrid RAG</td></tr>
+    <tr><td>Combining results from several retrievers</td><td>RRF fusion — then re-rank the survivors</td></tr>
+    <tr><td>Too many similar chunks, slow search</td><td>RAPTOR / hierarchical structure</td></tr>
+    <tr><td>Poor, abstract user queries</td><td>HyDE (or query rewriting / decomposition)</td></tr>
+    <tr><td>Any pipeline change at all</td><td>RAGAS evals vs the golden dataset</td></tr>
+    <tr><td>Production underperforms the evals</td><td>Mine production logs → grow the golden dataset</td></tr>
+  </table>
+  <div class="band">Skip fusion and re-rank directly? Possible — but you send far more docs to the model. <b>Fuse first (math, cheap), re-rank the survivors (model, expensive).</b> Fusion is the first interview round; re-ranking is the final.</div>
+</section>
+
+<section class="slide" data-day="5" data-t="What is context">
+  <div class="kick">Day 5 · Context engineering</div>
+  <h2>Context engineering begins</h2>
+  <p class="sub">Everything you pass the LLM per call is context. It’s limited, and every token costs money. Why manage it explicitly? One-word interview answer: LLMs are <b>stateless</b>.</p>
+  <div class="grid g4">
+    <div class="card"><h3>1 · System prompt</h3></div>
+    <div class="card"><h3>2 · Conversation history</h3></div>
+    <div class="card"><h3>3 · Retrieved context</h3></div>
+    <div class="card"><h3>4 · Tool outputs</h3></div>
+  </div>
+  <div class="card hero" style="margin-top:1.3vh"><h3>5 · The current user query</h3><p class="mut">Architectures layer these: static (prompt + query) → + memory → + RAG chunks → + tool outputs → everything together.</p></div>
+</section>
+
+<section class="slide" data-day="5" data-t="Lost in the middle">
+  <div class="kick">Day 5 · Context engineering</div>
+  <h2>Lost in the middle</h2>
+  <p class="sub">Paper: “Lost in the Middle: How Language Models Use Long Contexts.” Order matters.</p>
+  <div class="grid g2" style="align-items:center">
+    <div class="svgwrap"><svg viewBox="0 0 360 170" width="100%">
+      <polyline points="20,40 90,55 180,120 270,55 340,35" fill="none" stroke="#5EE6A8" stroke-width="3" stroke-linecap="round"/>
+      <g font-size="12" fill="#98A4CD" text-anchor="middle">
+        <text x="30" y="150">start</text><text x="180" y="150">middle</text><text x="330" y="150">end</text>
+        <text x="180" y="105" fill="#FF7A85">least attention</text>
+      </g>
+      <text x="14" y="22" font-size="12" fill="#EAEEFB">attention</text>
+    </svg></div>
+    <div>
+      <div class="card"><h3>Primacy effect</h3><p class="mut">Beginnings are privileged — training data opens with instructions, headings, intros. Learned bias.</p></div>
+      <div class="card" style="margin-top:1.2vh"><h3>Recency effect</h3><p class="mut">Ends are privileged — next-token prediction attends most to recent tokens. Architectural bias.</p></div>
+    </div>
+  </div>
+  <div class="band"><b>Practical rule:</b> put key instructions, the query, and critical facts at the start or end of the context — never buried in the middle.</div>
+</section>
+
+<section class="slide" data-day="5" data-t="5 context operations">
+  <div class="kick">Day 5 · Context engineering</div>
+  <h2>The five context operations</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Expansion</h3><p class="mut">Deliberately add context: HyDE; fetching a function <b>plus</b> its class and helpers.</p></div>
+    <div class="card"><h3>Compression</h3><p class="mut">Too many tokens? Summarize. Combine with expansion: pull everything, then shrink it.</p></div>
+    <div class="card"><h3>Selection</h3><p class="mut">Choose a subset without summarizing — fusion/re-ranking picking 10 of 100 is selection.</p></div>
+    <div class="card"><h3>Pruning</h3><p class="mut">Clean it: dedupe overlapping retriever results, drop stale outputs and irrelevant data.</p></div>
+    <div class="card"><h3>Ordering</h3><p class="mut">Reorder so important pieces sit at the beginning and end — exploit primacy/recency.</p></div>
+    <div class="card hero"><h3>Coming next</h3><p class="mut">Token budgeting (the HLD capacity-estimation of agentic systems) + memory: short-term vs long-term (episodic, semantic, procedural).</p></div>
+  </div>
+</section>
+
+<section class="slide" data-day="5" data-t="Memory preview">
+  <div class="kick">Day 5 · Memory</div>
+  <h2>Memory — the preview</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Short-term</h3><p>The memory of the <b>current chat/session</b> — one ChatGPT conversation.</p></div>
+    <div class="card"><h3>Long-term</h3><p>Persists <b>across sessions</b> — user preferences. ChatGPT remembering you’re a developer learning AI in a brand-new chat.</p><p class="mut">Sub-types next class: episodic · semantic · procedural.</p></div>
+  </div>
+  <div class="band">Validated student example — hierarchical chunking for logs: <b>L0</b> single log entries → <b>L1</b> grouped by transaction/thread ID → <b>L2</b> LLM-written per-file summaries.</div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="slide" data-day="0" data-t="The blueprint">
+  <div class="kick">Synthesis</div>
+  <h2>The master blueprint, five days later</h2>
+  <div class="flow">
+    <div class="fbox"><b>Raw code</b></div><div class="farr">→</div>
+    <div class="fbox"><b>AST slicer</b><span>structural chunks</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Vector DB</b><span>semantic</span></div>
+    <div class="fbox" style="margin-left:.6vw"><b>BM25 index</b><span>exact match</span></div>
+    <div class="fbox" style="margin-left:.6vw"><b>Neo4j graph</b><span>relationships</span></div>
+  </div>
+  <div class="flow">
+    <div class="fbox"><b>User query</b><span>+ HyDE if vague</span></div>
+    <div class="farr">→</div>
+    <div class="fbox hot"><b>LLM router</b><span>agentic, call limits</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>RRF fusion</b></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Re-ranker</b></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Ordered context</b><span>primacy / recency</span></div>
+    <div class="farr">→</div>
+    <div class="fbox"><b>Answer</b><span>+ self/corrective check</span></div>
+  </div>
+  <div class="band">And around all of it: <b>RAGAS evals against a growing golden dataset</b>, run in CI/CD on every change. That’s eval-driven development.</div>
+</section>
+
+<section class="slide divider" data-day="0" data-t="Closing">
+  <div class="kick">End of week — what’s next</div>
+  <h2>Open threads</h2>
+  <div class="pills" style="margin-top:2vh">
+    <span class="pill">Token budgeting</span><span class="pill">Memory: episodic · semantic · procedural</span><span class="pill">Persistence & incremental re-indexing</span><span class="pill">Multi-layer caching</span><span class="pill">Multi-agent architectures</span><span class="pill">Harness engineering</span><span class="pill solid">Capstone: a Claude-Code-style coding agent</span>
+  </div>
+  <p class="sub" style="margin-top:5vh;font-size:clamp(1.05rem,1.6vw,1.4rem)">There is no single correct solution.<br><b style="color:var(--acc)">Understand the trade-offs at every step.</b></p>
+</section>
+
+
+</div>
+<div class="hud">
+  <span id="count">1 / ?</span>
+  <div class="btns">
+    <button id="prev">←</button>
+    <button id="menu">Menu</button>
+    <button id="next">→</button>
+  </div>
+</div>
+<div id="toc"><h2 style="font-family:'Space Grotesk'">Table of contents</h2><div class="tgrid" id="tlist"></div></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const bar=document.getElementById('bar'),count=document.getElementById('count'),toc=document.getElementById('toc'),tlist=document.getElementById('tlist');
+function go(n){cur=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>s.classList.toggle('active',i===cur));bar.style.width=((cur+1)/slides.length*100)+'%';count.textContent=(cur+1)+' / '+slides.length;location.hash='s'+(cur+1);}
+slides.forEach((s,i)=>{const a=document.createElement('a');a.href='#s'+(i+1);a.innerHTML='<b>'+(i+1)+'</b>'+(s.dataset.t||'Slide');a.onclick=e=>{e.preventDefault();toc.classList.remove('open');go(i)};tlist.appendChild(a);});
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('menu').onclick=()=>toc.classList.toggle('open');
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(cur+1)}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1)}
+  else if(e.key==='Home')go(0);else if(e.key==='End')go(slides.length-1);
+  else if(e.key.toLowerCase()==='m')toc.classList.toggle('open');
+  else if(e.key==='Escape')toc.classList.remove('open');
+});
+let tx=null;
+addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)go(cur+(dx<0?1:-1));tx=null;});
+const h=parseInt((location.hash||'').replace('#s',''));go(isNaN(h)?0:h-1);
+</script>
+</body>
+</html>

@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Engineering — Hinglish Visual Notes</title>
+<style>
+:root{
+  --bg:#F4F6F3; --surface:#FFFFFF; --ink:#1B2420; --muted:#5C6B64; --line:#DCE3DE;
+  --acc:#C57A10; --acc-soft:#F6E7CC; --acc-ink:#8A5507;
+  --teal:#0E7C72; --teal-soft:#DCEEEC; --rose:#B34A3A; --rose-soft:#F3E1DD;
+  --chip:#EAEFEA; --code-bg:#EEF2EF;
+  --disp:"Bahnschrift","Segoe UI Variable Display","Segoe UI",Arial,sans-serif;
+  --body:"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:"Cascadia Mono",Consolas,"SF Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#101816; --surface:#17211E; --ink:#E9E6DC; --muted:#9AABA2; --line:#28352F;
+    --acc:#E8A83C; --acc-soft:#3A2E14; --acc-ink:#F0BE68;
+    --teal:#42BFB2; --teal-soft:#12302C; --rose:#E0826D; --rose-soft:#3A211B;
+    --chip:#1E2A26; --code-bg:#1C2723;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101816; --surface:#17211E; --ink:#E9E6DC; --muted:#9AABA2; --line:#28352F;
+  --acc:#E8A83C; --acc-soft:#3A2E14; --acc-ink:#F0BE68;
+  --teal:#42BFB2; --teal-soft:#12302C; --rose:#E0826D; --rose-soft:#3A211B;
+  --chip:#1E2A26; --code-bg:#1C2723;
+}
+:root[data-theme="light"]{
+  --bg:#F4F6F3; --surface:#FFFFFF; --ink:#1B2420; --muted:#5C6B64; --line:#DCE3DE;
+  --acc:#C57A10; --acc-soft:#F6E7CC; --acc-ink:#8A5507;
+  --teal:#0E7C72; --teal-soft:#DCEEEC; --rose:#B34A3A; --rose-soft:#F3E1DD;
+  --chip:#EAEFEA; --code-bg:#EEF2EF;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.65;font-size:16.5px}
+#pbar{position:fixed;top:0;left:0;height:3px;background:var(--acc);width:0;z-index:99;transition:width .15s linear}
+.wrap{display:grid;grid-template-columns:270px minmax(0,1fr);gap:0;max-width:1200px;margin:0 auto}
+aside{border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin}
+aside .brand{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-ink);margin-bottom:6px}
+aside .prog{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+aside .progtrack{height:6px;background:var(--chip);border-radius:3px;overflow:hidden;margin-top:5px}
+aside .progfill{height:100%;background:var(--teal);width:0;border-radius:3px;transition:width .3s}
+#toc{display:flex;flex-direction:column;gap:1px}
+#toc .part{font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px;padding-left:8px}
+#toc a{display:flex;gap:8px;align-items:baseline;color:var(--ink);text-decoration:none;font-size:13.5px;padding:5px 8px;border-radius:6px;line-height:1.35}
+#toc a:hover{background:var(--chip)}
+#toc a.active{background:var(--acc-soft);color:var(--acc-ink)}
+#toc a .n{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:20px}
+#toc a.read .n::after{content:" ✓";color:var(--teal)}
+main{padding:0 clamp(20px,5vw,64px) 90px;min-width:0}
+header.hero{padding:64px 0 40px;border-bottom:1px solid var(--line);margin-bottom:8px}
+header.hero .kicker{font-family:var(--disp);font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+header.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5.4vw,54px);line-height:1.06;margin:0 0 18px;text-wrap:balance}
+header.hero h1 em{font-style:normal;color:var(--acc)}
+header.hero p.sub{font-size:18px;color:var(--muted);max-width:62ch;margin:0 0 22px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px}
+.hero-stats span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13.5px;color:var(--muted)}
+.hero-stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+section.chapter{padding:46px 0 34px;border-bottom:1px solid var(--line)}
+.ch-head{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+.ch-no{font-family:var(--mono);font-size:12.5px;color:var(--acc-ink);background:var(--acc-soft);border-radius:6px;padding:3px 9px;white-space:nowrap}
+section.chapter h2{font-family:var(--disp);font-weight:700;font-size:clamp(23px,3vw,30px);line-height:1.15;margin:0;text-wrap:balance}
+section.chapter h3{font-family:var(--disp);font-weight:600;font-size:18.5px;margin:26px 0 8px}
+section.chapter p, section.chapter li{max-width:70ch}
+section.chapter p{margin:0 0 14px}
+ul,ol{padding-left:22px;margin:0 0 14px}
+li{margin-bottom:6px}
+b,strong{font-weight:600}
+.hl{color:var(--acc-ink);font-weight:600}
+code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);border-radius:5px;padding:2px 6px}
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+.diagram .cap{font-size:12.5px;color:var(--muted);margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+.lab{background:var(--surface);border:1.5px solid var(--teal);border-radius:12px;padding:20px;margin:20px 0;overflow-x:auto}
+.lab .lab-tag{font-family:var(--disp);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.note{background:var(--acc-soft);border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14.5px;max-width:74ch}
+.note .nt{font-family:var(--disp);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-ink);display:block;margin-bottom:4px}
+.warn{background:var(--rose-soft)}
+.warn .nt{color:var(--rose)}
+label.done{display:inline-flex;align-items:center;gap:9px;margin-top:18px;font-size:14px;color:var(--muted);cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 16px;user-select:none}
+label.done input{accent-color:var(--teal);width:16px;height:16px}
+label.done.checked{border-color:var(--teal);color:var(--teal)}
+/* flow diagrams */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:14px}
+.fbox{background:var(--chip);border:1px solid var(--line);border-radius:9px;padding:10px 14px;font-size:13.5px;text-align:center;min-width:90px;display:flex;flex-direction:column;justify-content:center}
+.fbox small{color:var(--muted);font-size:11.5px;line-height:1.3;margin-top:3px}
+.fbox.acc{background:var(--acc-soft);border-color:var(--acc)}
+.fbox.teal{background:var(--teal-soft);border-color:var(--teal)}
+.farr{align-self:center;padding:0 10px;color:var(--muted);font-size:17px;flex-shrink:0}
+.fcol{display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;align-items:center;flex-wrap:wrap;row-gap:12px}
+/* controls */
+button.btn{font-family:var(--disp);font-size:13.5px;letter-spacing:.03em;background:var(--teal);color:#fff;border:0;border-radius:8px;padding:9px 18px;cursor:pointer}
+:root[data-theme="dark"] button.btn, button.btn.dk{color:#08211E}
+button.btn:hover{filter:brightness(1.08)}
+button.btn.ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+button.btn.ghost.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink)}
+button.btn:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input[type=range]{accent-color:var(--acc);width:min(260px,100%)}
+input[type=text]{font-family:var(--body);font-size:15px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 12px;width:min(420px,100%)}
+.tokchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.tok{font-family:var(--mono);font-size:13px;padding:5px 9px;border-radius:7px;background:var(--teal-soft);border:1px solid var(--teal)}
+.tok small{display:block;font-size:10px;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:14px;max-width:460px}
+.brow{display:grid;grid-template-columns:86px 1fr 52px;gap:10px;align-items:center;font-size:13.5px}
+.brow .btrack{height:18px;background:var(--chip);border-radius:5px;overflow:hidden}
+.brow .bfill{height:100%;background:var(--teal);border-radius:5px;transition:width .35s}
+.brow .bv{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.grid8{display:grid;gap:3px;margin-top:14px;width:max-content}
+.grid8 .c{width:26px;height:26px;border-radius:4px;background:var(--chip);border:1px solid var(--line);transition:background .3s}
+.grid8 .c.cache{background:var(--teal-soft);border-color:var(--teal)}
+.grid8 .c.new{background:var(--acc-soft);border-color:var(--acc)}
+.grid8 .c.mask{background:var(--bg);border-style:dashed;opacity:.45}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+canvas.viz{background:var(--bg);border:1px solid var(--line);border-radius:10px;max-width:100%;touch-action:none;display:block}
+.vout{font-size:14px;margin-top:10px;color:var(--muted)}
+.vout b{color:var(--ink)}
+table.t{border-collapse:collapse;font-size:14px;margin:14px 0;min-width:480px}
+table.t th{font-family:var(--disp);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 14px 8px 0;border-bottom:2px solid var(--line)}
+table.t td{padding:8px 14px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.t td:first-child{font-weight:600;white-space:nowrap}
+.attn-words{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.attn-words span{padding:7px 12px;border-radius:8px;background:var(--chip);border:1px solid var(--line);font-family:var(--mono);font-size:14px;transition:all .4s}
+footer{padding:50px 0;color:var(--muted);font-size:14px}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  #toc{display:none}
+  aside.open #toc{display:flex}
+  aside .togg{display:block}
+}
+aside .togg{display:none;width:100%;text-align:left;margin-top:8px}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div id="pbar"></div>
+<div class="wrap">
+<aside id="side">
+  <div class="brand">AI Engineering Notes</div>
+  <div class="prog">Progress: <b id="pcount">0</b>/<span id="ptotal">0</span> chapters
+    <div class="progtrack"><div class="progfill" id="pfill"></div></div>
+  </div>
+  <button class="btn ghost togg" id="tocbtn">☰ Chapters dekho</button>
+  <nav id="toc" aria-label="Chapters"></nav>
+</aside>
+<main>
+
+<header class="hero">
+  <div class="kicker">Vector Databases + Large Language Models</div>
+  <h1>AI Engineering ka <em>poora course</em>, Hinglish mein — visually.</h1>
+  <p class="sub">Ye page tumhare lesson transcript ka har ek concept cover karta hai — embeddings se lekar HNSW, attention, KV cache, MoE, RAG, agents aur MCP tak. Har chapter mein simple Hinglish explanation, diagrams, aur interactive demos jo tum khud chhed kar samajh sakte ho. Jahan transcript mein galti ya purani baat thi, wahan <b>Correction/2026 Update</b> notes bhi diye hain.</p>
+  <div class="hero-stats">
+    <span><b id="chn">35</b> chapters</span>
+    <span><b>7</b> parts</span>
+    <span><b>9</b> interactive labs</span>
+    <span>Progress auto-save hota hai ✓</span>
+  </div>
+</header>
+
+<!-- ============ PART 1 ============ -->
+<section class="chapter" id="ch01" data-part="Part 1 · Setup & Problem">
+<div class="ch-head"><span class="ch-no">Ch 01</span><h2>Course kya hai, kya seekhoge</h2></div>
+<p>Ye course AI ke do sabse important building blocks pe focus karta hai: <span class="hl">Vector Databases</span> aur <span class="hl">Large Language Models (LLMs)</span>. Aaj-kal jitne bhi modern AI products hain — chat systems, search engines, recommendation engines — sab ke andar yehi do cheezein kaam kar rahi hain.</p>
+<ul>
+<li><b>Software engineer ho?</b> Toh seekhoge ki AI systems andar se kaise bane hote hain — actual algorithms.</li>
+<li><b>PM ya tech lead ho?</b> Toh samjhoge ki AI ki capabilities kya hain aur apni company mein kahan use kar sakte ho.</li>
+<li><b>Prerequisites:</b> koi nahi, bas neural networks aur software engineering ka thoda idea ho toh smooth chalega.</li>
+</ul>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox teal">Vector Databases<small>Data ko "meaning" ke hisaab se store &amp; search karna</small></div>
+  <div class="farr">+</div>
+  <div class="fbox acc">Large Language Models<small>Text samajhna aur generate karna</small></div>
+  <div class="farr">=</div>
+  <div class="fbox">Modern AI Systems<small>Chatbots, search, recommendations, agents</small></div>
+</div>
+<div class="cap">Course ka core equation: har AI product in dono ka combination hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch01"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch02" data-part="Part 1 · Setup & Problem">
+<div class="ch-head"><span class="ch-no">Ch 02</span><h2>Problem: E-commerce customer support ka kharcha</h2></div>
+<p>Socho tumhari ek t-shirt bechne wali website hai. Customers ke sawaal mostly do type ke hote hain: <i>"mera order status kya hai?"</i> aur <i>"delivery kab aayegi?"</i> Traditional solution — ek customer support team. Par yahan <span class="hl">sabse badi problem hai cost</span>:</p>
+<ul>
+<li>Zyada customers = zyada bada support team.</li>
+<li>Hiring, training, aur log chhod ke jaayein toh re-hiring — sab mehenga hai.</li>
+<li>Low-margin business ke liye yehi profit aur loss ka difference ban jaata hai.</li>
+</ul>
+<h3>Pehle ke jugaad (jo partially kaam karte hain)</h3>
+<ul>
+<li><b>Customer ko educate karo:</b> pehle hi bata do "delivery 7 din, max 30 din" — kuch queries khud hi khatam.</li>
+<li><b>Support team sasti jagah shift karo:</b> lower labor cost wale country mein.</li>
+</ul>
+<p>Par scale hone par automation zaroori hai. Idea: ek <span class="hl">AI chat assistant</span> jo simple queries khud answer kare, aur complex cases human ko forward kar de. Human loop mein rehta hai — final resolution ke liye.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Customer Query<small>"Order kahan hai?"</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">AI Assistant<small>Simple queries khud handle</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">Human Agent<small>Sirf complex cases</small></div>
+</div>
+<div class="cap">Poore course ka running example yehi hai: is AI assistant ko step-by-step build karna.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch02"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 2 ============ -->
+<section class="chapter" id="ch03" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 03</span><h2>Objects → Vectors: Embeddings kya hote hain</h2></div>
+<p>Core idea: <span class="hl">kisi bhi object (document, image, query) ko numbers ki ek list mein badal do</span> — aise numbers jo uska "meaning" capture karein. Is list ko <b>vector</b> ya <b>embedding</b> kehte hain.</p>
+<p>Intuition ke liye 2D se shuru karo. Har document ko do properties pe plot karo: <b>x-axis = length</b> (kitna lamba hai), <b>y-axis = kitna real/non-fictional hai</b>. Toh:</p>
+<ul>
+<li><b>Harry Potter</b> — lamba + fictional → right-bottom.</li>
+<li><b>Sherlock Holmes</b> — lamba, thoda believable → right, Harry Potter se upar.</li>
+<li><b>"Attention Is All You Need" paper</b> — chhota + 100% real → left-top.</li>
+</ul>
+<p>Jaise-jaise aur documents plot karoge, <b>clusters</b> banenge: textbooks ek jagah, short stories ek jagah, journals ek jagah. Matlab: <span class="hl">position = meaning</span>. Document ka meaning ek topological/spatial space mein aa gaya.</p>
+<h3>2 dimensions kaafi nahi</h3>
+<p>Duniya ke saare documents describe karne ke liye 2 properties kam hain. Popularity ke liye teesri dimension, publish year ke liye chauthi... aise toh infinite dimensions chahiye honge, jo impossible hai. Isliye hum dimensions ko ek <b>fixed number d</b> pe constrain karte hain — jaise <b>Llama mein d = 4096</b>. Bade models aur zyada dimensions use karte hain.</p>
+<p>Ab sawaal: infinitely complex object ko fixed d dimensions mein kaise map karein? Answer: <span class="hl">neural network</span>. Millions of documents feed karo, network deep patterns seekh leta hai. Input = text document, Output = <code>1D array of size 4096</code> — yehi vector hai. Similar objects → paas-paas ke vectors.</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 1 — Vector Space khud explore karo</div>
+<p style="font-size:14px;margin-bottom:10px">Orange dot (query) ko <b>drag karo</b>. Dekho kaun se documents sabse paas (relevant) hain — Euclidean distance live update hoti hai. Dashed circle = threshold <i>t</i> (iske andar wale documents "relevant" maane jaate hain).</p>
+<canvas id="vspace" class="viz" width="640" height="400" aria-label="2D vector space demo"></canvas>
+<div class="vout" id="vspaceOut"></div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch03"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch04" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 04</span><h2>Similarity, Training Loss aur Fine-tuning</h2></div>
+<p>Do vectors "similar" kab hain? Jab unke beech ka <b>distance kam</b> ho. Common measures:</p>
+<table class="t">
+<tr><th>Measure</th><th>Kya hai</th><th>Kab use hota hai</th></tr>
+<tr><td>Euclidean</td><td>Seedhi line ki doori (√Σ(a−b)²)</td><td>General similarity, clustering</td></tr>
+<tr><td>Manhattan</td><td>Grid ke saath-saath doori (Σ|a−b|)</td><td>High-dimension mein kabhi-kabhi behtar</td></tr>
+<tr><td>Cosine</td><td>Do vectors ke beech ka angle</td><td>Text similarity mein sabse popular</td></tr>
+</table>
+<h3>Model ko sikhaya kaise jaata hai</h3>
+<p>Training mein hum model ko reward/penalize karte hain. Example: ek object age=89 (senior) aur doosra age=21 (young) — ye bahut different hain, toh inke vectors <b>door</b> hone chahiye. Agar model ne paas rakh diya → <span class="hl">penalize</span> (loss badhta hai, backpropagation se weights change hote hain). Door rakha → reward. Iterate karte-karte network achha ho jaata hai. Isse <b>vector loss functions pe training</b> kehte hain (contrastive learning family).</p>
+<h3>Fine-tuning: apne use case ke liye</h3>
+<p>Mostly ready-made embedding libraries/models kaafi hain — pre-trained, well-tested. Par kabhi-kabhi customize karna padta hai. T-shirt website ka image search example: off-the-shelf model photo mein <b>model ka face, complexion, posture</b> sab vector mein daal dega — jo tumhare liye <i>noise</i> hai. Tumhe sirf t-shirt se matlab hai.</p>
+<ul>
+<li>Solution: network ko examples dikhao jahan expression/posture change hota hai <b>par output same rehta hai</b> → model irrelevant cheezein ignore karna seekh jaata hai.</li>
+<li>Cost: manual data banana + GPU training — time aur paisa lagta hai. Cloud providers ya khud TensorFlow/PyTorch se kar sakte ho.</li>
+</ul>
+<div class="note"><span class="nt">Yaad rakhne wali baat</span>Vector = distilled meaning. Raw image/document bada aur noisy hota hai; hum use compress kar ke aakhri layer ka 1D array nikaalte hain jo sirf matlab ki cheezein rakhta hai. Similar objects → similar (paas-paas) vectors.</div>
+<h3>Poora flow (RAG ka seed idea)</h3>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Company Documents</div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Embedding Model<small>docs → vectors</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Vector Store</div>
+</div>
+<div class="frow" style="margin-top:10px">
+  <div class="fbox">User Query</div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Same Model<small>query → vector</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Nearest docs dhoondo</div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">LLM<small>docs + query → answer</small></div>
+</div>
+<div class="cap">Query apne related documents ke paas map hoti hai → wahi docs LLM ko context ke roop mein dete hain.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch04"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch05" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 05</span><h2>Vector DB hi kyun? SQL/NoSQL kyun nahi?</h2></div>
+<p>Natural sawaal: relational databases already hain, unhi mein store kar lo na? Problem ye hai:</p>
+<ul>
+<li><b>Index 1D ke liye bane hain.</b> Naam pe index lagao → sorted data → binary search → fast. Par <span class="hl">4096 dimensions pe binary search kaise karoge?</span> Data format hi suit nahi karta.</li>
+<li><b>ACID aur fast updates ki zaroorat nahi.</b> Relational DBs transactions guarantee karte hain — vector search ko iski zaroorat hi nahi. Wo overhead waste hai.</li>
+</ul>
+<p>Vector databases do cheezon mein optimized hain:</p>
+<ol>
+<li><b>Compression:</b> vectors ko efficiently compress kar ke store karna.</li>
+<li><b>Fast n-dimensional search:</b> clustering se nearby vectors jaldi dhoondhna — poore cluster ko ek centroid point se represent kar dena.</li>
+</ol>
+<div class="note warn"><span class="nt">Trade-off dhyan rakho</span>Vector DBs <b>exactness ki guarantee nahi dete</b>. Financial systems (transactions, exact retrieval) ke liye ye bilkul galat choice hai. Ye search, recommendations, text-generation jaise <i>inexact</i> use cases ke liye hain — thodi accuracy chhod ke bahut speed milti hai.</div>
+<label class="done"><input type="checkbox" data-ch="ch05"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch06" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 06</span><h2>Kaun sa Vector DB chunein</h2></div>
+<p>Market mein options: <b>pgvector</b> (Postgres ke upar extension), <b>Milvus</b> (large-scale open source), aur managed solutions — GCP ka <b>Vertex AI</b>, AWS ka <b>OpenSearch</b>. Decision 3 factors pe:</p>
+<table class="t">
+<tr><th>Factor</th><th>Sawaal</th><th>Verdict</th></tr>
+<tr><td>Requirements</td><td>Vectors store + search ho sakta hai?</td><td>Sab mein ho jaata hai — tie</td></tr>
+<tr><td>Understanding</td><td>Andar se kaise kaam karta hai, pata hai? Kal requirements badlein toh optimize kar paoge?</td><td>OpenAI/Google closed-source → nahi. <b>pgvector open + well-documented → best</b></td></tr>
+<tr><td>Affordability</td><td>Setup + management cost?</td><td>Open source manage karna mehenga (engineers chahiye), managed service asaan par blackbox</td></tr>
+</table>
+<p>Course ka choice: <span class="hl">pgvector</span> — kyunki ye almost har scale pe kaam karta hai, Postgres ecosystem familiar hai, aur documentation solid hai. Milvus specifically very-large-scale ke liye hai.</p>
+<div class="note"><span class="nt">Correction (transcript fix)</span>Transcript mein "EG Vector" aur "MilversDB/MelvisDB" bola gaya — sahi naam <b>pgvector</b> aur <b>Milvus</b> hain. 2026 tak aur bhi popular options aa gaye hain: <b>Qdrant, Weaviate, Pinecone (managed), Chroma</b>, aur Postgres ecosystem mein pgvector ke saath <b>pgvectorscale</b>. Concepts sab mein same hain.</div>
+<label class="done"><input type="checkbox" data-ch="ch06"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch07" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 07</span><h2>Vectors store kaise hote hain: Compression, Clustering, Quantization</h2></div>
+<p>Naive search = query ko <b>har document</b> se compare karo = O(n). Scale pe ye bahut slow hai. Do techniques bachaati hain:</p>
+<h3>1. Compression (Scalar Quantization)</h3>
+<p>Har dimension normally 2 bytes (16 bits) leti hai. Usse ghata ke sirf <b>2 bits</b> kar do — values ko buckets mein baant do:</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">0–25 → <code>00</code></div>
+  <div class="farr"></div>
+  <div class="fbox">26–50 → <code>01</code></div>
+  <div class="farr"></div>
+  <div class="fbox">51–75 → <code>10</code></div>
+  <div class="farr"></div>
+  <div class="fbox">76–100 → <code>11</code></div>
+</div>
+<div class="cap">16 bits → 2 bits per dimension ≈ <b>~90% memory saving</b>. Distinct vectors bhi kam ho jaate hain → search chhoti space mein hoti hai → fast.</div>
+</div>
+<h3>2. Clustering</h3>
+<p>Saare vectors ko clusters (clumps) mein baanto. Har cluster ka ek <b>centroid vector</b> hota hai. Query aane par saare vectors se compare karne ke bajaye <b>sirf centroids se compare karo</b>, sahi cluster dhoondo, phir uske andar nearest documents dekho.</p>
+<p>In dono ka mix — pehle compress, phir compressed vectors ko cluster karna — vector DB world mein <span class="hl">quantization</span> (product quantization) kehlata hai. Memory footprint aur search time dono aur ghat jaate hain.</p>
+<div class="note warn"><span class="nt">Drawback</span>Compression mein information loss hota hai → perfect similarity match nahi milega. Clustering mein sabse relevant document galti se doosre cluster mein ja sakta hai → wo consider hi nahi hoga. Par scale pe ye trade-off worth hai: thodi accuracy ke badle zabardast speed.</div>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 2 — Quantization slider</div>
+<p style="font-size:14px;margin-bottom:10px">Bits per value ghatao aur dekho: memory bachti hai par detail (levels) kam hote jaate hain. Neeche ki strip dikhaati hai ki ek smooth value-range kitne coarse buckets mein toot jaati hai.</p>
+<label style="font-size:14px">Bits per value: <b id="qbitsLbl">16</b></label><br>
+<input type="range" id="qbits" min="0" max="4" step="1" value="4" aria-label="bits slider">
+<canvas id="qstrip" class="viz" width="620" height="56" style="margin-top:12px"></canvas>
+<div class="bars">
+  <div class="brow"><span>Memory</span><div class="btrack"><div class="bfill" id="qmem" style="background:var(--teal)"></div></div><span class="bv" id="qmemV"></span></div>
+  <div class="brow"><span>Detail</span><div class="btrack"><div class="bfill" id="qacc" style="background:var(--acc)"></div></div><span class="bv" id="qaccV"></span></div>
+</div>
+<div class="vout" id="qout"></div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch07"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch08" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 08</span><h2>Search Algorithms: Quad tree se HNSW tak</h2></div>
+<p>Relational DB wala indexing (ek column sort + binary search) yahan fail ho jaata hai kyunki distance <b>saari dimensions milakar</b> nikalti hai, kisi ek column se nahi. Toh kaunse algorithms kaam karte hain? Timeline dekho:</p>
+<h3>Quad tree → KD-tree</h3>
+<ul>
+<li><b>Quad tree:</b> 2D space ko recursively 4 regions mein todta hai. Query ke liye har level pe decide karo — top-left/top-right/bottom-left/bottom-right — jab tak ek vector na bache. Sirf 2D ke liye.</li>
+<li><b>KD-tree:</b> quad tree ka k-dimensional version. Har level pe koi ek dimension choose kar ke split karo (e.g. dim1 &lt; 3 left, ≥ 3 right), neeche jaate raho, aakhri cluster mein brute-force. <b>Problem:</b> space bahut leta hai, high dimensions mein accuracy/performance kharab (curse of dimensionality).</li>
+</ul>
+<h3>ANNOY (Spotify)</h3>
+<p><b>A</b>pproximate <b>N</b>earest <b>N</b>eighbors <b>O</b>h <b>Y</b>eah. Idea simple: do random points lo, space ko aadhe mein kaat do. Repeat karte raho jab tak clusters chhote na ho jaayein. Query aane par decision tree se neeche jao, apne cluster mein search karo. Expected O(log n), par practice mein performance average — <b>Spotify khud 2022 mein isse hat ke HNSW pe chala gaya</b>.</p>
+<h3>HNSW — aaj ka standard</h3>
+<p><b>Hierarchical Navigable Small World.</b> Naam lamba, idea simple — <span class="hl">skip list jaisa layered graph</span>:</p>
+<ol>
+<li><b>Level 0:</b> saare vectors, har vector apne k nearest neighbors se connected. Kuch "popular" vectors (jinse bahut log jude hain) hote hain.</li>
+<li>High-degree (popular) vectors ko <b>upar wale level pe promote</b> karo (thoda randomness ke saath). Repeat — upar jaate-jaate kam, representative vectors bachte hain.</li>
+<li><b>Search:</b> top layer se shuru karo. Current layer mein koi aur vector query ke zyada paas hai? Wahan jump karo. Nahi? Ek layer neeche utro. Neeche jaate-jaate space detailed hoti jaati hai, par tumne har layer pe dher saare vectors skip kar diye → <b>O(log n)</b>.</li>
+</ol>
+<div class="diagram">
+<svg viewBox="0 0 640 240" width="640" role="img" aria-label="HNSW layers">
+  <g fill="none" stroke="var(--line)"><line x1="30" y1="60" x2="610" y2="60"/><line x1="30" y1="130" x2="610" y2="130"/><line x1="30" y1="200" x2="610" y2="200"/></g>
+  <text x="30" y="45" fill="var(--muted)" font-size="12" font-family="var(--disp)">LEVEL 2 (kam vectors — highways)</text>
+  <text x="30" y="115" fill="var(--muted)" font-size="12" font-family="var(--disp)">LEVEL 1</text>
+  <text x="30" y="185" fill="var(--muted)" font-size="12" font-family="var(--disp)">LEVEL 0 (saare vectors — galiyan)</text>
+  <g fill="var(--teal)">
+    <circle cx="140" cy="60" r="7"/><circle cx="430" cy="60" r="7"/>
+    <circle cx="140" cy="130" r="6"/><circle cx="300" cy="130" r="6"/><circle cx="430" cy="130" r="6"/><circle cx="540" cy="130" r="6"/>
+    <circle cx="80" cy="200" r="5"/><circle cx="140" cy="200" r="5"/><circle cx="200" cy="200" r="5"/><circle cx="260" cy="200" r="5"/><circle cx="300" cy="200" r="5"/><circle cx="370" cy="200" r="5"/><circle cx="430" cy="200" r="5"/><circle cx="480" cy="200" r="5"/><circle cx="540" cy="200" r="5"/><circle cx="590" cy="200" r="5"/>
+  </g>
+  <circle cx="480" cy="200" r="10" fill="none" stroke="var(--acc)" stroke-width="2.5"/>
+  <text x="465" y="228" fill="var(--acc-ink)" font-size="12" font-weight="bold">target</text>
+  <g stroke="var(--acc)" stroke-width="2.5" fill="none" stroke-dasharray="6 5">
+    <path d="M140,60 L430,60 L430,130 L540,130 L540,200 L480,200"/>
+  </g>
+  <text x="95" y="64" fill="var(--acc-ink)" font-size="12" font-weight="bold">start</text>
+</svg>
+<div class="cap">Upar ki layers = express highways (bade jumps), neeche ki layers = local galiyan (exact search). Har level pe zyada-tar vectors skip ho jaate hain.</div>
+</div>
+<h3>IVF — Inverted File Index</h3>
+<p>Very large scale ke liye: k-means se document vectors ko clusters mein baanto, har cluster ka centroid rakho. Query → nearest centroid(s) dhoondo → sirf unhi clusters mein search karo. Parameter <code>k</code> (kitne clusters search karne hain) tunable hai — zyada k = zyada accurate, zyada slow. <b>Drawback:</b> ho sakta hai centroid door ho par uske cluster mein tumhara asli nearest vector ho — wo miss ho jaayega.</p>
+<div class="note"><span class="nt">Big picture</span>Ye sab <b>Approximate Nearest Neighbor (ANN)</b> algorithms hain — approximation se accuracy thodi girti hai, par memory aur speed ka fayda bahut bada hai. Production mein aaj sabse common: <b>HNSW</b> (pgvector, Qdrant, Weaviate sab mein) aur <b>IVF+PQ</b> (billions-scale, FAISS/Milvus).</div>
+<label class="done"><input type="checkbox" data-ch="ch08"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch09" data-part="Part 2 · Vector Databases">
+<div class="ch-head"><span class="ch-no">Ch 09</span><h2>Case Study: Milvus ki internal architecture</h2></div>
+<p>Milvus ek popular open-source vector DB hai (~32k+ GitHub stars, kaafi companies use karti hain). Iski architecture dekh ke samajh aata hai ki scalable vector DB ke <b>engineering decisions</b> kaise dikhte hain. Write ka safar:</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">SDK / Client<small>ek line ka insert call</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Load Balancer<small>kaunsa node? even distribution</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Proxy<small>query ka type pehchano</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">Coordinators<small>Root / Data / Query</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Worker Nodes<small>Data / Query / Index nodes</small></div>
+</div>
+<div class="cap">Teen coordinators: <b>Root</b> (DDL — schema/table changes), <b>Data</b> (insert/update/delete), <b>Query</b> (fetch). Har request apne type ke coordinator ke paas jaati hai.</div>
+</div>
+<h3>Andar kya chal raha hai</h3>
+<ul>
+<li><b>Data nodes:</b> writes lete hain; data periodically compact ho kar files (S3/HDFS) mein jaata hai — sorted string tables jaisa.</li>
+<li><b>Index nodes:</b> in files se index banate hain (HNSW ya tumhara chosen algorithm) — index files ke cache jaise.</li>
+<li><b>Query nodes:</b> sirf data fetch pe focused — ek cache ki tarah, Kafka se constantly update hote rehte hain.</li>
+<li><b>Kafka cluster:</b> writes ke events data nodes aur query nodes dono ko pahunchata hai — persistence + real-time updates.</li>
+<li><b>Consistency:</b> default eventual (mostly kaafi hai); strong consistency ka option bhi hai — data persist hone ke baad hi query nodes padh sakte hain.</li>
+</ul>
+<p><b>Achhi baat:</b> separation of concerns — har cheez independently scale hoti hai (writes ke liye data nodes badhao, reads ke liye query nodes). <b>Criticism (course instructor ki bhi):</b> har coordinator ek <span class="hl">single point of failure</span> hai — ye design smell hai. Baaki sab ek normal distributed database jaisa hi hai.</p>
+<div class="note"><span class="nt">Takeaway</span>Vector DB mein <b>koi magic nahi hai</b> — wahi load balancers, proxies, message queues, compaction, caching. Fark sirf itna: store hone wala data <i>vectors</i> hai aur indexes <i>HNSW/IVF</i> jaise ANN structures hain. (Ye chapter skip-able hai agar system design basics nahi aate.)</div>
+<label class="done"><input type="checkbox" data-ch="ch09"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 3 ============ -->
+<section class="chapter" id="ch10" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 10</span><h2>LLM ka black box: Next-token prediction</h2></div>
+<p>LLM ko text do, wo text wapas deta hai. Andar kya hai? Ek <span class="hl">neural network jo millions of documents pe train hua hai</span> aur bas ek kaam mein expert hai: <b>"agla word/token kya hoga?"</b> predict karna.</p>
+<p>Wo ek token nikaalta hai, phir usko input mein jodkar agla token predict karta hai, phir agla... isi loop se poora essay, code, ya answer ban jaata hai. "I went to the mall, continue the story" bolo — model story ke tokens ek-ek karke generate karega.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">"I went to the"</div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">LLM<small>probability nikaalo</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">"mall" (72%)<small>"park" (14%) · "gym" (6%)…</small></div>
+  <div class="farr">↻</div>
+  <div class="fbox">Output input mein judta hai, loop repeat</div>
+</div>
+<div class="cap">Autoregressive generation: har naya token pichle sab tokens ko dekh ke predict hota hai.</div>
+</div>
+<div class="note"><span class="nt">2026 Update</span>2022 ke models sirf simple text-prediction karte the. Ab (GPT/o-series, DeepSeek-R1, Claude, Gemini) models mein <b>reasoning capabilities</b> bhi hain — wo answer se pehle "soch" sakte hain. Wo aage Part 6 mein cover hai; base mechanism ab bhi yehi next-token prediction hai.</div>
+<label class="done"><input type="checkbox" data-ch="ch10"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch11" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 11</span><h2>Tokenization: Text ko tukdon mein todna</h2></div>
+<p>Model raw text nahi padhta. Pehle text ko <b>tokens</b> mein toda jaata hai — words ke tukde. <code>catching</code> = <code>catch</code> + <code>ing</code>, <code>balling</code> = <code>ball</code> + <code>ing</code>. Kabhi-kabhi "George R.R. Martin" jaisa naam ek hi token ban jaata hai. Har token ko ek <b>unique ID</b> milti hai — in IDs ka set model ki <span class="hl">vocabulary</span> hai.</p>
+<p><b>Flow:</b> text → tokens → IDs → model → output IDs → decode → text.</p>
+<h3>Raw text seedha kyun nahi dete?</h3>
+<ul>
+<li><b>Compression:</b> character-by-character padhne se sequence bahut lambi ho jaati hai. Attention ka cost <b>O(n²)</b> hai jahan <b>n = sequence ke tokens ki count</b> — toh jitne kam tokens, utna sasta.</li>
+<li><b>Meaning:</b> <code>catch</code> token ka apna inherent matlab hai (cricket ho ya fishing), <code>ing</code> ka matlab hai "abhi ho raha hai". Tokens meaning ke natural units hain.</li>
+<li><b>Separation of concerns:</b> tokenization (encoding/decoding) aur LLM alag-alag rakhe jaate hain, taaki tokenizer independently improve ho sake. Algorithms: <b>Byte Pair Encoding (BPE)</b> sabse common; Meta ka <b>Byte Latent Transformer</b> naya research hai jo tokenizer hata ke bytes pe kaam karta hai.</li>
+</ul>
+<div class="note"><span class="nt">Correction (transcript fix)</span>Transcript mein bola gaya "attention O(n²) hai, n = vocabulary size" — ye galat hai. <b>n = input sequence ki length (tokens)</b> hoti hai, vocabulary size nahi. Tokenization sequence chhota karta hai, isliye attention sasta padta hai.</div>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 3 — Tokenizer khud chalao</div>
+<p style="font-size:14px;margin-bottom:10px">Koi bhi sentence likho — simplified BPE-style splitting dekho (real tokenizers zyada smart hote hain, par idea yehi hai):</p>
+<input type="text" id="tokIn" value="I am catching the ball while running" aria-label="tokenizer input">
+<div class="tokchips" id="tokOut"></div>
+<div class="vout" id="tokStats"></div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch11"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch12" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 12</span><h2>Training: Model seekhta kaise hai (aur kitna mehenga hai)</h2></div>
+<p>Training data = high-quality sources: arXiv research papers, GitHub ka open-source code, Wikipedia. Web crawlers data laate hain, HTML/PDF parse hota hai, tokenize hota hai, aur phir:</p>
+<ol>
+<li>Model ko sentence do: <i>"I went to the mall"</i>.</li>
+<li>"I" ke baad kya aayega? Model probabilities deta hai: "went" 60%, "am" 20%...</li>
+<li>Sahi predict kiya → <b>reward</b>; galat → <b>penalize</b> (backpropagation se weights adjust).</li>
+<li>Trillions of tokens pe ye repeat karo → model sentences ki structure mein expert ban jaata hai.</li>
+</ol>
+<h3>Kharcha kitna?</h3>
+<ul>
+<li><b>DeepSeek (V3, 2024-25):</b> claim ~$5.5M sirf GPU/electricity cost ka. <b>Llama:</b> isi order ke millions. Ye sirf <i>compute</i> cost hai — hardware (GPUs/TPUs) acquire karna alag se bahut bada investment hai.</li>
+<li>Frontier models (GPT-4 class aur aage) ka असली total cost <b>$100M+</b> estimate hota hai.</li>
+</ul>
+<div class="note warn"><span class="nt">Practical advice</span>Startup ya mid-size company ho? <b>Apna foundational model mat banao.</b> Ye apna database banane jitna (ya usse zyada) mushkil hai. Existing models use karo — open-weight (Llama, DeepSeek-R1, Qwen, Mistral) ya APIs (OpenAI, Anthropic, Google).</div>
+<label class="done"><input type="checkbox" data-ch="ch12"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch13" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 13</span><h2>RAG: Retrieval Augmented Generation</h2></div>
+<p>Ab dono sections jud gaye. Hamara AI support system aise kaam karta hai:</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Customer Query<small>"Delivery kab tak?"</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Vector DB<small>Relevant company docs <b>Retrieve</b> karo</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Query + Docs<small>Context <b>Augment</b> hua</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">LLM<small>Answer <b>Generate</b> karo</small></div>
+</div>
+<div class="cap">R-A-G: Retrieve → Augment → Generate. Naam mein hi poora recipe hai.</div>
+</div>
+<p>Simple request-response se RAG ke answers <span class="hl">kaafi behtar hote hain</span>, kyunki model ke paas tumhari company ka असली data (policies, order info, docs) context mein hota hai — wo guess nahi karta. Hallucinations kam, accuracy zyada.</p>
+<label class="done"><input type="checkbox" data-ch="ch13"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch14" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 14</span><h2>Accuracy badhao: Self-validation, System Prompt, Few-shot</h2></div>
+<p>Engineer ke naate teen cheezein chahiye: <b>accurate responses</b>, <b>kam cost</b>, <b>achha UX</b>. Pehle accuracy — hallucination rokne ke teen hathiyaar:</p>
+<h3>1. Self-validation</h3>
+<p>Model se answer generate karwao, phir usi se poochho: <i>"kya ye sahi hai?"</i> Interesting fact: <span class="hl">models evaluate karne mein generate karne se behtar hote hain</span> — jaise insaan ke liye painting banana mushkil hai par painting achhi hai ya nahi, batana asaan. Answer dene se pehle ye extra check laga do.</p>
+<h3>2. System Prompt (Prompt Engineering)</h3>
+<p>Model ko batao <b>wo kaun hai</b>: "Tum ek customer support executive ho..." Ye <b>system prompt</b> hai (user prompt = actual sawaal). LLMs general trained hote hain — koi bhi personality le sakte hain. Personality restrict karo → response quality upar.</p>
+<h3>3. Few-shot Prompting</h3>
+<p>Query ke saath <b>similar solved examples</b> bhi bhejo — "delivery late ho toh kya bolte hain" ke 2-3 real Q&A pairs. Model ko format + behaviour dono samajh aa jaata hai. (Zero-shot = koi example nahi; few-shot = kuch examples.)</p>
+<div class="diagram">
+<div class="fcol">
+<div class="frow"><div class="fbox acc" style="min-width:150px">System Prompt<small>"Tum support executive ho, politely jawab do"</small></div><div class="farr">+</div><div class="fbox" style="min-width:130px">Few-shot Examples<small>2-3 solved Q&amp;A</small></div><div class="farr">+</div><div class="fbox teal" style="min-width:120px">Retrieved Docs<small>RAG context</small></div><div class="farr">+</div><div class="fbox" style="min-width:110px">User Query</div></div>
+<div class="frow"><div class="farr" style="padding-left:40%">⬇ sab milakar ek prompt</div></div>
+<div class="frow"><div class="fbox" style="min-width:200px">LLM → Answer → Self-validation check → User</div></div>
+</div>
+<div class="cap">Production-grade prompt ki anatomy. Har layer quality badhaati hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch14"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch15" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 15</span><h2>Cost ghatao: Semantic caching, chhote models, kam tokens</h2></div>
+<p>LLM APIs mehengi hain (transcript ke time ~2¢/query; scale pe lakhs ka bill). Normal caching kaam nahi karti kyunki: CDN pe model nahi rakh sakte, aur server string-match se cache nahi kar sakta — <i>"how long will delivery take"</i> aur <i>"expected delivery time please"</i> strings alag hain par <b>matlab same</b> hai. Solutions:</p>
+<h3>1. Semantic caching (vectors as cache keys)</h3>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">New Query</div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Vector banao</div>
+  <div class="farr">➜</div>
+  <div class="fbox">Purani query ka vector paas hai?</div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">Haan → cached answer<small>LLM call bach gayi 💰</small></div>
+</div>
+<div class="cap">Queries ko vectors mein convert karke cache karo — same-meaning queries ek hi cached response reuse karti hain. Repetitive support queries pe massive saving.</div>
+</div>
+<h3>2. Sabse sasta model jo kaam kar de</h3>
+<p>Automated support queries ko deep reasoning nahi chahiye. <b>Chhota model = sasta + fast + kam memory.</b> Complex case? User human se baat kar hi sakta hai. (Aaj ke terms mein: har query pe frontier model mat lagao — Haiku/mini/flash class models se shuru karo.)</p>
+<h3>3. Tokens kam bhejo</h3>
+<p>Cost tokens ke proportional hai. Poora document mat bhejo — document ke <b>paragraphs ko bhi vectors bana ke store karo</b>, aur sirf wo paragraph bhejo jo query se match karta hai (chunking). Chhota system prompt, chhota context = same quality, kam paisa.</p>
+<h3>4. Rate limiting (last resort)</h3>
+<p>Per-user ya per-API limits — stopgap hai, quality solution nahi, par system collapse hone aur paisa khatam hone se bachaata hai.</p>
+<div class="note"><span class="nt">2026 Update</span>Ab providers khud bhi madad karte hain: <b>prompt caching</b> (same prefix dubara bhejo toh 90% tak sasta), <b>batch APIs</b> (50% discount), aur bahut capable chhote models. Par semantic caching + chunking + right-sizing wale principles ab bhi utne hi zaroori hain.</div>
+<label class="done"><input type="checkbox" data-ch="ch15"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch16" data-part="Part 3 · LLM Basics">
+<div class="ch-head"><span class="ch-no">Ch 16</span><h2>UX aur Safety: Context, Agents ka intro, PII protection</h2></div>
+<p><b>Accuracy ≠ UX.</b> Accuracy = sahi hona; UX = user ko wahi dena jo wo dhoondh raha hai. User poochhe "is t-shirt ka size kya hai?" — असली sawaal hai <i>"mujhe fit hogi kya?"</i>. Aur conversation ka context banaye rakhna zaroori hai: "koi discount hai?" ka matlab hai <b>isi t-shirt pe</b> discount, general discounts nahi.</p>
+<p>User flows (marketing → lead → conversion → recommendation) ko AI mein map karne ka best tareeka: <span class="hl">AI agents</span> — jo user ki current state dekh ke sahi response dete hain. (Detail mein Part 7 mein. Frameworks: Amazon Bedrock Agents; OpenAI ka Swarm — jo ab <b>OpenAI Agents SDK</b> ban chuka hai.)</p>
+<h3>Customer ko abuse/leakage se bachao</h3>
+<ul>
+<li><b>Data leakage:</b> user ki query private hai. Queries/responses store karte ho toh <b>anonymize karo</b> — credit card, email jaisi cheezein regex/PII-detection se hatao.</li>
+<li>System logs aur saved queries mein <b>koi personally identifiable information (PII) nahi</b> honi chahiye.</li>
+<li>Model ka khud abusive hona rare hai (training docs clean hain), par output filtering phir bhi rakho.</li>
+</ul>
+<div class="note"><span class="nt">Milestone 🎉</span>Yahan tak: accurate + cost-effective + achhe UX wala AI support system ban gaya. Support team same headcount pe kai guna queries handle kar sakti hai. Ab andar ghusenge — attention aur transformers.</div>
+<label class="done"><input type="checkbox" data-ch="ch16"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 4 ============ -->
+<section class="chapter" id="ch17" data-part="Part 4 · Attention & Transformer">
+<div class="ch-head"><span class="ch-no">Ch 17</span><h2>Attention ka intuition: "Crane" wala example</h2></div>
+<p>Word <b>crane</b> ka matlab kya hai? Akele mein — pata nahi. Par sentence mein turant clear ho jaata hai:</p>
+<ul>
+<li><i>"The crane damaged its <b>wings</b> while <b>flying</b>"</i> → पक्षी (bird) 🐦</li>
+<li><i>"The crane has an <b>arm</b> made of <b>steel</b>"</i> → machine 🏗️</li>
+<li><i>"They had to crane their <b>neck</b>"</i> → body posture</li>
+</ul>
+<p>Tumne matlab kaise nikala? <b>Aas-paas ke words dekh ke.</b> Yehi kaam <span class="hl">attention mechanism</span> karta hai. Problem ye hai: tokenizer dono sentences mein "crane" ko <b>same token ID → same starting vector</b> deta hai. Context vector mein nahi hota.</p>
+<h3>Attention kya karta hai</h3>
+<ol>
+<li>Sentence ke saare words ka ek <b>n×n similarity matrix</b> banao (har word ka har word se score — cosine similarity jaisa).</li>
+<li>"crane" ke liye scores: <code>the</code>→0, <code>crane</code>→1, <code>damaged</code>→0.5, <code>wings</code>→high, <code>flying</code>→high.</li>
+<li>Ab crane ke vector mein weighted push do: <code>crane + 0.5×wings + 0.5×flying</code> → crane ka vector <b>bird-meaning ki taraf khisak jaata hai</b>.</li>
+</ol>
+<p>Result: har word ke vector mein uske sentence ka <b>contextual information embed</b> ho gaya. Sirf crane nahi — "arm" bhi crane ke context mein "metal arm" ban jaata hai, human arm nahi.</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 4 — Attention khud dekho</div>
+<p style="font-size:14px;margin-bottom:10px">Sentence choose karo aur dekho "crane" kis word pe kitna attention deta hai — aur uska meaning kis taraf khinchta hai:</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+  <button class="btn ghost on" id="attnS1">🐦 wings/flying wala</button>
+  <button class="btn ghost" id="attnS2">🏗️ arm/steel wala</button>
+</div>
+<div class="attn-words" id="attnWords"></div>
+<div class="bars" id="attnBars"></div>
+<div class="vout" id="attnVerdict"></div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch17"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch18" data-part="Part 4 · Attention & Transformer">
+<div class="ch-head"><span class="ch-no">Ch 18</span><h2>Attention ka math: Q, K, V, Softmax, Temperature</h2></div>
+<p>Ab wahi cheez mathematically. Matrix ke <b>rows = queries (Q)</b> — "main kis word ke liye attention dekh raha hoon", aur <b>columns = keys (K)</b> — "wo word mujhe kitna affect karta hai".</p>
+<ol>
+<li>n words, har word ka d-dimension vector → Q matrix hai <code>n×d</code>, K bhi <code>n×d</code>.</li>
+<li><code>Q × Kᵀ</code> (n×d · d×n) = <b>n×n similarity matrix</b>.</li>
+<li><b>Scale down:</b> √d se divide karo — warna values ke bade hills/valleys ban jaate hain, training unstable hoti hai.</li>
+<li><b>Softmax:</b> values ko exponential se smooth probabilities mein badlo (har row ka sum 1).</li>
+<li>Is attention matrix ko <b>V (values, n×d)</b> se multiply karo → har word ka vector "sahi force" se push hota hai → n context-aware vectors.</li>
+</ol>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox"><code>Q·Kᵀ</code><small>similarity scores</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox"><code>÷ √d</code><small>scaling</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox"><code>softmax</code><small>probabilities</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox teal"><code>× V</code><small>context-pushed vectors</small></div>
+</div>
+<div class="cap">Attention(Q,K,V) = softmax(QKᵀ/√d)·V — "Attention Is All You Need" (2017) ka famous formula.</div>
+</div>
+<h3>Ek nahi, stack of transformers</h3>
+<p>Attention ke baad ye vectors ek chhote <b>feed-forward network (2 layers)</b> se guzarte hain jo next word predict karta hai. Galat prediction → backpropagation → weights update. Aur ye poora block (attention + FFN) <b>ek transformer layer</b> hai — models mein aise <b>12 se 96+ layers stack</b> hote hain. Har layer ka output agli layer ka input. Aakhri layer ke embeddings pe linear function chala ke sabse likely next token ki probability milti hai.</p>
+<h3>Greedy vs Temperature</h3>
+<p>Hamesha highest-probability token chunna = <b>greedy</b> (boring, repetitive). <span class="hl">Temperature</span> randomness laati hai — kabhi 2nd ya 3rd best token bhi chun liya jaata hai, isliye same prompt pe alag-alag essays milte hain.</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 5 — Temperature se khelo</div>
+<p style="font-size:14px;margin-bottom:10px"><i>"The crane damaged its wings while ___"</i> — model ke paas ye options hain. Temperature ghumao aur dekho probabilities kaise badalti hain, phir sample karo:</p>
+<label style="font-size:14px">Temperature: <b id="tempLbl">1.0</b> <span style="color:var(--muted);font-size:12.5px" id="tempMood"></span></label><br>
+<input type="range" id="tempSlider" min="0.1" max="2" step="0.1" value="1" aria-label="temperature">
+<div class="bars" id="tempBars"></div>
+<button class="btn" id="tempSample" style="margin-top:12px">🎲 Next token sample karo</button>
+<div class="tokchips" id="tempOut"></div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch18"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch19" data-part="Part 4 · Attention & Transformer">
+<div class="ch-head"><span class="ch-no">Ch 19</span><h2>Transformer architecture detail: GPT = Decoder-only + Masking</h2></div>
+<p>"Attention Is All You Need" paper ke famous diagram mein left side <b>encoder</b> hai, right side <b>decoder</b>. GPT jaisi models <span class="hl">purely decoder architecture</span> use karti hain — encoder wala hissa aur beech ka cross-attention block hata do, bacha: masked multi-head attention + feed-forward network.</p>
+<h3>Masked attention: training ka jugaad</h3>
+<p>Sentence: <i>"my family member passed away"</i>. Model ko sikhaana hai ki har prefix ke baad kya aata hai:</p>
+<ul>
+<li>"my" → "family" predict karo</li>
+<li>"my family" → "member" predict karo</li>
+<li>"my family member" → "passed" predict karo ... aur aage bhi</li>
+</ul>
+<p>Ek-ek prefix alag se bhejna bahut slow hoga. Trick: <b>poora sentence ek saath bhejo, par attention matrix ka upper half mask (zero) kar do</b> — har word sirf apne se <i>pehle</i> ke words dekh sakta hai, future nahi. Ek hi pass mein saare prefixes ki predictions parallel mein train ho jaati hain.</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 6 — Causal mask dekho</div>
+<p style="font-size:14px;margin-bottom:10px">5-word sentence ka attention matrix — har row ek query word hai. Dhundhli (dashed) cells masked hain: future words dikhte hi nahi.</p>
+<div class="grid8" id="maskGrid" style="grid-template-columns:repeat(6,26px)"></div>
+<div class="legend"><span><i style="background:var(--teal-soft);border:1px solid var(--teal)"></i>Allowed (past)</span><span><i style="background:var(--bg);border:1px dashed var(--line)"></i>Masked (future)</span></div>
+</div>
+<div class="note"><span class="nt">Interview-worthy sawaal</span>Kya inference (prediction) time pe bhi masking hoti hai? <b>Haan.</b> Model ke saare weights isi masked setup pe train hue hain, toh inference pe bhi wahi structure chahiye. "Write me an essay on AI" (7 tokens) doge toh model 7 predictions banaata hai — hum sirf <b>aakhri wali</b> use karte hain (next token).</div>
+<p>Ye architecture 8+ saal se lagbhag same hai — kyunki har component ka hona logical hai. Improvements (Transformer², Titans, byte-latent...) aate rehte hain, par as an engineer tumhe high-level samajh chahiye: <b>encoder (tokenize) → transformer stack → decoder (de-tokenize)</b> — algorithms andar badalte rehte hain, database indexes ki tarah.</p>
+<label class="done"><input type="checkbox" data-ch="ch19"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch20" data-part="Part 4 · Attention & Transformer">
+<div class="ch-head"><span class="ch-no">Ch 20</span><h2>Multi-Head Attention: Ek cheez ko kai nazariye se dekhna</h2></div>
+<p>Ek embedding dimension socho: <b>size</b>. Hydrogen atom = 0.00000001, apple = 10cm, black hole = trillions. Ek hi scale pe itna variation handle karna mushkil hai. Space ki baat karte waqt planets wale scale mein sochna hai; atoms ki baat mein nano scale mein.</p>
+<p>Solution: <span class="hl">linear transformations</span> (computer graphics jaisa — image ko stretch/shrink/translate karna). Attention formula mein beech mein <b>weight matrices ghusa do</b>:</p>
+<ul>
+<li><code>Q × W_q</code> (n×d · d×k) aur <code>K × W_k</code> — ye matrices space ko alag "perspective" mein transform karti hain.</li>
+<li>V ke liye bhi apna <code>W_v</code> hai.</li>
+<li>Har aisa perspective = ek <b>attention head</b>. Kai heads = <b>multi-head attention</b>.</li>
+</ul>
+<p>Ek head "space-scale" cheezon pe focus kar sakta hai, doosra grammar pe, teesra atoms pe... Sab heads ke outputs ko <b>concat + combine</b> kar ke ek final output banta hai. Aur best part: <b>ye weight matrices bhi trainable hain</b> — galti hui toh sirf FFN nahi, W_q/W_k/W_v ke values bhi backpropagation se sudharte hain. Zyada data = behtar transformations.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Input Embeddings<small>n × d</small></div>
+  <div class="farr">➜</div>
+  <div class="fcol">
+    <div class="fbox teal">Head 1 <small>W_q¹ W_k¹ W_v¹ — "scale" lens</small></div>
+    <div class="fbox teal">Head 2 <small>W_q² W_k² W_v² — "grammar" lens</small></div>
+    <div class="fbox teal">Head h <small>... apna-apna lens</small></div>
+  </div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">Concat + Combine<small>ek context-rich output</small></div>
+</div>
+<div class="cap">Har head same input ko alag linear transformation (nazariya) se dekhta hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch20"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 5 ============ -->
+<section class="chapter" id="ch21" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 21</span><h2>KV Caching: Dubara mat gino jo gin chuke ho</h2></div>
+<p>Models mein 300 billion+ parameters hote hain (Q/K/V weight matrices + FFN weights milakar; naye models mein trillions). Training aur inference dono optimize karne padte hain. Pehla, sabse standard optimization: <span class="hl">KV (Key-Value) caching</span>.</p>
+<p>Input: <i>"the crane damaged its wings while"</i> (6 tokens) → 6×6 attention matrix bana. Model ne "flying" generate kiya. Ab 7 tokens ke liye 7×7 matrix chahiye. Par dhyan se dekho: <b>pehle 6×6 wala hissa bilkul same rahega</b> — purane words ka aapas ka context badla nahi. Naya sirf: aakhri row aur aakhri column.</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 7 — KV Cache in action</div>
+<p style="font-size:14px;margin-bottom:10px">"Next token" dabao — dekho har naye token pe kitni cells cache se aati hain (teal) aur kitni nayi compute hoti hain (orange):</p>
+<div class="grid8" id="kvGrid"></div>
+<div class="legend"><span><i style="background:var(--teal-soft);border:1px solid var(--teal)"></i>Cached (free!)</span><span><i style="background:var(--acc-soft);border:1px solid var(--acc)"></i>Naya compute</span></div>
+<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+<button class="btn" id="kvNext">Next token →</button>
+<button class="btn ghost" id="kvReset">Reset</button>
+</div>
+<div class="vout" id="kvOut"></div>
+</div>
+<h3>Math kyun kaam karta hai</h3>
+<p>Weight matrices ke saath bhi ye chalta hai: <code>W_q·W_k</code> ka product (d×d) fix hai — wo change nahi hota. Naya token aane par Q matrix mein bas ek row judti hai (n+1×d) aur K mein ek column. Multiply karke dekhoge: <b>purani saari values same, sirf last row + last column nayi</b>. V ke liye bhi same — n×d cached, ek nayi row compute. Toh O(n²) recompute ke bajaye sirf ~2n naya kaam.</p>
+<div class="note"><span class="nt">Trade-off + Correction</span>Compute bachta hai, par matrix <b>memory mein store</b> karna padta hai — memory kharch hoti hai. Fir bhi totally worth it: har serious LLM (Llama, GPT, Claude...) KV caching use karta hai. (Transcript mein kai jagah "KB caching" bola gaya — sahi naam <b>KV caching</b> hai: Keys aur Values cache hote hain.)</div>
+<label class="done"><input type="checkbox" data-ch="ch21"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch22" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 22</span><h2>Paged Attention: KV cache ki memory ka OS-style solution</h2></div>
+<p>KV cache ki ek badi problem: <b>pata nahi kitna bada hoga</b>. "I am going to the restaurant..." ka answer 4 words ka bhi ho sakta hai, 40 ka bhi. Production mein lakhon concurrent users hain, limited GPU memory hai. Ab:</p>
+<ul>
+<li><b>Over-allocate</b> karo (har user ko 1GB) → memory waste (naive implementation mein <b>40–60% memory waste</b> hoti thi).</li>
+<li><b>Under-allocate</b> karo → cache chhota pad gaya → recompute karna padega.</li>
+</ul>
+<p>Solution OS se udhaar liya: <span class="hl">Paged Attention</span> — KV cache ko <b>fixed-size blocks (pages)</b> mein todo, jaise CPU virtual memory. <b>Virtual blocks</b> logically continuous dikhte hain, par <b>physical blocks</b> memory mein kahin bhi bikhre ho sakte hain. Cache dynamically grow hota hai → <b>~100% memory utilization</b> → zyada users, zyada throughput.</p>
+<h3>Bonus: Prefix sharing</h3>
+<p>Reasoning models ek prompt se <b>multiple continuations</b> banate hain ("...because I wanted to meet a friend" / "...because I was hungry"). Sab ka <b>prefix same hai</b> — toh prefix ka attention block physical memory mein <b>ek hi copy</b> rakho, saare parallel branches usi ko share karein. Memory aur bachi.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox acc">Shared Prefix Block<small>"I went to the restaurant"</small></div>
+  <div class="farr">⇉</div>
+  <div class="fcol">
+    <div class="fbox">Branch 1: "...to eat food"</div>
+    <div class="fbox">Branch 2: "...to meet my friend"</div>
+    <div class="fbox">Branch 3: "...existential crisis 😅"</div>
+  </div>
+</div>
+<div class="cap">Ek physical block, kai virtual references — copy-on-write jaisa. Engineer ko internal layout ki tension nahi, bas virtual blocks use karo.</div>
+</div>
+<div class="note"><span class="nt">Correction</span>Ye technique <b>vLLM</b> project ne popular ki (2023 ka PagedAttention paper) — transcript mein "the most common is LLM" sunai diya, sahi naam <b>vLLM</b> (inference server) hai. Aaj vLLM, SGLang, TensorRT-LLM sab isi idea pe chalte hain; Gemma (Google) aur Mistral jaise models inhi servers pe serve hote hain.</div>
+<label class="done"><input type="checkbox" data-ch="ch22"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch23" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 23</span><h2>Mixture of Experts (MoE): Poora dimaag mat jalao</h2></div>
+<p>Idea: bahut bada model rakho, par har query ke liye <b>sirf uska relevant hissa (subgraph) activate karo</b>. Shopping query → shopping-expert section; emotional baat → emotions-expert section. (Ye multi-head attention se alag hai — wahan dimensions ke perspectives the, yahan network ke पूरे sections on/off hote hain.)</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 8 — Router khud banke dekho</div>
+<p style="font-size:14px;margin-bottom:10px">Query chuno — router decide karega kaunsa expert activate hoga:</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap" id="moeQs">
+  <button class="btn ghost" data-e="0">"I went to the mall"</button>
+  <button class="btn ghost" data-e="1">"I feel sad today"</button>
+  <button class="btn ghost" data-e="2">"Sort this array in Python"</button>
+  <button class="btn ghost" data-e="3">"Kohli ka average kya hai?"</button>
+</div>
+<div class="frow" style="margin-top:16px">
+  <div class="fbox acc" id="moeRouter">Router / Gate<small>top-1 expert chuno</small></div>
+  <div class="farr">➜</div>
+  <div class="fcol" id="moeExperts">
+    <div class="fbox">🛍️ Shopping Expert</div>
+    <div class="fbox">💙 Emotions Expert</div>
+    <div class="fbox">💻 Code Expert</div>
+    <div class="fbox">🏏 Sports Expert</div>
+  </div>
+</div>
+<div class="vout" id="moeOut">Koi query select karo…</div>
+</div>
+<h3>Training aur load balancing</h3>
+<ul>
+<li>Output sahi → <b>router ko bhi reward</b> (sahi expert chuna) <b>aur expert ko bhi</b> (weights reinforce). Galat → dono ko punish.</li>
+<li><b>Router problem:</b> agar saari queries ek hi expert ko jaayein toh wo over-trained, baaki under-trained. Isliye training mein <b>load-balancing loss</b> add hota hai — queries experts mein distribute hoti hain, har expert apni specialty seekh leta hai.</li>
+<li>Result: 100B+ parameters ki intelligence, par inference pe sirf ~1/10th neurons fire → <b>fast + sasta</b>.</li>
+</ul>
+<div class="note"><span class="nt">Correction + 2026 Update</span>History thodi fix: idea <b>1991</b> ka hai (Jacobs, Jordan, Hinton et al.). <b>2017</b> mein Shazeer, Hinton aur Jeff Dean wali Google Brain team ne "Outrageously Large Neural Networks" mein sparse gating dikhaayi. <b>GShard 2020</b> ka paper hai (transcript ne 2022 kaha), aur top-1 routing <b>Switch Transformer (2021)</b> ne popular ki. Aaj ke lagbhag saare frontier models — DeepSeek-V3 (671B total, ~37B active), Mixtral, GPT-4 (reportedly), Qwen — MoE hain.</div>
+<label class="done"><input type="checkbox" data-ch="ch23"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch24" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 24</span><h2>Flash Attention: GPU ko samajh ke likha gaya attention</h2></div>
+<p>GPU ke paas do memory hoti hain: <b>SRAM</b> (chip pe, chhoti par bijli-fast) aur <b>HBM/DRAM</b> (badi par slow). Vanilla attention har step (matmul → softmax → matmul) pe slow memory se data laata-le jaata hai — ye load/store hi bottleneck hai, almost IO call jaisa.</p>
+<p><span class="hl">Flash Attention</span> ka idea: attention ko <b>chhote blocks (tiles)</b> mein todo, ek block SRAM mein lao, <b>saare operations (matmul + softmax + matmul) wahin fuse karke</b> ek saath karo, sirf final result wapas bhejo. Mathematical tricks (online softmax) se ye blocks baad mein sahi tarike se aggregate ho jaate hain.</p>
+<table class="t">
+<tr><th>Version</th><th>Kab</th><th>Kya mila</th></tr>
+<tr><td>FlashAttention 1</td><td>2022</td><td>10–20× kam memory, 2–4× speedup vs vanilla</td></tr>
+<tr><td>FlashAttention 2</td><td>2023</td><td>Better GPU utilization, aur ~2× speedup</td></tr>
+<tr><td>FlashAttention 3</td><td>2024</td><td>Async operations (Hopper GPUs), aur ~2× speedup</td></tr>
+</table>
+<p>Ye <b>exact</b> attention hai — koi accuracy loss nahi, sirf smart memory scheduling. KV caching / paged attention ke saath layer karke use hota hai. Llama, Grok, Mistral, Phi — sab use karte hain. Challenge bas ye ki GPU-level code likhna padta hai (isliye libraries use hoti hain).</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">HBM (slow, badi)<small>poora matrix yahan</small></div>
+  <div class="farr">tile ➜</div>
+  <div class="fbox teal">SRAM (fast, chhoti)<small>block pe saare ops fused</small></div>
+  <div class="farr">sirf result ➜</div>
+  <div class="fbox">HBM<small>aggregate output</small></div>
+</div>
+<div class="cap">Data movement kam karo = speed. Compute sasta hai, memory traffic mehenga.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch24"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch25" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 25</span><h2>Model Quantization: Weights ko chhota karo</h2></div>
+<p>Model ki memory = <b>parameters ki count × har parameter ke bits</b>. Weights normally 32/16-bit floats hote hain. Unhe <b>8-bit ya 4-bit</b> mein represent karo → 50–90% memory saving + faster inference (zyada weights cache mein fit hote hain). Drawback: <b>accuracy thodi girti hai</b>, especially 4-bit/2-bit pe.</p>
+<h3>Smart tareeka: Train full, serve quantized</h3>
+<ul>
+<li><b>Training:</b> high-precision weights (accuracy critical hai, backprop sensitive hai).</li>
+<li><b>Inference:</b> training ke baad quantize karo (post-training quantization) — 21 din training + 1 din quantization.</li>
+<li><b>Static quantization:</b> saare weights same bits mein.</li>
+<li><b>Dynamic/mixed quantization:</b> sirf wo weights quantize karo jinka loss pe minimum impact hai; sensitive weights high-precision rahein. Better quality, par complex aur savings kam.</li>
+</ul>
+<p>Ye Ch 07 wale vector-compression jaisa hi idea hai — wahan stored vectors compress kiye the, yahan <b>model ke khud ke weights</b>. GPT series, Llama series — sab quantization use karte hain. (Local LLM chalane wale GGUF/4-bit models isi ke products hain.)</p>
+<label class="done"><input type="checkbox" data-ch="ch25"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch26" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 26</span><h2>Sparse Attention: Har word ko sab kuch dekhne ki zaroorat nahi</h2></div>
+<p>Attention O(n²) hai — core algorithm pe hi vaar karte hain. Observation: <span class="hl">kisi word ka context usually uske paas hi hota hai</span>. Harry Potter gussa hua toh wajah 3 sentences pehle hogi, 6 pages pehle nahi (mostly).</p>
+<p>Toh n×n matrix ke bajaye ek <b>thick diagonal</b> compute karo — har token sirf apne ±w neighbors dekhe. Cost: O(n·w). Drawback: door ka context miss ho jaayega → accuracy thodi giri.</p>
+<h3>Google BigBird ka clever mix</h3>
+<ul>
+<li><b>Local attention:</b> thick diagonal (paas ke tokens).</li>
+<li><b>Global attention:</b> kuch important tokens (jaise [CLS]) ki poori row/column compute karo — wo sabko dekhte hain, sab unko.</li>
+<li><b>Random attention:</b> kuch random cells bhi — door ka context milne ke chances badh jaate hain. Tunable: zyada random = zyada accurate = zyada cost.</li>
+</ul>
+<div class="diagram">
+<svg viewBox="0 0 560 180" width="560" role="img" aria-label="sparse attention patterns">
+  <g font-size="12" fill="var(--muted)" font-family="var(--disp)">
+    <text x="18" y="170">LOCAL (diagonal)</text><text x="215" y="170">+ GLOBAL (rows/cols)</text><text x="420" y="170">+ RANDOM (blocks)</text>
+  </g>
+  <g fill="var(--teal)">
+    <rect x="20" y="20" width="18" height="18" rx="2"/><rect x="40" y="20" width="18" height="18" rx="2"/>
+    <rect x="20" y="40" width="18" height="18" rx="2"/><rect x="40" y="40" width="18" height="18" rx="2"/><rect x="60" y="40" width="18" height="18" rx="2"/>
+    <rect x="40" y="60" width="18" height="18" rx="2"/><rect x="60" y="60" width="18" height="18" rx="2"/><rect x="80" y="60" width="18" height="18" rx="2"/>
+    <rect x="60" y="80" width="18" height="18" rx="2"/><rect x="80" y="80" width="18" height="18" rx="2"/><rect x="100" y="80" width="18" height="18" rx="2"/>
+    <rect x="80" y="100" width="18" height="18" rx="2"/><rect x="100" y="100" width="18" height="18" rx="2"/><rect x="120" y="100" width="18" height="18" rx="2"/>
+    <rect x="100" y="120" width="18" height="18" rx="2"/><rect x="120" y="120" width="18" height="18" rx="2"/>
+  </g>
+  <g fill="var(--teal)" opacity=".9">
+    <rect x="220" y="20" width="18" height="18" rx="2"/><rect x="240" y="20" width="18" height="18" rx="2"/><rect x="260" y="20" width="18" height="18" rx="2"/><rect x="280" y="20" width="18" height="18" rx="2"/><rect x="300" y="20" width="18" height="18" rx="2"/><rect x="320" y="20" width="18" height="18" rx="2"/>
+    <rect x="220" y="40" width="18" height="18" rx="2"/><rect x="220" y="60" width="18" height="18" rx="2"/><rect x="220" y="80" width="18" height="18" rx="2"/><rect x="220" y="100" width="18" height="18" rx="2"/><rect x="220" y="120" width="18" height="18" rx="2"/>
+    <rect x="260" y="60" width="18" height="18" rx="2"/><rect x="280" y="80" width="18" height="18" rx="2"/><rect x="300" y="100" width="18" height="18" rx="2"/>
+  </g>
+  <g fill="var(--acc)">
+    <rect x="420" y="40" width="38" height="38" rx="3"/><rect x="490" y="90" width="38" height="38" rx="3"/><rect x="440" y="110" width="20" height="20" rx="2" opacity=".6"/>
+  </g>
+  <g fill="var(--teal)" opacity=".5"><rect x="420" y="20" width="18" height="18" rx="2"/><rect x="440" y="20" width="18" height="18" rx="2"/><rect x="460" y="40" width="18" height="18" rx="2"/><rect x="480" y="60" width="18" height="18" rx="2"/><rect x="500" y="70" width="18" height="18" rx="2"/><rect x="520" y="120" width="18" height="18" rx="2"/></g>
+</svg>
+<div class="cap">BigBird = local + global + random. Orange: random cells ko <b>b×b blocks</b> mein rakha jaata hai — GPU blocks mein data process karta hai, bikhri hui 1×1 cells bhejne ka IO cost poore block jitna hi hota, toh block-sparse hi practical hai.</div>
+</div>
+<div class="note"><span class="nt">2026 Update</span>Sparse attention pehle widely used nahi thi, par <b>DeepSeek ka Native Sparse Attention (NSA, 2025)</b> aur isi family ke GPU-centric designs ne ise practical bana diya — lambi context windows (1M+ tokens) isi direction se aa rahi hain.</div>
+<label class="done"><input type="checkbox" data-ch="ch26"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch27" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 27</span><h2>Deployment: Sahi size ka model + Distillation</h2></div>
+<p>Ab theory se practice. Production mein pehla sawaal: <b>model kitna bada ho?</b> Ek reality check:</p>
+<ul>
+<li>Llama-7B jaisa "chhota" model ~50–100 concurrent queries handle karta hai per <b>NVIDIA A100</b> (~$3/hour).</li>
+<li>10 GPUs = $30/hour ≈ <b>$20,000+/month</b>. Startup ke liye bhaari.</li>
+</ul>
+<p>Cost ghataane ke raaste: quantization (Ch 25), vector dimensions kam karna, FFN parameters kam karna — aur sabse powerful: <span class="hl">Small Language Models (SLMs)</span>. 100B → 100M parameters = 1000× chhota. Intelligence poori transfer nahi hoti (lossy compression), par support queries / search jaise use cases ke liye kaafi hoti hai.</p>
+<h3>Distillation: Teacher-Student</h3>
+<ol>
+<li><b>Teacher</b> = bada LLM. <b>Student</b> = chhota model jo teacher ko mimic karna seekh raha hai.</li>
+<li>Dono ko same input do: "my eyes hurt after staring at the ___". Teacher: "screen". Student: "pigeon" 😅. Difference backpropagate karo.</li>
+<li><b>Naive tareeka kharab hai:</b> sirf top-token compare karoge toh student unfairly punish hoga (uska 2nd guess "screen" ho sakta tha). Isliye <b>poori probability distribution (soft targets)</b> compare hoti hai — teacher ke saare token probabilities ke kareeb aana kaafi hai.</li>
+</ol>
+<p>(Ye GANs ki yaad dilaata hai — wahan generator vs discriminator ka competition hai; yahan student teacher ko copy karta hai.) Isliye har bada model family apne chhote distilled versions bhi release karti hai (Llama 70B → 8B, DeepSeek-R1 → distilled Qwen versions, waghera).</p>
+<label class="done"><input type="checkbox" data-ch="ch27"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch28" data-part="Part 5 · LLM Optimizations">
+<div class="ch-head"><span class="ch-no">Ch 28</span><h2>Speculative Decoding: Chhota likhe, bada check kare</h2></div>
+<p>Observation: sentence ke zyada-tar tokens <b>predict karna asaan hai</b>. "The result of this is 2.552" mein "The/result/of/this/is" trivially easy hain — saara dimaag sirf "552" pe chahiye. Toh har token pe pura 300B model kyun chalaayein?</p>
+<p>Idea: ek <b>chhota draft model (SLM)</b> jaldi-jaldi kai tokens likh deta hai, aur <b>bada model unhe parallel mein (ek batch mein) verify</b> karta hai:</p>
+<div class="lab">
+<div class="lab-tag">🧪 Lab 9 — Speculative decoding step-by-step</div>
+<p style="font-size:14px;margin-bottom:10px">"Step" dabate jao aur draft→verify→correct ka dance dekho:</p>
+<button class="btn" id="specStep">Step ▸</button>
+<button class="btn ghost" id="specReset" style="margin-left:8px">Reset</button>
+<div class="tokchips" id="specOut" style="min-height:40px"></div>
+<div class="vout" id="specMsg">SLM draft banayega, LLM verify karega…</div>
+</div>
+<ul>
+<li>SLM ka compute negligible hai (1000× chhota).</li>
+<li>LLM ek hi forward pass mein <b>saare draft tokens parallel verify</b> karta hai — sequential token-by-token generation ki jagah. Galat token mila toh wahan se correct karke SLM ko naya draft banane bhejta hai.</li>
+<li><b>Speedup ~2–3×</b> (Google ke speculative decoding paper ke mutabik) aur <b>accuracy mein zero loss</b> — final output wahi hai jo bada model khud deta.</li>
+</ul>
+<p>ChatGPT, Gemini, Claude — sab isi liye itne fast feel hote hain. Latency insaano ko bahut matter karti hai (100ms+ pe dhyan bhatak jaata hai).</p>
+<label class="done"><input type="checkbox" data-ch="ch28"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 6 ============ -->
+<section class="chapter" id="ch29" data-part="Part 6 · Reasoning Models">
+<div class="ch-head"><span class="ch-no">Ch 29</span><h2>Reinforcement Learning: Chess se seekho</h2></div>
+<p>LLM word-probabilities pe trained hai — usse "mate in 3 dhoondo" bologe toh wo random/illegal moves dega, kyunki wo game ki <b>physics nahi samajhta</b>, bas "is move ke baad kaunsa move aata hai" jaanta hai. Chess games pe train karne se bhi novel best move nahi milega.</p>
+<p>Chahiye: <span class="hl">Reinforcement Learning (RL)</span> — model ek <b>environment</b> mein hai, <b>observations</b> dekhta hai, <b>actions</b> leta hai, aur har action pe <b>reward</b> milta hai (achha move +, bura move −). Lakhs of games khelte-khelte model duniya ka representation bana leta hai. Google DeepMind ka <b>AlphaZero</b> isi se bana — aaj ke sabse strong chess engines ki foundation.</p>
+<div class="note"><span class="nt">Correction</span>IBM ka <b>Deep Blue</b> 1990s ka brute-force search engine tha jo <b>1997</b> mein Kasparov ko haraya (transcript ne 1992 kaha). Point sahi hai: bade game trees pe poora search impossible hai — RL zyada efficient nikla.</div>
+<h3>Ye text models mein kaise aata hai</h3>
+<p>Model se 3 baar move-sequences generate karwao: mate-in-6 (score −100), mate-in-4 (score 0), mate-in-2 (score +100). Har trajectory ka score uske raaste ke har step pe "paint" kar do. Ab starting point se <b>greedy ho ke sabse positive raasta follow karo</b>. Enough trajectories explore karoge toh ek reward space ban jaati hai jo batati hai: kahin se bhi shuru karo, best goal tak kaise pahuncho.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Start</div>
+  <div class="farr">➜</div>
+  <div class="fbox">m1</div>
+  <div class="farr">➜</div>
+  <div class="fcol">
+    <div class="fbox" style="border-color:var(--rose)">m2…m6 → mate in 6 <small>score −100</small></div>
+    <div class="fbox">m2'…m4' → mate in 4 <small>score 0</small></div>
+    <div class="fbox teal">m2'' → mate in 2 <small>score +100 ✓ yahi raasta seekho</small></div>
+  </div>
+</div>
+<div class="cap">Har path ka final score peeche ke steps pe distribute hota hai; greedy traversal best path pe le jaata hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch29"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch30" data-part="Part 6 · Reasoning Models">
+<div class="ch-head"><span class="ch-no">Ch 30</span><h2>RLHF aur PPO: Insaan reward dete hain</h2></div>
+<p>Essay ke liye reward kaun dega? <b>Insaan.</b> Isliye naam: <span class="hl">Reinforcement Learning from Human Feedback (RLHF)</span>. Model 5 blogs generate karta hai, human batata hai kaunsa pasand hai → wo direction reinforce hoti hai. Practical dikkat-ein:</p>
+<ul>
+<li><b>Scoring mushkil hai, ranking asaan:</b> "100 mein se kitne?" nahi, "kaunsa behtar?" — isliye ChatGPT type apps tumse do responses mein se ek choose karwate hain.</li>
+<li><b>Feedback mehenga aur rare hai:</b> log answer chahte hain, ratings nahi dete; kuch randomly/maliciously click karte hain.</li>
+</ul>
+<h3>PPO: Sparse feedback se continuous space</h3>
+<p><b>Proximal Policy Optimization.</b> "Policy" = function: state do, action batata hai. Humans millions points pe feedback nahi de sakte, toh jahan +100 ka real feedback hai uske aas-paas ki space ko +99, +98... se <b>bhar do (diminishing returns ke saath)</b> — sparse points se ek smooth, continuous, differentiable reward space ban jaati hai jisme gradient descent chal sakta hai. Result: model waise answers dene lagta hai jo insaano ko pasand aate hain.</p>
+<div class="note"><span class="nt">Dhyan do</span>Ye abhi <b>reasoning nahi hai</b> — ye bas "humans ko khush karna" seekhna hai. Par ye har reasoning model ki foundation hai. (2026 tak PPO ke saath <b>DPO</b> aur DeepSeek ka <b>GRPO</b> bhi standard alternatives ban gaye hain — same goal, asaan training.)</div>
+<label class="done"><input type="checkbox" data-ch="ch30"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch31" data-part="Part 6 · Reasoning Models">
+<div class="ch-head"><span class="ch-no">Ch 31</span><h2>Chain of Thought: Sochne ke tokens</h2></div>
+<p><span class="hl">Chain of Thought (CoT)</span> = model answer se pehle <b>thoughts</b> (intermediate sentences) generate karta hai. "100 ÷ 200?" → <i>"common factor 100 nikaalta hoon... 100/100=1... 200/100=2... toh 1/2 = 0.5"</i>. Lamba lagta hai, par:</p>
+<ul>
+<li><b>Fine-tuning ke waqt</b> model ko <code>&lt;thought&gt;...&lt;/thought&gt;</code> tags wale structured examples pe train karte hain — "ye user ko mat dikhao, internally use karo".</li>
+<li>Zyada thought tokens = zyada compute per question = <b>behtar answers</b>. Complex task → lambi chain; simple task → chhoti.</li>
+<li>RL upar lagao → model <i>sahi</i> answers ki taraf nudge hota hai.</li>
+</ul>
+<h3>Self-consistency</h3>
+<p>Ek thought ke bajaye <b>kai variations</b> generate karo (thought1, thought1', thought1''...), aur <b>majority/centroid wala</b> chuno (thoughts ko vectors bana ke centroid ke sabse paas wala). Complex reasoning tasks pe kaafi improvement.</p>
+<div class="note warn"><span class="nt">Common confusion</span>CoT <b>prompt engineering nahi hai</b>. Prompt mein "step by step socho" likhna sirf output pe constraint hai. Asli CoT <b>fine-tuning/training time</b> pe sikhaayi jaati hai — model khud thoughts banana seekhta hai. (2026 tak: OpenAI o-series, DeepSeek-R1, Claude extended thinking, Gemini thinking — sab isi principle ke production versions hain.)</div>
+<label class="done"><input type="checkbox" data-ch="ch31"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch32" data-part="Part 6 · Reasoning Models">
+<div class="ch-head"><span class="ch-no">Ch 32</span><h2>Tools aur Function Calling</h2></div>
+<p>Model tokens generate karta hai — <b>math aur exact computation uski weakness hai</b>. 319÷215 tokens se guess karna risky hai. Solution: <span class="hl">tools</span>. Sorting chahiye → Python code chalao; math → calculator; grammar → checker.</p>
+<p>Kaise sikhaate hain? <b>Fine-tuning mein special tokens:</b> training examples mein <code>&lt;tool&gt;python&lt;/tool&gt;</code> jaisa pattern hota hai — model seekh jaata hai ki kab tool call token nikaalna hai. RL se ye behaviour aur sharp hota hai. Search, code, math jaise cases mein tools se output quality dramatically badh jaati hai.</p>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">"Sort this array"</div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">LLM<small>&lt;tool&gt;python&lt;/tool&gt; emit karta hai</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Python chalta hai<small>exact result</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">Result wapas LLM ko<small>final answer banata hai</small></div>
+</div>
+<div class="cap">Ecosystem: LangChain jaisi libraries tool-use orchestrate karti hain; <b>MCP (Model Context Protocol)</b> external tools/servers se connect karne ka standard hai — jaise Gmail MCP server se email bhejwana. Ab LLM sirf text nahi deta, <b>actions perform karta hai</b>.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch32"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch33" data-part="Part 6 · Reasoning Models">
+<div class="ch-head"><span class="ch-no">Ch 33</span><h2>Test-time Compute: Tree of Thought aur Latent Reasoning</h2></div>
+<p>Scaling law ka naya roop: <span class="hl">jitna zyada time/compute answer sochne mein lagao, utna smart answer</span>. Developer 2 minute wait kar lega agar code bug-free mile — 10 second wale buggy code se behtar. Toh aur compute kaise kharch karein?</p>
+<ul>
+<li><b>Self-consistency scale karo?</b> 10 ke bajaye 500 thoughts — thoda hi better. Better algorithm chahiye.</li>
+<li><b>Tree of Thought:</b> chain nahi, <b>tree</b> — starting point se thought1, thought2, thought3 branches; promising branches expand karo (BFS/Monte-Carlo Tree Search se); goal states tak pahuncho; best response chuno (heuristic score ya self-verification se). Generate → verify → respond. Slow, par accuracy ke liye worth it.</li>
+<li><b>Latent reasoning (active research):</b> thoughts ko tokens ki jagah <b>vectors</b> mein represent karke unhi mein reason karna — search space token-space se bada ho jaata hai.</li>
+</ul>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">Query</div>
+  <div class="farr">➜</div>
+  <div class="fcol">
+    <div class="fbox">Thought A <small>→ A1 → A2 (dead end)</small></div>
+    <div class="fbox teal">Thought B <small>→ B1 → B2 → answer ✓ best score</small></div>
+    <div class="fbox">Thought C <small>(kam promising, prune)</small></div>
+  </div>
+  <div class="farr">➜</div>
+  <div class="fbox acc">Verify + Best answer</div>
+</div>
+<div class="cap">Reasoning model ki recipe: RLHF (direction) + CoT fine-tuning (thoughts) + test-time compute scaling (tree/branches). Paged attention ka prefix-sharing (Ch 22) in branches ko sasta banata hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch33"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<!-- ============ PART 7 ============ -->
+<section class="chapter" id="ch34" data-part="Part 7 · AI Apps banana">
+<div class="ch-head"><span class="ch-no">Ch 34</span><h2>Context Engineering: Prompt se aage ki cheez</h2></div>
+<p>App banate waqt LLM ko bhejne wala context = <b>system prompt + examples + chain-of-thought examples + retrieved docs + chat history</b>. 2023 mein log sab kuch system prompt mein thoons dete the ("prompt engineering") — prompt bada hota gaya aur real-time data ka koi jugaad nahi tha. RAG ne docs ka problem solve kiya. Par ek naya problem aaya: <span class="hl">chat history ka kya karein?</span></p>
+<ul>
+<li>History limit karoge → user preferences kho jaayengi ("mujhe sirf 2-din delivery wale items dikhao" wali baat).</li>
+<li>Poori history bhejoge → mehenga + irrelevant purana data quality girata hai.</li>
+</ul>
+<h3>History ko nichodne ke tareeke</h3>
+<ol>
+<li><b>Sliding window:</b> last 10 messages as-is + purani history ki summarized version.</li>
+<li><b>Rolling summary:</b> poori history ko LLM se 5-line summary banwao ("user preferences nikaalo, upset/happy moments note karo"), aur wahi bhejo.</li>
+</ol>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">System Prompt</div>
+  <div class="farr">+</div>
+  <div class="fbox">Few-shot + CoT examples</div>
+  <div class="farr">+</div>
+  <div class="fbox teal">RAG docs</div>
+  <div class="farr">+</div>
+  <div class="fbox acc">Summarized history<small>preferences distilled</small></div>
+  <div class="farr">+</div>
+  <div class="fbox">Current query</div>
+  <div class="farr">➜</div>
+  <div class="fbox">LLM</div>
+</div>
+<div class="cap">Context engineering = LLM ko bheja jaane wala har token deliberate ho. Science kam, art zyada — par checklist yehi hai.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch34"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch35" data-part="Part 7 · AI Apps banana">
+<div class="ch-head"><span class="ch-no">Ch 35</span><h2>AI Agents: LLM ke upar ka wrapper jo kaam karta hai</h2></div>
+<p><b>Definition:</b> software jo <i>independently</i> intelligent tasks perform kare jo business requirements meet karein. Example — <b>AI travel agent</b>: "Bali trip plan karo, book karo, manage karo" → wo research karega, bookings karega, notifications pe react karega (email bhejna, booking update karna).</p>
+<p>Andar se agent = <span class="hl">LLM (brain) + MCP clients (external systems se baat) + tools (calculator, currency converter...) + apna system prompt + memory</span>.</p>
+<h3>Agents ke 3 fayde</h3>
+<ol>
+<li><b>Isolation of concerns:</b> booking agent alag, travel-manager agent alag, feedback/upsell agent alag — har ek ka apna LLM, apne tools, apni team. Microservices jaisa organization benefit.</li>
+<li><b>Feedback se improvement:</b> "budget cross kar diya" jaisi user feedback agent ke behaviour mein aati hai.</li>
+<li><b>Memory:</b> long-running process hai — user pehle Bali gaya tha toh next time naya itinerary, purani jagah skip. Personalized UX.</li>
+</ol>
+<h3>Drawbacks</h3>
+<ul>
+<li><b>Distributed-system complexity</b> — microservices wale saare problems.</li>
+<li><b>Orchestration:</b> booking agent user ko travel-manager agent ko kab handover kare? Criteria chahiye ("saari bookings done"). Aur ye intelligence bhi... <b>LLM hi decide karta hai</b>. Handover pe relevant context bhi साथ forward hota hai.</li>
+</ul>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox teal">Booking Agent<small>plan + book<br>criteria: sab booked ✓</small></div>
+  <div class="farr">handoff ➜</div>
+  <div class="fbox teal">Travel Manager<small>emails, notifications<br>criteria: trip khatam</small></div>
+  <div class="farr">handoff ➜</div>
+  <div class="fbox teal">Feedback Agent<small>review lo, next trip upsell karo</small></div>
+</div>
+<div class="cap">Har transition LLM decide karta hai. Agents darawne lagte hain par hain bas LLM ke upar wrappers.</div>
+</div>
+<label class="done"><input type="checkbox" data-ch="ch35"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<section class="chapter" id="ch36" data-part="Part 7 · AI Apps banana">
+<div class="ch-head"><span class="ch-no">Ch 36</span><h2>MCP: Model Context Protocol</h2></div>
+<p>RAG/context engineering ko external data chahiye — web pages, file systems, API servers. <span class="hl">MCP ek common protocol hai in sab se baat karne ka.</span> (Anthropic ne Nov 2024 mein launch kiya; ab industry standard hai — OpenAI, Google sab adopt kar chuke hain.)</p>
+<h3>Bina MCP vs MCP ke saath</h3>
+<ul>
+<li><b>Pehle:</b> blog dhoondhne ke liye HTML scrape karo, parse karo, filter karo — slow aur fragile.</li>
+<li><b>MCP se:</b> company apna <b>MCP server</b> expose karti hai ("top blogs on system design" jaisi structured queries) → LLM ko clean structured response milta hai. No HTML parsing.</li>
+</ul>
+<h3>Architecture</h3>
+<div class="diagram">
+<div class="frow">
+  <div class="fbox">User Query</div>
+  <div class="farr">➜</div>
+  <div class="fbox teal">Agent<small>orchestration</small></div>
+  <div class="farr">➜</div>
+  <div class="fbox">MCP Client(s)<small>discovery: kaunse servers, kaunse tools</small></div>
+  <div class="farr">⇄</div>
+  <div class="fbox acc">LLM<small>decide: kya fetch karna hai, kis order mein</small></div>
+</div>
+<div class="frow" style="margin-top:10px">
+  <div class="fbox">MCP Client</div>
+  <div class="farr">➜</div>
+  <div class="fbox">Server 1: InterviewReady<small>courses, blogs</small></div>
+  <div class="farr"></div>
+  <div class="fbox">Server 2: GitHub</div>
+  <div class="farr"></div>
+  <div class="fbox">Server 3: Gmail<small>actions bhi: email bhejo</small></div>
+</div>
+<div class="cap">Client sab servers se data laata hai (parallel ya sequential — LLM decide karta hai), aggregate karke LLM ko deta hai, LLM final response banata hai.</div>
+</div>
+<h3>"Ye API server se alag kaise hai?"</h3>
+<ul>
+<li>Honestly — <b>bahut similar hai.</b> Fark: protocol AI-first designed hai.</li>
+<li><b>Stateful hai:</b> server har client ke API calls ka status track karta hai — "mere kitne open calls hain?" poochh sakte ho. Long-running tasks ke liye perfect. (HTTP stateless hai.)</li>
+<li>Standard hone ka fayda: ek baar server banao, har AI app (Claude, ChatGPT, custom agents) use kar sakti hai.</li>
+</ul>
+<p><b>Roles clear rakho:</b> MCP client sochta nahi — wo sirf discovery/communication karta hai. Sochna agent + LLM ka kaam hai. Ek agent kai clients use kar sakta hai; ek client kai servers se juda ho sakta hai.</p>
+<div class="note"><span class="nt">Course khatam — ab kya? 🎓</span>Ab tumhare paas poori theoretical base hai: vectors, vector DBs, transformers, optimizations, reasoning, agents, MCP. Agla step: <b>hands-on practice</b>. Chhota RAG app banao (pgvector + koi bhi LLM API), ek MCP server likho, ek agent banao. Implement karoge toh nitty-gritties dikhengi — aur wahi cheez hamesha yaad rehti hai.</div>
+<label class="done"><input type="checkbox" data-ch="ch36"> Ho gaya, samajh aa gaya</label>
+</section>
+
+<footer>
+Ye notes tumhare lesson transcript (InterviewReady AI Engineering course) pe based hain — har concept cover kiya gaya hai, corrections aur 2026 updates ke saath. Progress is browser mein save hota hai. All the best! 🚀
+</footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+/* ---------- TOC + progress ---------- */
+var chapters=$$('section.chapter');
+$('#chn').textContent=chapters.length;
+$('#ptotal').textContent=chapters.length;
+var toc=$('#toc'),lastPart='';
+chapters.forEach(function(sec){
+  var part=sec.getAttribute('data-part');
+  if(part!==lastPart){var h=document.createElement('div');h.className='part';h.textContent=part;toc.appendChild(h);lastPart=part;}
+  var a=document.createElement('a');a.href='#'+sec.id;a.id='toc-'+sec.id;
+  var no=sec.querySelector('.ch-no').textContent.replace('Ch ','');
+  a.innerHTML='<span class="n">'+no+'</span><span>'+sec.querySelector('h2').textContent+'</span>';
+  toc.appendChild(a);
+});
+var store={get:function(){try{return JSON.parse(localStorage.getItem('aihing')||'{}')}catch(e){return{}}},
+  set:function(o){try{localStorage.setItem('aihing',JSON.stringify(o))}catch(e){}}};
+function refreshProg(){
+  var st=store.get(),done=0;
+  chapters.forEach(function(sec){
+    var c=!!st[sec.id];if(c)done++;
+    var lbl=sec.querySelector('label.done');
+    lbl.classList.toggle('checked',c);
+    lbl.querySelector('input').checked=c;
+    document.getElementById('toc-'+sec.id).classList.toggle('read',c);
+  });
+  $('#pcount').textContent=done;
+  $('#pfill').style.width=(done/chapters.length*100)+'%';
+}
+$$('label.done input').forEach(function(inp){
+  inp.addEventListener('change',function(){
+    var st=store.get();st[inp.getAttribute('data-ch')]=inp.checked;store.set(st);refreshProg();
+  });
+});
+refreshProg();
+$('#tocbtn').addEventListener('click',function(){$('#side').classList.toggle('open')});
+toc.addEventListener('click',function(e){if(e.target.closest('a'))$('#side').classList.remove('open')});
+
+/* scroll progress + active toc */
+var ticking=false;
+window.addEventListener('scroll',function(){
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(function(){
+    var h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+    $('#pbar').style.width=(max>0?h.scrollTop/max*100:0)+'%';
+    var cur=null;
+    chapters.forEach(function(sec){if(sec.getBoundingClientRect().top<140)cur=sec.id});
+    $$('#toc a').forEach(function(a){a.classList.toggle('active',a.id==='toc-'+cur)});
+    ticking=false;
+  });
+},{passive:true});
+
+/* ---------- Lab 1: vector space ---------- */
+(function(){
+  var cv=$('#vspace');if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var docs=[
+    {n:"Harry Potter",x:.82,y:.80,g:"fiction"},
+    {n:"Lord of the Rings",x:.90,y:.86,g:"fiction"},
+    {n:"Sherlock Holmes",x:.78,y:.62,g:"fiction"},
+    {n:"Panchatantra",x:.30,y:.78,g:"fiction"},
+    {n:"Short Stories",x:.18,y:.86,g:"fiction"},
+    {n:"Physics Textbook",x:.84,y:.16,g:"real"},
+    {n:"DBMS Textbook",x:.74,y:.22,g:"real"},
+    {n:"Attention paper",x:.14,y:.10,g:"real"},
+    {n:"BERT paper",x:.20,y:.16,g:"real"},
+    {n:"News Article",x:.10,y:.30,g:"real"},
+    {n:"Wikipedia page",x:.26,y:.24,g:"real"}
+  ];
+  var q={x:.45,y:.40},drag=false,T=0.28;
+  function px(p){return{x:40+p.x*(cv.width-80),y:20+p.y*(cv.height-70)}}
+  function draw(){
+    var teal=cssv('--teal'),acc=cssv('--acc'),muted=cssv('--muted'),line=cssv('--line'),ink=cssv('--ink');
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle=line;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(40,cv.height-50);ctx.lineTo(cv.width-30,cv.height-50);ctx.moveTo(40,cv.height-50);ctx.lineTo(40,15);ctx.stroke();
+    ctx.fillStyle=muted;ctx.font='12px sans-serif';
+    ctx.fillText('length (kitna lamba) →',cv.width-190,cv.height-30);
+    ctx.save();ctx.translate(18,190);ctx.rotate(-Math.PI/2);ctx.fillText('fictional (upar = zyada) →',0,0);ctx.restore();
+    var qp=px(q);
+    var ds=docs.map(function(d){var dp=px(d);return{d:d,dp:dp,dist:Math.hypot(d.x-q.x,d.y-q.y)}}).sort(function(a,b){return a.dist-b.dist});
+    // threshold circle
+    ctx.strokeStyle=acc;ctx.setLineDash([6,5]);ctx.beginPath();
+    ctx.arc(qp.x,qp.y,T*(cv.width-80),0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ds.slice(0,3).forEach(function(o){
+      ctx.strokeStyle=o.dist<T?teal:muted;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(qp.x,qp.y);ctx.lineTo(o.dp.x,o.dp.y);ctx.stroke();
+    });
+    ds.forEach(function(o){
+      var rel=o.dist<T;
+      ctx.fillStyle=rel?teal:(o.d.g==='fiction'?muted:ink);
+      ctx.beginPath();ctx.arc(o.dp.x,o.dp.y,rel?7:5,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=rel?teal:muted;ctx.font=(rel?'bold ':'')+'11.5px sans-serif';
+      ctx.fillText(o.d.n,o.dp.x+9,o.dp.y+4);
+    });
+    ctx.fillStyle=acc;ctx.beginPath();ctx.arc(qp.x,qp.y,9,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=ink;ctx.font='bold 12px sans-serif';ctx.fillText('QUERY',qp.x-20,qp.y-14);
+    var rels=ds.filter(function(o){return o.dist<T}).map(function(o){return o.d.n});
+    $('#vspaceOut').innerHTML=rels.length
+      ?'Threshold t ke andar (relevant): <b>'+rels.join(', ')+'</b> — yehi docs LLM ko context mein jaayenge.'
+      :'Koi document threshold ke andar nahi — query kisi cluster ke paas le jao.';
+  }
+  function pos(e){
+    var r=cv.getBoundingClientRect(),cx=(e.touches?e.touches[0].clientX:e.clientX),cy=(e.touches?e.touches[0].clientY:e.clientY);
+    return{x:((cx-r.left)*(cv.width/r.width)-40)/(cv.width-80),y:((cy-r.top)*(cv.height/r.height)-20)/(cv.height-70)}
+  }
+  function clamp(v){return Math.max(0,Math.min(1,v))}
+  cv.addEventListener('pointerdown',function(e){drag=true;cv.setPointerCapture(e.pointerId);var p=pos(e);q.x=clamp(p.x);q.y=clamp(p.y);draw()});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;var p=pos(e);q.x=clamp(p.x);q.y=clamp(p.y);draw()});
+  cv.addEventListener('pointerup',function(){drag=false});
+  draw();
+  window.__redraws=window.__redraws||[];window.__redraws.push(draw);
+})();
+
+/* ---------- Lab 2: quantization ---------- */
+(function(){
+  var sl=$('#qbits');if(!sl)return;
+  var bitsMap=[2,4,8,16,32];
+  function upd(){
+    var bits=bitsMap[+sl.value];
+    $('#qbitsLbl').textContent=bits;
+    var memPct=bits/32*100;
+    $('#qmem').style.width=memPct+'%';$('#qmemV').textContent=memPct.toFixed(0)+'%';
+    var params=7e9,gb=params*bits/8/1e9;
+    var accPct={32:100,16:99,8:96,4:88,2:65}[bits];
+    $('#qacc').style.width=accPct+'%';$('#qaccV').textContent='~'+accPct+'%';
+    $('#qout').innerHTML='7B-parameter model @ '+bits+'-bit = <b>~'+gb.toFixed(1)+' GB</b> memory · levels per value: <b>'+Math.pow(2,bits).toLocaleString()+'</b>'+(bits<=4?' — yahan accuracy visibly girti hai ⚠️':'');
+    var cv=$('#qstrip'),ctx=cv.getContext('2d'),levels=Math.min(Math.pow(2,bits),cv.width);
+    var teal=cssv('--teal'),acc2=cssv('--acc');
+    for(var i=0;i<cv.width;i++){
+      var v=i/cv.width,qv=Math.round(v*(levels-1))/(levels-1);
+      var r1=parseInt(teal.slice(1,3)||'0e',16),g1=parseInt(teal.slice(3,5)||'7c',16),b1=parseInt(teal.slice(5,7)||'72',16);
+      var r2=parseInt(acc2.slice(1,3)||'c5',16),g2=parseInt(acc2.slice(3,5)||'7a',16),b2=parseInt(acc2.slice(5,7)||'10',16);
+      ctx.fillStyle='rgb('+Math.round(r1+(r2-r1)*qv)+','+Math.round(g1+(g2-g1)*qv)+','+Math.round(b1+(b2-b1)*qv)+')';
+      ctx.fillRect(i,0,1,cv.height);
+    }
+  }
+  sl.addEventListener('input',upd);upd();
+  window.__redraws.push(upd);
+})();
+
+/* ---------- Lab 3: tokenizer ---------- */
+(function(){
+  var inp=$('#tokIn');if(!inp)return;
+  var sufs=['ing','tion','ness','ment','er','ed','ly','es','s'];
+  function hash(s){var h=7;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%50257;return h}
+  function tok(){
+    var words=inp.value.trim().split(/\s+/).filter(Boolean),toks=[];
+    words.forEach(function(w){
+      var lw=w.toLowerCase(),done=false;
+      for(var i=0;i<sufs.length;i++){
+        var s=sufs[i];
+        if(lw.length>s.length+2&&lw.endsWith(s)){toks.push(w.slice(0,w.length-s.length));toks.push('##'+s);done=true;break}
+      }
+      if(!done)toks.push(w);
+    });
+    var out=$('#tokOut');out.innerHTML='';
+    toks.forEach(function(t){
+      var d=document.createElement('span');d.className='tok';
+      d.innerHTML=t.replace(/</g,'&lt;')+'<small>ID '+hash(t)+'</small>';
+      out.appendChild(d);
+    });
+    $('#tokStats').innerHTML='<b>'+words.length+'</b> words → <b>'+toks.length+'</b> tokens. Har token ki apni ID hai — yehi IDs model ka input hain. <code>##</code> = word ka continuation piece.';
+  }
+  inp.addEventListener('input',tok);tok();
+})();
+
+/* ---------- Lab 4: attention ---------- */
+(function(){
+  var wrap=$('#attnWords');if(!wrap)return;
+  var S=[
+    {words:['the','crane','damaged','its','wings','while','flying'],
+     w:{the:.02,crane:1,damaged:.5,its:.05,wings:.85,while:.03,flying:.9},
+     verdict:'"wings" (0.85) aur "flying" (0.90) crane ke vector ko zor se <b>🐦 bird-meaning</b> ki taraf dhakel rahe hain.'},
+    {words:['the','crane','has','an','arm','made','of','steel'],
+     w:{the:.02,crane:1,has:.05,an:.02,arm:.8,made:.3,of:.02,steel:.85},
+     verdict:'"arm" (0.80) aur "steel" (0.85) crane ko <b>🏗️ machine-meaning</b> ki taraf le ja rahe hain — aur "arm" khud bhi "metal arm" ban gaya.'}
+  ];
+  var cur=0;
+  function render(){
+    var s=S[cur];wrap.innerHTML='';
+    var teal=cssv('--teal');
+    s.words.forEach(function(w){
+      var sp=document.createElement('span');sp.textContent=w;
+      var wt=s.w[w]||0;
+      if(w==='crane'){sp.style.borderColor=cssv('--acc');sp.style.background=cssv('--acc-soft');sp.style.fontWeight='700'}
+      else if(wt>=.3){sp.style.borderColor=teal;sp.style.background=cssv('--teal-soft')}
+      wrap.appendChild(sp);
+    });
+    var bars=$('#attnBars');bars.innerHTML='';
+    s.words.filter(function(w){return w!=='crane'}).forEach(function(w){
+      var wt=s.w[w]||0;
+      var row=document.createElement('div');row.className='brow';
+      row.innerHTML='<span>crane→'+w+'</span><div class="btrack"><div class="bfill" style="width:0"></div></div><span class="bv">'+wt.toFixed(2)+'</span>';
+      bars.appendChild(row);
+      requestAnimationFrame(function(){requestAnimationFrame(function(){row.querySelector('.bfill').style.width=(wt*100)+'%'})});
+    });
+    $('#attnVerdict').innerHTML=s.verdict;
+    $('#attnS1').classList.toggle('on',cur===0);
+    $('#attnS2').classList.toggle('on',cur===1);
+  }
+  $('#attnS1').addEventListener('click',function(){cur=0;render()});
+  $('#attnS2').addEventListener('click',function(){cur=1;render()});
+  render();
+})();
+
+/* ---------- Lab 5: temperature ---------- */
+(function(){
+  var sl=$('#tempSlider');if(!sl)return;
+  var opts=[{t:'flying',l:4.0},{t:'eating',l:2.2},{t:'sleeping',l:1.8},{t:'dancing',l:0.8},{t:'coding',l:0.3}];
+  var probs=[];
+  function upd(){
+    var T=+sl.value;$('#tempLbl').textContent=T.toFixed(1);
+    $('#tempMood').textContent=T<=0.4?'(almost greedy — safe & boring)':T>=1.5?'(creative/random — kabhi kuch bhi!)':'(balanced)';
+    var ex=opts.map(function(o){return Math.exp(o.l/T)}),sum=ex.reduce(function(a,b){return a+b},0);
+    probs=ex.map(function(e){return e/sum});
+    var bars=$('#tempBars');bars.innerHTML='';
+    opts.forEach(function(o,i){
+      var row=document.createElement('div');row.className='brow';
+      row.innerHTML='<span>'+o.t+'</span><div class="btrack"><div class="bfill" style="width:'+(probs[i]*100)+'%"></div></div><span class="bv">'+(probs[i]*100).toFixed(1)+'%</span>';
+      bars.appendChild(row);
+    });
+  }
+  sl.addEventListener('input',upd);upd();
+  $('#tempSample').addEventListener('click',function(){
+    var r=Math.random(),acc=0,pick=opts[0].t;
+    for(var i=0;i<probs.length;i++){acc+=probs[i];if(r<=acc){pick=opts[i].t;break}}
+    var d=document.createElement('span');d.className='tok';d.textContent=pick;
+    var out=$('#tempOut');out.appendChild(d);
+    if(out.children.length>12)out.removeChild(out.firstChild);
+  });
+})();
+
+/* ---------- Lab 6: causal mask ---------- */
+(function(){
+  var g=$('#maskGrid');if(!g)return;
+  var words=['my','family','member','passed','away'];
+  g.appendChild(document.createElement('div'));
+  words.forEach(function(w){var d=document.createElement('div');d.style.cssText='font-size:9px;text-align:center;color:var(--muted);align-self:end';d.textContent=w;g.appendChild(d)});
+  words.forEach(function(w,r){
+    var lbl=document.createElement('div');lbl.style.cssText='font-size:9px;color:var(--muted);display:flex;align-items:center;justify-content:flex-end;padding-right:4px';lbl.textContent=w;g.appendChild(lbl);
+    words.forEach(function(_,c){
+      var cell=document.createElement('div');cell.className='c '+(c<=r?'cache':'mask');g.appendChild(cell);
+    });
+  });
+})();
+
+/* ---------- Lab 7: KV cache ---------- */
+(function(){
+  var g=$('#kvGrid');if(!g)return;
+  var N=8,n=3;
+  g.style.gridTemplateColumns='repeat('+N+',26px)';
+  function render(fresh){
+    g.innerHTML='';
+    var newCells=0,cached=0;
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){
+      var cell=document.createElement('div');cell.className='c';
+      if(r<n&&c<n){
+        if(!fresh&&(r===n-1||c===n-1)){cell.classList.add('new');newCells++}
+        else{cell.classList.add(fresh?'new':'cache');if(fresh)newCells++;else cached++}
+      }
+      g.appendChild(cell);
+    }
+    var tot=n*n;
+    $('#kvOut').innerHTML=fresh
+      ?'Pehla pass: poori <b>'+n+'×'+n+'</b> matrix compute hui ('+tot+' cells).'
+      :'Token #'+n+' aaya: sirf <b>'+newCells+'</b> nayi cells compute ('+(n*2-1)+' = last row+col), <b>'+cached+'</b> cache se muft mili. Bachat: <b>'+Math.round(cached/tot*100)+'%</b>';
+  }
+  $('#kvNext').addEventListener('click',function(){if(n<N){n++;render(false)}else{n=3;render(true)}});
+  $('#kvReset').addEventListener('click',function(){n=3;render(true)});
+  render(true);
+})();
+
+/* ---------- Lab 8: MoE ---------- */
+(function(){
+  var qs=$('#moeQs');if(!qs)return;
+  var experts=$$('#moeExperts .fbox');
+  var names=['Shopping','Emotions','Code','Sports'];
+  qs.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    $$('#moeQs button').forEach(function(x){x.classList.toggle('on',x===b)});
+    var idx=+b.getAttribute('data-e');
+    experts.forEach(function(ex,i){
+      ex.style.opacity=i===idx?'1':'.3';
+      ex.style.borderColor=i===idx?cssv('--teal'):'';
+      ex.style.background=i===idx?cssv('--teal-soft'):'';
+    });
+    $('#moeOut').innerHTML='Router ne <b>'+names[idx]+' Expert</b> activate kiya — baaki 3 experts ke neurons fire hi nahi hue. Compute: sirf ~25% (yahan), intelligence: poore model ki.';
+  });
+})();
+
+/* ---------- Lab 9: speculative decoding ---------- */
+(function(){
+  var btn=$('#specStep');if(!btn)return;
+  var steps=[
+    {msg:'<b>SLM (draft):</b> jaldi se likha — "The result of this is 2.689"',toks:[['The','d'],['result','d'],['of','d'],['this','d'],['is','d'],['2.','d'],['689','d']]},
+    {msg:'<b>LLM (verify, parallel batch):</b> saare prefixes ek saath check kiye — "The result of this is 2." tak sab ✓, par <b>689 ✗</b> → correction: <b>552</b>',toks:[['The','ok'],['result','ok'],['of','ok'],['this','ok'],['is','ok'],['2.','ok'],['689','bad'],['552','fix']]},
+    {msg:'<b>SLM:</b> correction mila, aage continue kiya — full stop laga diya. <b>LLM:</b> ✓ done!',toks:[['The','ok'],['result','ok'],['of','ok'],['this','ok'],['is','ok'],['2.','ok'],['552','fix'],['.','ok']]},
+    {msg:'<b>Result:</b> 8 tokens mein se 7 chhote model ne likhe, bade ne sirf 2 verify-passes kiye (sequential 8 ke bajaye) → <b>~2-3× speedup, zero accuracy loss.</b> Reset karke dubara dekho!',toks:[['The','ok'],['result','ok'],['of','ok'],['this','ok'],['is','ok'],['2.','ok'],['552','fix'],['.','ok']]}
+  ];
+  var i=-1;
+  function show(){
+    var s=steps[Math.min(i,steps.length-1)];
+    var out=$('#specOut');out.innerHTML='';
+    s.toks.forEach(function(t){
+      var d=document.createElement('span');d.className='tok';d.textContent=t[0];
+      if(t[1]==='bad'){d.style.borderColor=cssv('--rose');d.style.background=cssv('--rose-soft');d.style.textDecoration='line-through'}
+      if(t[1]==='fix'){d.style.borderColor=cssv('--acc');d.style.background=cssv('--acc-soft')}
+      if(t[1]==='d'){d.style.opacity='.75';d.style.borderStyle='dashed'}
+      out.appendChild(d);
+    });
+    $('#specMsg').innerHTML=s.msg;
+  }
+  btn.addEventListener('click',function(){if(i<steps.length-1)i++;show()});
+  $('#specReset').addEventListener('click',function(){i=-1;$('#specOut').innerHTML='';$('#specMsg').innerHTML='SLM draft banayega, LLM verify karega…'});
+})();
+
+/* redraw canvases on theme change */
+try{
+  var mo=new MutationObserver(function(){(window.__redraws||[]).forEach(function(f){f()})});
+  mo.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){(window.__redraws||[]).forEach(function(f){f()})});
+}catch(e){}
+})();
+</script>
+
+
+
+
+
+</main>
+</div>
+
+</body>
+</html>
